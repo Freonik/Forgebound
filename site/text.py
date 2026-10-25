@@ -290,8 +290,8 @@ T = {
     'clash': ('<p>Zabij hráče, který nese legendu, <b>s legendou v ruce</b> a tvoje zbraň dostane <b>+{stars} ★</b> (nejvýš do {max} ★ – poslední hvězdy dává jen End).</p>',
               '<p>Kill a player who carries a legend <b>with a legend in your hand</b> and your weapon gets <b>+{stars} ★</b> (up to {max} ★ – the last stars only come from the End).</p>'),
     'mace-title': ('Mace', 'Maces'),
-    'mace': ('<p>Vanilla mace se craftit nedá. Knightfall se kove z Breeze Rodů a Heavy Corů.</p>',
-             '<p>Vanilla maces can\'t be crafted. Knightfall is forged from Breeze Rods and Heavy Cores.</p>'),
+    'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p>',
+             '<p>Vanilla maces can\'t be crafted on this server.</p>'),
     'teams-title': ('Týmy', 'Teams'),
     'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-Teams">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
               'naklikat všechno: založení týmu (až 3 hráči), pozvánky, tag a barva před jménem, týmový chat (<code>!zpráva</code>), spojenci '

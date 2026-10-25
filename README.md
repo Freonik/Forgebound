@@ -446,7 +446,7 @@ Kill a player who carries a legend weapon **with a legend weapon in your hand** 
 again after an hour.
 
 ### No vanilla maces
-Vanilla maces can't be crafted. Knightfall is forged from Breeze Rods and two Heavy Cores instead.
+Vanilla maces can't be crafted.
 
 Everything is under `combat:` in the config.
 
