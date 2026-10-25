@@ -95,7 +95,7 @@ T = {
              '<span>a legend (only one)</span>→<span>stars at an Ancient Forge</span>→<span>bounties, PvP, events</span></div>'),
     'f-forge': ('Rituály, jediná kopie, hvězdy', 'Rituals, one of each, stars'),
     'f-weapons': ('Schopnosti, ceny, recepty', 'Abilities, costs, recipes'),
-    'f-relics': ('Relikvie a 4 sety brnění', 'Relics and 4 armor sets'),
+    'f-relics': ('Relikvie a sety brnění', 'Relics and armor sets'),
     'f-materials': ('Kde co padá', 'Where everything drops'),
     'f-world': ('Scorched Lands, meteory, Warden', 'Scorched Lands, meteors, the Warden'),
     'f-events': ('Blood Moon, Rift, velké eventy', 'Blood Moon, Rift, big events'),

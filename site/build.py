@@ -25,7 +25,9 @@ POM = open(os.path.join(ROOT, 'pom.xml'), encoding='utf-8').read()
 VERSION = re.search(r'<artifactId>Forgebound</artifactId>\s*<version>([^<]+)</version>', POM).group(1)
 LANGS = ['cs', 'en']
 MIRRORED = {'pinning_repeater', 'the_last_act'}   # crossbow textures are stored mirrored for the hold
-DOCS_ICON = {'stitchguard'}                         # the pack texture is a shield (model UV), the README icon is the item
+DOCS_ICON = {'stitchguard'}
+HIDDEN_SETS = {'thorn', 'thick_hide'}               # not shown on the wiki (yet)
+ARMOR_ROWS = [0, 3]                                 # rows of docs/armor.png shown on the wiki (Heartsteel, Pale Seraph)                         # the pack texture is a shield (model UV), the README icon is the item
 
 COLORS = {'0': '#000', '1': '#0000aa', '2': '#00aa00', '3': '#00aaaa', '4': '#aa0000', '5': '#aa00aa', '6': '#ffaa00',
           '7': '#aaaaaa', '8': '#555', '9': '#5555ff', 'a': '#55ff55', 'b': '#55ffff', 'c': '#ff5555', 'd': '#ff55ff',
@@ -113,7 +115,14 @@ def copy_images():
     for kind, name in USED:
         src = os.path.join(TEX if kind == 'tex' else os.path.join(ROOT, 'docs/items'), name + '.png')
         shutil.copy(src, os.path.join(OUT, 'img', name + '.png'))
-    for f in ['forge-menu.png', 'armor.png', 'banner.png', 'weapons.gif', 'relics.gif']:
+    from PIL import Image
+    armor = Image.open(os.path.join(ROOT, 'docs/armor.png'))
+    row = armor.height // 4
+    out = Image.new('RGBA', (armor.width, row * len(ARMOR_ROWS)))
+    for i, r in enumerate(ARMOR_ROWS):
+        out.paste(armor.crop((0, r * row, armor.width, (r + 1) * row)), (0, i * row))
+    out.save(os.path.join(OUT, 'img', 'armor.png'))
+    for f in ['forge-menu.png', 'banner.png', 'weapons.gif']:
         p = os.path.join(ROOT, 'docs', f)
         if os.path.exists(p):
             shutil.copy(p, os.path.join(OUT, 'img', f))
@@ -130,12 +139,19 @@ def weapons(mythic=False):
             if bool(v.get('mythic')) == mythic and (mythic or craftable('weapons', k))]
 
 
+def hidden(sec, ident):
+    return sec == 'relics' and CFG['relics'].get(ident, {}).get('relic', {}).get('set') in HIDDEN_SETS
+
+
 def relics():
-    return [(k, v) for k, v in CFG['relics'].items() if craftable('relics', k)]
+    return [(k, v) for k, v in CFG['relics'].items() if craftable('relics', k) and not hidden('relics', k)]
 
 
 def materials():
-    return [(k, v) for k, v in CFG['materials'].items() if craftable('materials', k)]
+    uses = used_for()
+    return [(k, v) for k, v in CFG['materials'].items() if craftable('materials', k) and (k in uses or not any(
+        str(e['item']) == 'material:' + k for sec in ['weapons', 'relics'] for e in
+        [x for v2 in CFG[sec].values() for x in (v2.get('forge') or [])]))]
 
 
 def item_name(ref):
@@ -167,6 +183,8 @@ def used_for():
     m = {}
     for sec in ['weapons', 'relics']:
         for k, v in CFG[sec].items():
+            if hidden(sec, k) or not craftable(sec, k):
+                continue
             for e in v.get('forge', []) or []:
                 ref = str(e['item'])
                 if ref.startswith('material:'):
