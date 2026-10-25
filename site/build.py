@@ -26,7 +26,7 @@ VERSION = re.search(r'<artifactId>Forgebound</artifactId>\s*<version>([^<]+)</ve
 LANGS = ['cs', 'en']
 MIRRORED = {'pinning_repeater', 'the_last_act'}   # crossbow textures are stored mirrored for the hold
 DOCS_ICON = {'stitchguard'}
-HIDDEN_SETS = {'thorn', 'thick_hide'}               # not shown on the wiki (yet)
+HIDDEN_SETS = set()                                 # sets not shown on the wiki
 ARMOR_ROWS = [0, 3]                                 # rows of docs/armor.png shown on the wiki (Heartsteel, Pale Seraph)                         # the pack texture is a shield (model UV), the README icon is the item
 
 COLORS = {'0': '#000', '1': '#0000aa', '2': '#00aa00', '3': '#00aaaa', '4': '#aa0000', '5': '#aa00aa', '6': '#ffaa00',
@@ -115,13 +115,6 @@ def copy_images():
     for kind, name in USED:
         src = os.path.join(TEX if kind == 'tex' else os.path.join(ROOT, 'docs/items'), name + '.png')
         shutil.copy(src, os.path.join(OUT, 'img', name + '.png'))
-    from PIL import Image
-    armor = Image.open(os.path.join(ROOT, 'docs/armor.png'))
-    row = armor.height // 4
-    out = Image.new('RGBA', (armor.width, row * len(ARMOR_ROWS)))
-    for i, r in enumerate(ARMOR_ROWS):
-        out.paste(armor.crop((0, r * row, armor.width, (r + 1) * row)), (0, i * row))
-    out.save(os.path.join(OUT, 'img', 'armor.png'))
     for f in ['forge-menu.png', 'banner.png', 'weapons.gif']:
         p = os.path.join(ROOT, 'docs', f)
         if os.path.exists(p):
@@ -386,7 +379,7 @@ def page_relics(lang):
     for sid, pieces in sets.items():
         name, desc = SETS.get(sid, {'cs': (sid, ''), 'en': (sid, '')})[lang]
         out += section(name, p(desc) + f'<div class="grid">{"".join(relic_card(k, v, lang) for k, v in pieces)}</div>', sid)
-    out += section(t("sets-how-title", lang), t("sets-how", lang) + '<img class="shot" src="../img/armor.png" alt="">')
+    out += section(t("sets-how-title", lang), t("sets-how", lang))
     return out
 
 
