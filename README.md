@@ -8,6 +8,8 @@
   hunt bosses for legendary materials, then forge it in a 15-minute ritual the whole server can see.
 </p>
 
+<p align="center"><b>📖 <a href="https://freonik.github.io/Forgebound/">Wiki – every weapon, relic, material and event (CZ / EN)</a></b></p>
+
 <p align="center">
   <img alt="Paper" src="https://img.shields.io/badge/Paper-1.21.11-blue">
   <img alt="Java" src="https://img.shields.io/badge/Java-21-orange">
