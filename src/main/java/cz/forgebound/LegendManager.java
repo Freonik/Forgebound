@@ -225,7 +225,7 @@ public final class LegendManager implements Listener {
         List<String> forging = new ArrayList<>();
         List<String> free = new ArrayList<>();
         long now = System.currentTimeMillis();
-        for (ItemManager.Entry entry : allLegends()) {
+        for (ItemManager.Entry entry : loggedLegends(carriedBy.keySet())) {
             ForgeData.Claim claim = plugin.rituals().claim(entry);
             if (claim != null && claim.state() == ForgeData.State.RITUAL) {
                 forging.add(entry.ref() + " (" + claim.name() + ")");
@@ -419,6 +419,20 @@ public final class LegendManager implements Listener {
         public Inventory getInventory() {
             return inventory;
         }
+    }
+
+    /** For the console's holder list: the legends of the game + any that someone has (e.g. given by an admin). */
+    private List<ItemManager.Entry> loggedLegends(java.util.Set<String> carried) {
+        List<ItemManager.Entry> list = new ArrayList<>(allLegends());
+        for (ItemManager.Kind kind : new ItemManager.Kind[] {ItemManager.Kind.WEAPON, ItemManager.Kind.RELIC}) {
+            for (ItemManager.Entry entry : items.all(kind)) {
+                if (!list.contains(entry) && (carried.contains(entry.ref())
+                        || legends.isSet("holder." + key(entry.ref()) + ".name"))) {
+                    list.add(entry);
+                }
+            }
+        }
+        return list;
     }
 
     /** Legends that are part of the game right now (forgeable, or already out there). */

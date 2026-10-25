@@ -199,7 +199,7 @@ public final class BigEventManager implements Listener {
     // ================================================================ planning
 
     private static final Pattern RELATIVE = Pattern.compile("\\+(\\d+)\\s*([mhd])");
-    private static final Pattern CLOCK = Pattern.compile("(?:(\\d{1,2})\\.(\\d{1,2})\\.?(\\d{4})?\\s+)?(\\d{1,2}):(\\d{2})");
+    private static final Pattern CLOCK = Pattern.compile("(?:(\\d{1,2})\\.(\\d{1,2})\\.?(\\d{4})?\\s+)?(\\d{1,2}):(\\d{2})(?::\\d{2})?");
 
     /** "+30m", "+2h", "20:00" (next time it's 20:00), "25.10 20:00", "25.10.2026 20:00". Returns ms or -1. */
     long parseTime(String text) {
@@ -702,7 +702,7 @@ public final class BigEventManager implements Listener {
             }
             int min = Math.max(2, plugin.getConfig().getInt("big-events.min-players", 2));
             if (alive.size() < min) {
-                return "not enough players in " + world.getName() + " (" + alive.size() + "/" + min + ")";
+                return "not enough players in survival in " + world.getName() + " (" + alive.size() + "/" + min + ")";
             }
             everyone.addAll(alive);
             WorldBorder b = world.getWorldBorder();
@@ -817,7 +817,7 @@ public final class BigEventManager implements Listener {
             int playing = (int) Bukkit.getOnlinePlayers().stream().filter(BigEventManager::playing).count();
             int min = Math.max(2, plugin.getConfig().getInt("big-events.min-players", 2));
             if (playing < min) {
-                return "not enough players (" + playing + "/" + min + ")";
+                return "not enough players in survival (" + playing + "/" + min + ")";
             }
             for (World w : Bukkit.getWorlds()) {
                 Boolean before = w.getGameRuleValue(GameRules.LOCATOR_BAR);
@@ -1148,7 +1148,9 @@ public final class BigEventManager implements Listener {
                 return;
             }
             double dealt = Math.min(virtualHp, event.getFinalDamage());
-            damage.merge(p.getUniqueId(), dealt, Double::sum);
+            if (playing(p)) {
+                damage.merge(p.getUniqueId(), dealt, Double::sum);      // creative / spectator hits don't win prizes
+            }
             virtualHp -= dealt;
             event.setDamage(0.0001);
             if (virtualHp > 0) {
