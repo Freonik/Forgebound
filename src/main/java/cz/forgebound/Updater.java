@@ -116,6 +116,20 @@ public final class Updater implements Listener {
     private void check() {
         try {
             String repo = cfg("repo", "Freonik/Forgebound");
+            // 1) which release is the newest? The release page redirect has no rate limit, the API (60/h per IP) has.
+            String pageTag = latestTagFromPage(repo);
+            if (pageTag != null) {
+                lastError = null;
+                String latest = version(pageTag);
+                if (latest != null && compare(latest, plugin.getPluginMeta().getVersion()) < 0) {
+                    return;
+                }
+                if (latest != null && compare(latest, plugin.getPluginMeta().getVersion()) == 0
+                        && !on("resource-pack", true)) {
+                    return;
+                }
+            }
+            // 2) the details (assets, the pack's SHA1) from the API
             HttpResponse<String> res = http.send(get("https://api.github.com/repos/" + repo + "/releases/latest"),
                     HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
@@ -162,17 +176,26 @@ public final class Updater implements Listener {
      * Without the API: github.com/<repo>/releases/latest redirects to the newest release's tag, and the jar has a fixed
      * download link. The resource pack line in server.properties is left alone here (its SHA1 is only in the API).
      */
-    private boolean fallback(String repo, String why) {
+    /** The newest release's tag from github.com/<repo>/releases/latest (a redirect), or null. */
+    private String latestTagFromPage(String repo) {
         try {
             HttpResponse<Void> res = noRedirect.send(HttpRequest.newBuilder(
                             URI.create("https://github.com/" + repo + "/releases/latest")).timeout(Duration.ofSeconds(20))
                     .header("User-Agent", "Forgebound").GET().build(), HttpResponse.BodyHandlers.discarding());
             String location = res.headers().firstValue("location").orElse("");
             int at = location.indexOf("/releases/tag/");
-            if (at < 0) {
+            return at < 0 ? null : location.substring(at + "/releases/tag/".length());
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private boolean fallback(String repo, String why) {
+        try {
+            String tag = latestTagFromPage(repo);
+            if (tag == null) {
                 return false;
             }
-            String tag = location.substring(at + "/releases/tag/".length());
             String latest = version(tag);
             if (latest == null) {
                 return false;

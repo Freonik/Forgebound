@@ -1815,7 +1815,8 @@ auto-update:
   # false = only tell the admins that a new version is out
   download: true
   resource-pack: true
-  check-hours: 6
+  # how often to look for a new version (it asks the GitHub release page, which has no limit)
+  check-hours: 1
   repo: "Freonik/Forgebound"
 
 # ------------------------------------------------------------

@@ -486,7 +486,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
         }
         // changed defaults: a value that was never touched (still the old default) moves to the new one, once
-        String[][] changedDefaults = {{"doppelganger.attack-reach", "2.5", "2.0"}};
+        String[][] changedDefaults = {{"doppelganger.attack-reach", "2.5", "2.0"}, {"auto-update.check-hours", "6", "1"}};
         for (String[] c : changedDefaults) {
             String mark = "changed:" + c[0] + "=" + c[2];
             if (seen.contains(mark)) {
