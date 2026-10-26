@@ -34,6 +34,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     private HudManager hud;
     private EnchantManager enchants;
     private Updater updater;
+    private AutoRestart autoRestart;
     private ScorchedLands scorched;
     private StarManager stars;
     private PvpManager pvp;
@@ -218,6 +219,8 @@ public final class Forgebound extends JavaPlugin implements Listener {
         updater = new Updater(this);
         getServer().getPluginManager().registerEvents(updater, this);
         updater.start();
+        autoRestart = new AutoRestart(this);
+        autoRestart.start();
 
         RecipesCommand command = new RecipesCommand(this, items, rituals, data);
         new ForgeCommands(this, command).register();
@@ -230,6 +233,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
     public void onDisable() {
         if (updater != null) {
             updater.stop();
+        }
+        if (autoRestart != null) {
+            autoRestart.stop();
         }
         if (abilities != null) {
             abilities.shutdown();
@@ -347,6 +353,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
 
     public Updater updater() {
         return updater;
+    }
+
+    public AutoRestart autoRestart() {
+        return autoRestart;
     }
 
     /** This plugin's jar in plugins/ (for the updater). */

@@ -1829,6 +1829,18 @@ auto-update:
   # how often to look for a new version (it asks the GitHub release page, which has no limit)
   check-hours: 1
   repo: "Freonik/Forgebound"
+  # nightly update restart: at this time Forgebound, Forgebound Guard and Forgebound Teams all check for a new version
+  # at once; if any downloaded one, players get a countdown and the server restarts once for all of them.
+  # Your host (or a start script) has to start the server again after it stops.
+  # /forge update restart = check now and restart (even without a new version), /forge update cancel = stop the countdown
+  restart:
+    enabled: true
+    time: "04:00"
+    timezone: "Europe/Prague"
+    # minutes of warning for the players (bossbar + chat)
+    warn-minutes: 10
+    # restart = spigot.yml restart-script (falls back to a stop), stop = just stop (the host starts it again)
+    method: restart
 
 # ------------------------------------------------------------
 #  TEAMS

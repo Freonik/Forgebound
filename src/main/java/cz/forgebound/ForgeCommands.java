@@ -233,7 +233,7 @@ final class ForgeCommands {
                                 }))));
         var update = Commands.literal("update").requires(ForgeCommands::admin)
                 .executes(ctx -> update(ctx, "now"));
-        for (String sub : List.of("on", "off", "now")) {
+        for (String sub : List.of("on", "off", "now", "restart", "cancel")) {
             update.then(Commands.literal(sub).executes(ctx -> update(ctx, sub)));
         }
         root.then(update);
@@ -244,6 +244,10 @@ final class ForgeCommands {
     }
 
     private int update(CommandContext<CommandSourceStack> ctx, String what) {
+        if (what.equals("restart") || what.equals("cancel")) {
+            plugin.autoRestart().command(ctx.getSource().getSender(), what);
+            return Command.SINGLE_SUCCESS;
+        }
         plugin.updater().command(ctx.getSource().getSender(), what);
         return Command.SINGLE_SUCCESS;
     }

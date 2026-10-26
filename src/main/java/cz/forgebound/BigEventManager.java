@@ -86,6 +86,11 @@ public final class BigEventManager implements Listener {
     private BossBar countdown;
     private Running running;
 
+    /** A big event is running right now (the nightly restart waits for it). */
+    public boolean busy() {
+        return running != null;
+    }
+
     record Planned(String id, String type, long at, String world, double x, double z, String by) { }
 
     public BigEventManager(Forgebound plugin) {

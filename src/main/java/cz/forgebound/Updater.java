@@ -112,6 +112,14 @@ public final class Updater implements Listener {
         }
     }
 
+    /** For the nightly restart: checks right now (blocking, off the main thread); the version waiting in plugins/update or null. */
+    public String checkNow() {
+        if (on("enabled", true)) {
+            check();
+        }
+        return downloaded;
+    }
+
     /** Off the main thread. */
     private void check() {
         try {
