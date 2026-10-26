@@ -40,6 +40,11 @@ run('tank.py', f'{CC}/textures/item', f'{CC}/textures/entity/equipment')
 # Clawline Pick, Silk Needle, Soul Vessel Mask (+ worn), Stitchguard and their materials
 run('hk.py', f'{CC}/textures/item', f'{CC}/textures/entity/equipment')
 run('sets2.py', f'{CC}/textures/item', f'{CC}/textures/entity/equipment')
+# worn Thick Hide / Thorn Plate: netherite's shading, recoloured (replaces the flat layers from tank/sets/sets2)
+run('hide_worn.py', f'{CC}/textures/entity/equipment')
+run('thorn_worn.py', f'{CC}/textures/entity/equipment')
+run('seraph_worn.py', f'{CC}/textures/entity/equipment')
+run('heart_worn.py', f'{CC}/textures/entity/equipment')
 # Knightfall, Rimebreaker, Pinning Repeater, Valkyrie's Lance, Trident of the Great Sea + materials
 run('arsenal.py', f'{CC}/textures/item')
 # The Last Act (rifle on the crossbow) + Gilded Mask Shard
