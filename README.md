@@ -98,9 +98,9 @@
 > link and SHA1 into `server.properties`, so you never have to copy the SHA1 by hand (only if your pack line already
 > points to this repository). Turn it off with **`/forge update off`** (`/forge update now` checks right away).
 >
-> **Nightly restart:** at 4:00 (`auto-update.restart`) Forgebound, Forgebound Guard and Forgebound Teams check for
+> **Nightly restart** (off by default, `auto-update.restart.enabled`)**:** at 4:00 Forgebound, Forgebound Guard and Forgebound Teams check for
 > a new version together. If any of them has one, players get a 10-minute countdown and the server restarts once for
-> all of them (it waits for a running big event). Your host or start script must start the server again after it stops.
+> all of them (it waits for a running big event). Turn it on only if your host starts the server again after it stops.
 > `/forge update restart` checks and restarts now, `/forge update cancel` stops the countdown.
 >
 > **Updating by hand:** just replace the jar. New weapons, relics, materials and messages are added to your existing `config.yml`

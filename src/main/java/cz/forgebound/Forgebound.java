@@ -508,6 +508,15 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
             seenChanged |= seen.add(mark);
         }
+        // the nightly restart only works where the host starts the server again after it stops: off until an admin turns it on
+        String restartMark = "changed:auto-update.restart.enabled=false";
+        if (!seen.contains(restartMark)) {
+            if (getConfig().getBoolean("auto-update.restart.enabled", false)) {
+                getConfig().set("auto-update.restart.enabled", false);
+                added.add("auto-update.restart.enabled (true -> false)");
+            }
+            seenChanged |= seen.add(restartMark);
+        }
         // vanilla maces can't be crafted any more: Knightfall's forge recipe swaps the mace for breeze rods
         String maceMark = "changed:weapons.knightfall.forge=no-mace";
         if (!seen.contains(maceMark)) {

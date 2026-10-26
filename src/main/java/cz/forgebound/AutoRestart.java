@@ -44,7 +44,7 @@ public final class AutoRestart {
     }
 
     private boolean enabled() {
-        return plugin.getConfig().getBoolean("auto-update.restart.enabled", true);
+        return plugin.getConfig().getBoolean("auto-update.restart.enabled", false);
     }
 
     private ZoneId zone() {
