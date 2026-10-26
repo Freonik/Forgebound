@@ -53,6 +53,13 @@ public final class SeasonManager implements org.bukkit.event.Listener {
     private BukkitRunnable running;
     private final List<BlockDisplay> beam = new ArrayList<>();
     private final List<Display> halo = new ArrayList<>();
+    /** The glowing rune circle on the ground. */
+    private final List<BlockDisplay> sigil = new ArrayList<>();
+    /** Lines of the rune circle still to be drawn (from, to, width). */
+    private final List<float[]> sigilQueue = new ArrayList<>();
+    /** The spiked crown above the center: spikes first, then the band. */
+    private final List<BlockDisplay> crown = new ArrayList<>();
+    private int crownSpikes;
     private static final Particle.DustOptions EMBER = new Particle.DustOptions(Color.fromRGB(255, 140, 40), 1.2f);
     private static final Particle.DustTransition COOLING =
             new Particle.DustTransition(Color.fromRGB(255, 170, 60), Color.fromRGB(70, 60, 55), 1.0f);
@@ -100,6 +107,8 @@ public final class SeasonManager implements org.bukkit.event.Listener {
         removeBeam();
         removeHalo();
         removeHologram();
+        removeSigil();
+        removeCrown();
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.removePotionEffect(PotionEffectType.SLOWNESS);
             p.removePotionEffect(PotionEffectType.JUMP_BOOST);
@@ -185,7 +194,15 @@ public final class SeasonManager implements org.bukkit.event.Listener {
                                 : "&6&lThe FORGEBOUND SMP Begins").replace("\\n", "\n")
                                 .replace("{legends}", String.valueOf(legends().size()))));
                     }
-                    spawnHalo(center);
+                    if (forge() || !on("crown")) {
+                        spawnHalo(center);                  // soul: the crown takes the ring's place
+                    }
+                    if (on("sigil")) {
+                        planSigil(center);
+                    }
+                    if (on("crown")) {
+                        spawnCrown(center);
+                    }
                     for (int i = 0; i < 4; i++) {
                         double a = i * Math.PI / 2;
                         world.strikeLightningEffect(center.clone().add(Math.cos(a) * 6, 0, Math.sin(a) * 6));
@@ -210,6 +227,32 @@ public final class SeasonManager implements org.bukkit.event.Listener {
                         firework(c.clone().add(Math.cos(a) * 8, 0, Math.sin(a) * 8),
                                 ThreadLocalRandom.current().nextBoolean() ? Color.WHITE : Color.YELLOW, Color.ORANGE);
                     }
+                }
+                // the rune circle draws itself, line after line
+                if (!sigilQueue.isEmpty()) {
+                    drawSigil(center, 6);
+                }
+                if (t > welcomeAt && t < teleportAt && t % 5 == 0) {
+                    sigilSparks(center);
+                }
+                if (t > welcomeAt && t < teleportAt && t % 2 == 0) {
+                    double close = t < beamAt ? 0 : Math.min(1, (double) (t - beamAt) / (teleportAt - beamAt));
+                    moveCrown(center, t, close);
+                }
+                // the world goes dark for a moment, then the beam lights it up
+                if (t == beamAt - 30 && on("darkness")) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 75, 0, false, false));
+                        p.playSound(p.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.2f, 0.5f);
+                        p.playSound(p.getLocation(), forge() ? Sound.BLOCK_FIRE_EXTINGUISH : Sound.ENTITY_WARDEN_HEARTBEAT, 1f, 0.6f);
+                    }
+                }
+                if (t == beamAt) {
+                    recolorSigil(forge() ? Material.YELLOW_CONCRETE : Material.WHITE_CONCRETE);
+                }
+                // ash (and embers) drifting down while the beam shines
+                if (t >= beamAt && t < teleportAt && t % 2 == 0 && on("ash")) {
+                    ash(center);
                 }
                 // the beam
                 if (t == beamAt) {
@@ -253,6 +296,7 @@ public final class SeasonManager implements org.bukkit.event.Listener {
                     }
                     center.getWorld().spawnParticle(Particle.FLASH, center.clone().add(0, 4, 0), 3, 1, 2, 1, 0, Color.WHITE, true);
                     burstHalo();
+                    recolorSigil(Material.WHITE_CONCRETE);
                 }
                 if (t == teleportAt) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -265,6 +309,8 @@ public final class SeasonManager implements org.bukkit.event.Listener {
                     removeBeam();
                     removeHalo();
                     removeHologram();
+                    removeSigil();
+                    removeCrown();
                 }
                 if (t >= endAt) {
                     cancel();
@@ -481,6 +527,214 @@ public final class SeasonManager implements org.bukkit.event.Listener {
             }
         }
         halo.clear();
+    }
+
+    private boolean on(String key) {
+        return plugin.getConfig().getBoolean("season." + key, true);
+    }
+
+    // ================================================================ the rune circle (thin glowing block displays)
+
+    /** A flat glowing bar on the ground from (x1, z1) to (x2, z2), relative to the center. */
+    private BlockDisplay bar(Location origin, Material block, float x1, float z1, float x2, float z2, float width, float y) {
+        float dx = x2 - x1;
+        float dz = z2 - z1;
+        float len = (float) Math.sqrt(dx * dx + dz * dz);
+        Quaternionf rot = new Quaternionf().rotationY((float) Math.atan2(-dz, dx));
+        Vector3f scale = new Vector3f(len, 0.02f, width);
+        Vector3f mid = new Vector3f((x1 + x2) / 2, y, (z1 + z2) / 2);
+        Vector3f half = rot.transform(new Vector3f(0.5f, 0.5f, 0.5f).mul(scale));
+        Vector3f translation = mid.sub(half);
+        return origin.getWorld().spawn(origin, BlockDisplay.class, d -> {
+            d.setBlock(block.createBlockData());
+            d.setPersistent(false);
+            d.setBrightness(new Display.Brightness(15, 15));
+            d.setViewRange(8f);
+            d.setDisplayWidth(40);
+            d.setDisplayHeight(4);
+            d.setTransformation(new Transformation(translation, rot, scale, new Quaternionf()));
+        });
+    }
+
+    /** Rings, a star and spokes: queued now, drawn a few lines per tick. */
+    private void planSigil(Location center) {
+        removeSigil();
+        float r = (float) num("sigil-radius", 9);
+        ringLines(r, 0.16f);
+        ringLines(r - 0.45f, 0.08f);
+        float inner = r * 0.62f;
+        ringLines(inner, 0.12f);
+        // an eight-pointed star in the inner ring
+        for (int i = 0; i < 8; i++) {
+            double a = i * Math.PI / 4;
+            double b = (i + 3) * Math.PI / 4;
+            sigilQueue.add(new float[] {(float) (Math.cos(a) * inner), (float) (Math.sin(a) * inner),
+                    (float) (Math.cos(b) * inner), (float) (Math.sin(b) * inner), 0.1f});
+        }
+        ringLines(r * 0.22f, 0.1f);
+        // spokes: four long ones reaching out past the circle, four short ones
+        for (int i = 0; i < 8; i++) {
+            double a = i * Math.PI / 4 + Math.PI / 8;
+            float from = r * 0.22f;
+            float to = i % 2 == 0 ? r + 4.5f : r;
+            sigilQueue.add(new float[] {(float) (Math.cos(a) * from), (float) (Math.sin(a) * from),
+                    (float) (Math.cos(a) * to), (float) (Math.sin(a) * to), 0.1f});
+        }
+        center.getWorld().playSound(center, forge() ? Sound.ITEM_FIRECHARGE_USE : Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, 1.5f, 0.6f);
+    }
+
+    private void ringLines(float radius, float width) {
+        int n = Math.max(16, Math.round((float) (2 * Math.PI * radius / 1.1)));
+        for (int i = 0; i < n; i++) {
+            double a = i * 2 * Math.PI / n;
+            double b = (i + 1.04) * 2 * Math.PI / n;
+            sigilQueue.add(new float[] {(float) (Math.cos(a) * radius), (float) (Math.sin(a) * radius),
+                    (float) (Math.cos(b) * radius), (float) (Math.sin(b) * radius), width});
+        }
+    }
+
+    private void drawSigil(Location center, int perTick) {
+        Location origin = center.clone();
+        origin.setYaw(0);
+        origin.setPitch(0);
+        float y = (float) (Math.floor(center.getY()) - center.getY()) + 0.03f;
+        Material block = forge() ? Material.ORANGE_CONCRETE : Material.LIGHT_BLUE_CONCRETE;
+        for (int i = 0; i < perTick && !sigilQueue.isEmpty(); i++) {
+            float[] l = sigilQueue.removeFirst();
+            sigil.add(bar(origin, block, l[0], l[1], l[2], l[3], l[4], y));
+            if (i == 0) {
+                Location at = center.clone().add(l[2], 0.1, l[3]);
+                center.getWorld().spawnParticle(forge() ? Particle.FLAME : Particle.SOUL_FIRE_FLAME, at, 2, 0.05, 0.05, 0.05, 0.01, null, true);
+            }
+        }
+    }
+
+    private void recolorSigil(Material block) {
+        for (BlockDisplay d : sigil) {
+            if (d.isValid()) {
+                d.setBlock(block.createBlockData());
+            }
+        }
+    }
+
+    /** Little flames rising off the lines. */
+    private void sigilSparks(Location center) {
+        if (sigil.isEmpty()) {
+            return;
+        }
+        double r = num("sigil-radius", 9);
+        World w = center.getWorld();
+        for (int i = 0; i < 6; i++) {
+            double a = ThreadLocalRandom.current().nextDouble(Math.PI * 2);
+            double rr = ThreadLocalRandom.current().nextBoolean() ? r : r * 0.62;
+            Location at = center.clone().add(Math.cos(a) * rr, 0.15, Math.sin(a) * rr);
+            w.spawnParticle(forge() ? Particle.SMALL_FLAME : Particle.SOUL_FIRE_FLAME, at, 1, 0, 0.05, 0, 0.01, null, true);
+        }
+    }
+
+    private void removeSigil() {
+        sigilQueue.clear();
+        for (BlockDisplay d : sigil) {
+            if (d.isValid()) {
+                d.remove();
+            }
+        }
+        sigil.clear();
+    }
+
+    // ================================================================ the spiked crown above the center
+
+    private void spawnCrown(Location center) {
+        removeCrown();
+        Location origin = center.clone();
+        origin.setYaw(0);
+        origin.setPitch(0);
+        int spikes = (int) num("crown-spikes", 12);
+        int band = 28;
+        Material spike = Material.POINTED_DRIPSTONE;
+        Material ring = forge() ? Material.POLISHED_BLACKSTONE : Material.CRYING_OBSIDIAN;
+        Color glow = forge() ? Color.fromRGB(255, 120, 30) : Color.fromRGB(120, 230, 255);
+        for (int i = 0; i < spikes + band; i++) {
+            boolean isSpike = i < spikes;
+            crown.add(origin.getWorld().spawn(origin, BlockDisplay.class, d -> {
+                d.setBlock((isSpike ? spike : ring).createBlockData());
+                d.setPersistent(false);
+                d.setBrightness(new Display.Brightness(13, 13));
+                d.setViewRange(8f);
+                d.setDisplayWidth(20);
+                d.setDisplayHeight(20);
+                d.setGlowing(true);
+                d.setGlowColorOverride(glow);
+                d.setTransformation(new Transformation(new Vector3f(0, 12, 0), new Quaternionf(), new Vector3f(0.01f, 0.01f, 0.01f),
+                        new Quaternionf()));
+            }));
+        }
+        crownSpikes = spikes;
+    }
+
+    /** Spins, grows in at the start, and at the end shrinks and drops into the beam. */
+    private void moveCrown(Location center, int t, double close) {
+        if (crown.isEmpty()) {
+            return;
+        }
+        double radius = num("crown-radius", 3.5) * (1 - 0.85 * Math.max(0, (close - 0.6) / 0.4));
+        double height = (forge() ? 10.5 : 8) - 4 * Math.max(0, (close - 0.75) / 0.25) + Math.sin(t * 0.06) * 0.3;
+        double spin = t * (0.03 + 0.1 * close);
+        int band = crown.size() - crownSpikes;
+        for (int i = 0; i < crown.size(); i++) {
+            BlockDisplay d = crown.get(i);
+            if (!d.isValid()) {
+                continue;
+            }
+            Vector3f pos;
+            Quaternionf rot;
+            Vector3f scale;
+            if (i < crownSpikes) {
+                double a = spin + i * 2 * Math.PI / crownSpikes;
+                pos = new Vector3f((float) (Math.cos(a) * radius), (float) height, (float) (Math.sin(a) * radius));
+                Vector3f inward = new Vector3f((float) -Math.cos(a), -0.35f, (float) -Math.sin(a)).normalize();
+                rot = new Quaternionf().rotationTo(new Vector3f(0, 1, 0), inward);
+                scale = new Vector3f(0.7f, 1.7f, 0.7f);
+            } else {
+                int k = i - crownSpikes;
+                double a = -spin * 0.5 + k * 2 * Math.PI / band;
+                double rr = radius + 0.45;
+                pos = new Vector3f((float) (Math.cos(a) * rr), (float) height + 0.35f, (float) (Math.sin(a) * rr));
+                rot = new Quaternionf().rotationY((float) (-a + Math.PI / 2));
+                scale = new Vector3f((float) (2 * Math.PI * rr / band * 1.08), 0.35f, 0.3f);
+            }
+            Vector3f half = rot.transform(new Vector3f(0.5f, 0.5f, 0.5f).mul(scale));
+            d.setInterpolationDelay(0);
+            d.setInterpolationDuration(2);
+            d.setTransformation(new Transformation(pos.sub(half), rot, scale, new Quaternionf()));
+        }
+    }
+
+    private void removeCrown() {
+        for (BlockDisplay d : crown) {
+            if (d.isValid()) {
+                Location at = d.getLocation().add(d.getTransformation().getTranslation().x(),
+                        d.getTransformation().getTranslation().y(), d.getTransformation().getTranslation().z());
+                d.getWorld().spawnParticle(Particle.BLOCK, at, 6, 0.2, 0.2, 0.2, 0, d.getBlock(), true);
+                d.remove();
+            }
+        }
+        crown.clear();
+    }
+
+    // ================================================================ ash
+
+    private void ash(Location center) {
+        World w = center.getWorld();
+        double r = Math.max(12, num("ambient-radius", 20));
+        Location sky = center.clone().add(0, 14, 0);
+        w.spawnParticle(Particle.WHITE_ASH, sky, 70, r, 4, r, 0, null, true);
+        if (forge()) {
+            w.spawnParticle(Particle.FALLING_DUST, sky, 6, r * 0.7, 3, r * 0.7, 0, Material.ORANGE_CONCRETE_POWDER.createBlockData(), true);
+            w.spawnParticle(Particle.ASH, sky, 30, r, 4, r, 0, null, true);
+        } else {
+            w.spawnParticle(Particle.FALLING_DUST, sky, 6, r * 0.7, 3, r * 0.7, 0, Material.WHITE_CONCRETE_POWDER.createBlockData(), true);
+        }
     }
 
     // ================================================================ the beam (block displays, not particles)

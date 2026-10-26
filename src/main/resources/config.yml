@@ -1480,6 +1480,17 @@ season:
   beam-glow-block: ORANGE_STAINED_GLASS
   # How long the beam shines before everyone is teleported
   beam-seconds: 5
+  # A glowing rune circle draws itself on the ground (forge: glowing like hot metal, soul: pale blue), radius in blocks
+  sigil: true
+  sigil-radius: 9
+  # A dark spiked crown turns above the center and at the end falls into the beam (soul: instead of the halo ring)
+  crown: true
+  crown-radius: 3.5
+  crown-spikes: 12
+  # Everything goes dark for a moment right before the beam lights up
+  darkness: true
+  # Ash (forge: and embers) drifts down while the beam shines
+  ash: true
   # Players can't walk away during the ceremony
   freeze-players: true
   # You float up a little when it starts
