@@ -46,6 +46,12 @@ public final class Updater implements Listener {
     /** what admins should hear about on join (e.g. "restart to update") */
     private volatile String pending;
     private volatile String downloaded;
+    /** why the last check didn't work, or null */
+    private volatile String lastError;
+    private final HttpClient noRedirect = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(15))
+            .followRedirects(HttpClient.Redirect.NEVER)
+            .build();
 
     public Updater(Forgebound plugin) {
         this.plugin = plugin;
@@ -88,6 +94,7 @@ public final class Updater implements Listener {
                     Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(ItemManager.color(
                             after != null && !after.equals(before) ? "&8[&6Update&8] " + after
                                     : downloaded != null ? "&aVersion &f" + downloaded + " &ais already downloaded, restart to use it."
+                                    : lastError != null ? "&cCouldn't check for updates: &7" + lastError
                                     : "&7You have the newest version &8(" + plugin.getPluginMeta().getVersion() + ")")));
                 });
             }
@@ -112,8 +119,15 @@ public final class Updater implements Listener {
             HttpResponse<String> res = http.send(get("https://api.github.com/repos/" + repo + "/releases/latest"),
                     HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
+                // the API is limited per IP (shared hosting IPs run out); the release page itself isn't
+                String why = res.statusCode() == 403 || res.statusCode() == 429 ? "GitHub API rate limit (HTTP " + res.statusCode() + ")"
+                        : "HTTP " + res.statusCode();
+                if (!fallback(repo, why)) {
+                    fail(why);
+                }
                 return;
             }
+            lastError = null;
             JsonObject release = JsonParser.parseString(res.body()).getAsJsonObject();
             String tag = release.get("tag_name").getAsString();
             String latest = version(tag);
@@ -132,7 +146,52 @@ public final class Updater implements Listener {
                 }
             }
         } catch (Exception ex) {
-            plugin.getLogger().fine("Update check failed: " + ex.getMessage());
+            fail(ex.getClass().getSimpleName() + (ex.getMessage() == null ? "" : ": " + ex.getMessage()));
+        }
+    }
+
+    /** Logs a failed check once (not every 6 hours the same thing). */
+    private void fail(String why) {
+        if (!why.equals(lastError)) {
+            plugin.getLogger().info("[Update] Couldn't check for a new version: " + why);
+        }
+        lastError = why;
+    }
+
+    /**
+     * Without the API: github.com/<repo>/releases/latest redirects to the newest release's tag, and the jar has a fixed
+     * download link. The resource pack line in server.properties is left alone here (its SHA1 is only in the API).
+     */
+    private boolean fallback(String repo, String why) {
+        try {
+            HttpResponse<Void> res = noRedirect.send(HttpRequest.newBuilder(
+                            URI.create("https://github.com/" + repo + "/releases/latest")).timeout(Duration.ofSeconds(20))
+                    .header("User-Agent", "Forgebound").GET().build(), HttpResponse.BodyHandlers.discarding());
+            String location = res.headers().firstValue("location").orElse("");
+            int at = location.indexOf("/releases/tag/");
+            if (at < 0) {
+                return false;
+            }
+            String tag = location.substring(at + "/releases/tag/".length());
+            String latest = version(tag);
+            if (latest == null) {
+                return false;
+            }
+            lastError = null;
+            if (compare(latest, plugin.getPluginMeta().getVersion()) > 0) {
+                JsonObject release = new JsonObject();
+                com.google.gson.JsonArray assets = new com.google.gson.JsonArray();
+                JsonObject jar = new JsonObject();
+                jar.addProperty("name", "Forgebound.jar");
+                jar.addProperty("browser_download_url", "https://github.com/" + repo + "/releases/download/" + tag + "/Forgebound.jar");
+                assets.add(jar);
+                release.add("assets", assets);
+                plugin.getLogger().info("[Update] " + why + " - checked the release page instead");
+                update(repo, tag, latest, release);
+            }
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
     }
 
