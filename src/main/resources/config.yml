@@ -1831,11 +1831,14 @@ auto-update:
   repo: "Freonik/Forgebound"
   # nightly update restart: at this time Forgebound, Forgebound Guard and Forgebound Teams all check for a new version
   # at once; if any downloaded one, players get a countdown and the server restarts once for all of them.
-  # ONLY turn this on if your host starts the server again after it stops (try /restart in game: if the server comes
-  # back by itself, it works). Otherwise the server would stay off until someone starts it.
+  # ONLY turn this on if something starts the server again after it stops: e.g. a daily "start" in your host's
+  # planner a few minutes after the restart (set host-start to that time), or a host that restarts it by itself.
+  # Otherwise the server would stay off until someone starts it.
   # /forge update restart = check now and restart (even without a new version), /forge update cancel = stop the countdown
   restart:
     enabled: false
+    # when your host's planner starts the server; the restart has to be done before it (else it waits for tomorrow)
+    host-start: "04:15"
     time: "04:00"
     timezone: "Europe/Prague"
     # minutes of warning for the players (bossbar + chat)

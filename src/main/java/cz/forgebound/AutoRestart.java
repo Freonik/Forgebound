@@ -73,7 +73,7 @@ public final class AutoRestart {
             }
             ZonedDateTime now = ZonedDateTime.now(zone());
             LocalTime at = time();
-            boolean due = !now.toLocalTime().isBefore(at) && now.toLocalTime().isBefore(at.plusMinutes(30));
+            boolean due = !now.toLocalTime().isBefore(at) && now.toLocalTime().isBefore(at.plusMinutes(5));
             if (due && !now.toLocalDate().equals(lastRun)) {
                 lastRun = now.toLocalDate();
                 run(null, false);
@@ -133,7 +133,7 @@ public final class AutoRestart {
                 }
                 String what = found.isEmpty() ? "a test restart" : String.join(", ", found);
                 plugin.getLogger().info("[Update] Restarting for: " + what);
-                begin(what);
+                begin(what, !force);
             });
         });
     }
@@ -164,7 +164,26 @@ public final class AutoRestart {
 
     // ---------------------------------------------------------------- the countdown
 
-    private void begin(String what) {
+    /** The host's planned start (auto-update.restart.host-start): the server has to be off before it, or it stays off. */
+    private LocalTime hostStart() {
+        try {
+            String t = cfg("host-start", "04:15");
+            return t.isBlank() ? null : LocalTime.parse(t);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private boolean tooLate() {
+        LocalTime start = hostStart();
+        if (start == null) {
+            return false;
+        }
+        LocalTime now = ZonedDateTime.now(zone()).toLocalTime();
+        return !now.isBefore(start.minusMinutes(2)) && now.isBefore(start.plusHours(1));
+    }
+
+    private void begin(String what, boolean nightly) {
         int minutes = Math.max(1, plugin.getConfig().getInt("auto-update.restart.warn-minutes", 10));
         long total = minutes * 60L;
         long[] left = {total};
@@ -177,6 +196,13 @@ public final class AutoRestart {
             p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1f, 1f);
         }
         countdown = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            // stopping after the host's planned start would leave the server off until the next day: try tomorrow
+            if (nightly && tooLate()) {
+                cancelCountdown();
+                Bukkit.broadcast(ItemManager.color("&8[&6Update&8] &7The restart is moved to tomorrow night."));
+                plugin.getLogger().info("[Update] Too close to the host's planned start (auto-update.restart.host-start) - restart moved to tomorrow.");
+                return;
+            }
             // a big event shouldn't be cut off: hold at one minute until it ends (at most an hour)
             if (left[0] == 60 && waited[0] < 3600 && plugin.bigEvents() != null && plugin.bigEvents().busy()) {
                 waited[0]++;
