@@ -100,6 +100,17 @@ T = {
     'f-forge': ('Rituály, jediná kopie, hvězdy', 'Rituals, one of each, stars'),
     'f-weapons': ('Schopnosti, ceny, recepty', 'Abilities, costs, recipes'),
     'f-relics': ('Relikvie a sety brnění', 'Relics and armor sets'),
+    'f-weapons-teaser': ('Ukázka legendárních zbraní', 'A first look at the legendary weapons'),
+    'f-relics-teaser': ('Ukázka relikvií a setů', 'A first look at the relics and armor sets'),
+    'start-title-teaser': ('Co tě čeká', 'What awaits you'),
+    'start-teaser': ('<ul><li>Legendární zbraně a sety, které na serveru existují <b>jen jednou</b>. Kdo ji ukove první, má ji – dokud mu ji někdo nevezme.</li>'
+                     '<li>Rituály, které uvidí celý server, hvězdy, bounty a souboje legend.</li>'
+                     '<li>Blood Moon, Rift, velké eventy s mytickými zbraněmi, questy a týmy.</li>'
+                     '<li>Jak se co ukove a co přesně umí, se dozvíš <b>se startem Season 1</b>.</li></ul>',
+                     '<ul><li>Legendary weapons and armor sets that exist <b>only once</b> on the server. Whoever forges one first owns it – until someone takes it.</li>'
+                     '<li>Rituals the whole server can see, stars, bounties and clashes of legends.</li>'
+                     '<li>Blood Moon, Rifts, big events with mythic weapons, quests and teams.</li>'
+                     '<li>How to forge them and what exactly they do is revealed <b>when Season 1 starts</b>.</li></ul>'),
     'f-materials': ('Kde co padá', 'Where everything drops'),
     'f-world': ('Scorched Lands, meteory, Warden', 'Scorched Lands, meteors, the Warden'),
     'f-events': ('Blood Moon, Rift, velké eventy', 'Blood Moon, Rift, big events'),

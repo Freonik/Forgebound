@@ -38,7 +38,7 @@ COLORS = {'0': '#000', '1': '#0000aa', '2': '#00aa00', '3': '#00aaaa', '4': '#aa
 
 
 def t(key, lang):
-    v = T[key]
+    v = T[key + '-teaser'] if TEASER and key + '-teaser' in T else T[key]
     return v[0] if lang == 'cs' else v[1]
 
 
@@ -371,7 +371,7 @@ def page_index(lang):
 </div>
 {section(t("start-title", lang), unlink(t("start", lang)))}
 <div class="features">{cards}</div>
-{section(t("loop-title", lang), unlink(t("loop", lang)))}'''
+{'' if TEASER else section(t("loop-title", lang), t("loop", lang))}'''
 
 
 def page_forge(lang):
