@@ -308,10 +308,10 @@ T = {
     'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p>',
              '<p>Vanilla maces can\'t be crafted on this server.</p>'),
     'teams-title': ('Týmy', 'Teams'),
-    'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-Teams">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
+    'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
               'naklikat všechno: založení týmu (až 3 hráči), pozvánky, tag a barva před jménem, týmový chat (<code>!zpráva</code>), spojenci '
               '(<code>@zpráva</code>), války a žebříček týmů. Spoluhráči a spojenci si neublíží – ani schopnostmi legend.</p>',
-              '<p>Teams come from the <a href="https://github.com/Freonik/Forgebound-Teams">Forgebound Teams</a> plugin. <code>/team</code> opens a menu where '
+              '<p>Teams come from the <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a> plugin. <code>/team</code> opens a menu where '
               'everything can be clicked: create a team (up to 3 players), invites, a tag and color in front of the names, team chat (<code>!message</code>), allies '
               '(<code>@message</code>), wars and the team leaderboard. Teammates and allies can\'t hurt each other – not even with legend abilities.</p>'),
 

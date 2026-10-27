@@ -1828,7 +1828,8 @@ auto-update:
   resource-pack: true
   # how often to look for a new version (it asks the GitHub release page, which has no limit)
   check-hours: 1
-  repo: "Freonik/Forgebound"
+  # where the releases are published
+  repo: "Freonik/Forgebound-releases"
   # nightly update restart: at this time Forgebound, Forgebound Guard and Forgebound Teams all check for a new version
   # at once; if any downloaded one, players get a countdown and the server restarts once for all of them.
   # ONLY turn this on if something starts the server again after it stops: e.g. a daily "start" in your host's

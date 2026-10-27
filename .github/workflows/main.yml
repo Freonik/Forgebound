@@ -114,7 +114,7 @@ jobs:
 
           For \`server.properties\` (this link always points to the newest release):
           \`\`\`
-          resource-pack=https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/Forgebound-pack.zip
+          resource-pack=https://github.com/Freonik/Forgebound-releases/releases/latest/download/Forgebound-pack.zip
           resource-pack-sha1=${PACK_SHA1}
           \`\`\`
           Only the SHA1 changes when the textures change.
@@ -138,3 +138,8 @@ jobs:
             --notes-file notes.md \
             --latest \
             $EXTRA
+
+      - name: Publish to Forgebound-releases
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+        run: bash .github/publish-releases.sh Forgebound forgebound "Forgebound ${VERSION} (build ${GITHUB_RUN_NUMBER})" true target/Forgebound.jar target/Forgebound-pack.zip

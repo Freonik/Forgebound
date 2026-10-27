@@ -1,6 +1,5 @@
 package cz.forgebound;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
@@ -35,7 +34,7 @@ import java.util.regex.Pattern;
  */
 public final class Updater implements Listener {
 
-    private static final Pattern SHA1 = Pattern.compile("resource-pack-sha1=([0-9a-fA-F]{40})");
+    private static final Pattern SHA1_HEX = Pattern.compile("[0-9a-fA-F]{40}");
 
     private final Forgebound plugin;
     private final HttpClient http = HttpClient.newBuilder()
@@ -48,10 +47,6 @@ public final class Updater implements Listener {
     private volatile String downloaded;
     /** why the last check didn't work, or null */
     private volatile String lastError;
-    private final HttpClient noRedirect = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(15))
-            .followRedirects(HttpClient.Redirect.NEVER)
-            .build();
 
     public Updater(Forgebound plugin) {
         this.plugin = plugin;
@@ -120,59 +115,60 @@ public final class Updater implements Listener {
         return downloaded;
     }
 
+    /** Where the releases are published (the code repository is private); old configs still name the code repo. */
+    static final String RELEASES = "Freonik/Forgebound-releases";
+    private static final List<String> OLD_REPOS = List.of("Freonik/Forgebound");
+
+    private String releasesRepo() {
+        String repo = cfg("repo", RELEASES);
+        return OLD_REPOS.stream().anyMatch(repo::equalsIgnoreCase) ? RELEASES : repo;
+    }
+
+    /**
+     * The newest versions of all Forgebound plugins: latest.json in the releases repository (raw.githubusercontent.com,
+     * no API rate limit). Null if it can't be read.
+     */
+    static JsonObject manifest(HttpClient http, String repo, String agent) throws IOException, InterruptedException {
+        HttpResponse<String> res = http.send(HttpRequest.newBuilder(URI.create(
+                        "https://raw.githubusercontent.com/" + repo + "/main/latest.json?t=" + System.currentTimeMillis() / 60_000))
+                .timeout(Duration.ofSeconds(20)).header("User-Agent", agent).GET().build(), HttpResponse.BodyHandlers.ofString());
+        if (res.statusCode() != 200) {
+            throw new IOException("latest.json: HTTP " + res.statusCode());
+        }
+        return JsonParser.parseString(res.body()).getAsJsonObject();
+    }
+
+    private static String str(JsonObject o, String key) {
+        return o.has(key) && !o.get(key).isJsonNull() ? o.get(key).getAsString() : null;
+    }
+
     /** Off the main thread. */
     private void check() {
         try {
-            String repo = cfg("repo", "Freonik/Forgebound");
-            // 1) which release is the newest? The release page redirect has no rate limit, the API (60/h per IP) has.
-            String pageTag = latestTagFromPage(repo);
-            if (pageTag != null) {
-                lastError = null;
-                String latest = version(pageTag);
-                if (latest != null && compare(latest, plugin.getPluginMeta().getVersion()) < 0) {
-                    return;
-                }
-                if (latest != null && compare(latest, plugin.getPluginMeta().getVersion()) == 0
-                        && !on("resource-pack", true)) {
-                    return;
-                }
-            }
-            // 2) the details (assets, the pack's SHA1) from the API
-            HttpResponse<String> res = http.send(get("https://api.github.com/repos/" + repo + "/releases/latest"),
-                    HttpResponse.BodyHandlers.ofString());
-            if (res.statusCode() != 200) {
-                // the API is limited per IP (shared hosting IPs run out); the release page itself isn't
-                String why = res.statusCode() == 403 || res.statusCode() == 429 ? "GitHub API rate limit (HTTP " + res.statusCode() + ")"
-                        : "HTTP " + res.statusCode();
-                if (!fallback(repo, why)) {
-                    fail(why);
-                }
+            JsonObject all = manifest(http, releasesRepo(), "Forgebound");
+            if (!all.has("Forgebound")) {
+                fail("latest.json has no Forgebound entry");
                 return;
             }
             lastError = null;
-            JsonObject release = JsonParser.parseString(res.body()).getAsJsonObject();
-            String tag = release.get("tag_name").getAsString();
-            String latest = version(tag);
-            String current = plugin.getPluginMeta().getVersion();
+            JsonObject me = all.getAsJsonObject("Forgebound");
+            String latest = version(str(me, "version"));
             if (latest == null) {
                 return;
             }
-            int cmp = compare(latest, current);
+            int cmp = compare(latest, plugin.getPluginMeta().getVersion());
             if (cmp > 0) {
-                update(repo, tag, latest, release);
-            } else if (cmp == 0 && on("resource-pack", true)) {
-                // same version as running: make sure server.properties has this release's pack (fixes an old SHA1)
-                if (pinPack(repo, tag, release)) {
-                    tell("&7server.properties now points to the resource pack of &f" + tag
-                            + "&7 with its SHA1 &8(used after the next restart)");
-                }
+                update(latest, me);
+            } else if (cmp == 0 && on("resource-pack", true) && pinPack(me)) {
+                tell("&7server.properties now points to the resource pack of &f" + str(me, "tag")
+                        + "&7 with its SHA1 &8(used after the next restart)");
             }
         } catch (Exception ex) {
             fail(ex.getClass().getSimpleName() + (ex.getMessage() == null ? "" : ": " + ex.getMessage()));
         }
     }
 
-    /** Logs a failed check once (not every 6 hours the same thing). */
+    /** Logs a failed check once (not every hour the same thing). */
     private void fail(String why) {
         if (!why.equals(lastError)) {
             plugin.getLogger().info("[Update] Couldn't check for a new version: " + why);
@@ -180,53 +176,7 @@ public final class Updater implements Listener {
         lastError = why;
     }
 
-    /**
-     * Without the API: github.com/<repo>/releases/latest redirects to the newest release's tag, and the jar has a fixed
-     * download link. The resource pack line in server.properties is left alone here (its SHA1 is only in the API).
-     */
-    /** The newest release's tag from github.com/<repo>/releases/latest (a redirect), or null. */
-    private String latestTagFromPage(String repo) {
-        try {
-            HttpResponse<Void> res = noRedirect.send(HttpRequest.newBuilder(
-                            URI.create("https://github.com/" + repo + "/releases/latest")).timeout(Duration.ofSeconds(20))
-                    .header("User-Agent", "Forgebound").GET().build(), HttpResponse.BodyHandlers.discarding());
-            String location = res.headers().firstValue("location").orElse("");
-            int at = location.indexOf("/releases/tag/");
-            return at < 0 ? null : location.substring(at + "/releases/tag/".length());
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    private boolean fallback(String repo, String why) {
-        try {
-            String tag = latestTagFromPage(repo);
-            if (tag == null) {
-                return false;
-            }
-            String latest = version(tag);
-            if (latest == null) {
-                return false;
-            }
-            lastError = null;
-            if (compare(latest, plugin.getPluginMeta().getVersion()) > 0) {
-                JsonObject release = new JsonObject();
-                com.google.gson.JsonArray assets = new com.google.gson.JsonArray();
-                JsonObject jar = new JsonObject();
-                jar.addProperty("name", "Forgebound.jar");
-                jar.addProperty("browser_download_url", "https://github.com/" + repo + "/releases/download/" + tag + "/Forgebound.jar");
-                assets.add(jar);
-                release.add("assets", assets);
-                plugin.getLogger().info("[Update] " + why + " - checked the release page instead");
-                update(repo, tag, latest, release);
-            }
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private void update(String repo, String tag, String version, JsonObject release) throws IOException, InterruptedException {
+    private void update(String version, JsonObject me) throws IOException, InterruptedException {
         if (version.equals(downloaded)) {
             return;
         }
@@ -234,7 +184,7 @@ public final class Updater implements Listener {
             tell("&eForgebound &f" + version + " &eis out &8(auto-update.download is off)");
             return;
         }
-        String url = asset(release, "Forgebound.jar");
+        String url = str(me, "jar");
         if (url == null) {
             return;
         }
@@ -251,27 +201,26 @@ public final class Updater implements Listener {
         }
         Files.move(tmp, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         downloaded = version;
-        boolean pack = on("resource-pack", true) && pinPack(repo, tag, release);
+        boolean pack = on("resource-pack", true) && pinPack(me);
         tell("&aForgebound &f" + version + " &ais downloaded" + (pack ? " &7(+ the new resource pack)" : "")
                 + "&a. &7It's used after the next &frestart&7.");
     }
 
     /**
      * Puts the pack link of this release and its SHA1 into server.properties. Only touches a pack line that already
-     * points to this repository (a custom pack stays). Returns true if the file was changed.
+     * points to a Forgebound repository (a custom pack stays). Returns true if the file was changed.
      */
-    private boolean pinPack(String repo, String tag, JsonObject release) throws IOException {
-        Matcher m = SHA1.matcher(release.has("body") && !release.get("body").isJsonNull() ? release.get("body").getAsString() : "");
-        String packUrl = asset(release, "Forgebound-pack.zip");
-        if (!m.find() || packUrl == null) {
+    private boolean pinPack(JsonObject me) throws IOException {
+        String packUrl = str(me, "pack");
+        String sha1 = str(me, "pack_sha1");
+        if (packUrl == null || sha1 == null || !SHA1_HEX.matcher(sha1).matches()) {
             return false;
         }
         Path file = Path.of("server.properties");
         if (!Files.isRegularFile(file)) {
             return false;
         }
-        String pinned = "https://github.com/" + repo + "/releases/download/" + tag + "/Forgebound-pack.zip";
-        String result = rewrite(Files.readString(file, StandardCharsets.ISO_8859_1), repo, pinned, m.group(1).toLowerCase());
+        String result = rewrite(Files.readString(file, StandardCharsets.ISO_8859_1), releasesRepo(), packUrl, sha1.toLowerCase());
         if (result == null) {
             return false;
         }
@@ -290,7 +239,9 @@ public final class Updater implements Listener {
         for (String line : properties.split("\r?\n", -1)) {
             if (line.startsWith("resource-pack=")) {
                 String value = line.substring("resource-pack=".length()).replace("\\:", ":");
-                ours = value.toLowerCase().contains("github.com/" + repo.toLowerCase() + "/releases/");
+                String v = value.toLowerCase();
+                ours = v.contains("github.com/" + repo.toLowerCase() + "/releases/")
+                        || OLD_REPOS.stream().anyMatch(r -> v.contains("github.com/" + r.toLowerCase() + "/releases/"));
                 if (ours && !value.equals(url)) {
                     line = "resource-pack=" + url.replace(":", "\\:");
                     changed = true;
@@ -316,24 +267,6 @@ public final class Updater implements Listener {
             changed = true;
         }
         return changed ? String.join("\n", out) : null;
-    }
-
-    private static String asset(JsonObject release, String name) {
-        if (!release.has("assets")) {
-            return null;
-        }
-        for (JsonElement e : release.getAsJsonArray("assets")) {
-            JsonObject a = e.getAsJsonObject();
-            if (name.equals(a.get("name").getAsString())) {
-                return a.get("browser_download_url").getAsString();
-            }
-        }
-        return null;
-    }
-
-    private static HttpRequest get(String url) {
-        return HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(20))
-                .header("Accept", "application/vnd.github+json").header("User-Agent", "Forgebound").GET().build();
     }
 
     /** "v2.7.0-build.65" -> "2.7.0" */
