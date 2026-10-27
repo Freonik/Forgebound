@@ -77,6 +77,8 @@ public final class GhostManager implements Listener {
 
     private Mannequin body;
     private UUID target;
+    /** the player it came for: hunted whenever they can be, otherwise it goes for whoever is closest */
+    private UUID prey;
     private String copyName;            // whose copy it is (the original victim)
     private Component glitched;
     private double hp;
@@ -301,6 +303,7 @@ public final class GhostManager implements Listener {
             return false;
         }
         target = victim.getUniqueId();
+        prey = target;
         copyName = copyOf;
         glitched = glitch(copyOf);
         Player original = Bukkit.getPlayerExact(copyOf);
@@ -458,8 +461,44 @@ public final class GhostManager implements Listener {
         }
     }
 
+    private static boolean huntable(Player p) {
+        return p != null && p.isOnline() && !p.isDead()
+                && (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE);
+    }
+
+    /** Who it hunts right now: the player it came for if they can be hunted, else the closest survival player. */
+    private void retarget() {
+        Player want = Bukkit.getPlayer(prey);
+        if (!huntable(want)) {
+            want = null;
+            double best = Double.MAX_VALUE;
+            Location me = body.getLocation();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!huntable(p)) {
+                    continue;
+                }
+                double d = p.getWorld() == me.getWorld() ? p.getLocation().distanceSquared(me) : 1.0E12;
+                if (d < best) {
+                    best = d;
+                    want = p;
+                }
+            }
+        }
+        if (want != null && !want.getUniqueId().equals(target)) {
+            Player old = Bukkit.getPlayer(target);
+            target = want.getUniqueId();
+            if (old == null || !old.getWorld().equals(body.getWorld())
+                    || old.getLocation().distanceSquared(want.getLocation()) > 64 * 64) {
+                chat("you'll do, " + want.getName());
+            }
+        }
+    }
+
     private void tick() {
         long now = System.currentTimeMillis();
+        if (body.getTicksLived() % 10 == 0) {
+            retarget();
+        }
         Player victim = Bukkit.getPlayer(target);
         // offline, or out of reach in creative / spectator: it waits (and leaves after 2 minutes)
         if (victim == null || !victim.isOnline()
@@ -1289,6 +1328,7 @@ public final class GhostManager implements Listener {
         body = null;
         bar = null;
         target = null;
+        prey = null;
     }
 
     /** Admin: /forge ghost [player] */
