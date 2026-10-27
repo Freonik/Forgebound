@@ -1,0 +1,4 @@
+# Wiki mode. false = sneak peek before the season: weapons, relics and armor sets show only their icon, name and lore;
+# abilities, stats, recipes, set bonuses and the Forge / Materials pages stay hidden.
+# Set it to true (and push) when the season starts - the wiki rebuilds with everything.
+season-started: false

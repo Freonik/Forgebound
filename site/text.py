@@ -77,6 +77,10 @@ T = {
     'footer': ('Forgebound je plugin pro Paper 1.21.11. Tahle wiki se generuje z configu, takže čísla sedí s verzí na serveru.',
                'Forgebound is a plugin for Paper 1.21.11. This wiki is generated from the config, so the numbers match the server.'),
     'search': ('Hledat…', 'Search…'),
+    'locked-tag': ('Tajné', 'Secret'),
+    'locked': ('Schopnosti, staty a recept se odhalí se startem seasony.', 'Abilities, stats and the recipe are revealed when the season starts.'),
+    'locked-set': ('Co celý set umí, se dozvíš se startem seasony.', 'What the full set does is revealed when the season starts.'),
+    'teaser': ('✦ Sneak peek – všechno ostatní se odhalí se startem Season 1 ✦', '✦ Sneak peek – everything else is revealed when Season 1 starts ✦'),
     'start-title': ('Jak začít', 'Getting started'),
     'start': ('<ol><li><b>Shift + pravé tlačítko</b> na libovolný crafting table otevře <b>kovárnu</b> se všemi recepty.</li>'
               '<li>Každá legenda potřebuje jeden <a href="materials.html">legendární materiál</a> – padá z bossů, vzácných mobů a truhel ve strukturách.</li>'

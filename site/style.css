@@ -83,6 +83,9 @@ footer { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--line);
 .ab.onhit .tag { color: #ff9b73; }
 .ab .meta { float: right; color: var(--muted); font-size: .8rem; }
 .ab small { color: var(--muted); }
+.ab.locked { border-style: dashed; text-align: center; }
+.ab.locked .tag { color: var(--gold); }
+.hero .soon { margin: 14px 0 0; color: var(--gold); font-family: Cinzel, Georgia, serif; font-weight: 800; letter-spacing: .04em; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--panel2);
         border: 1px solid var(--line); font-size: .85rem; color: var(--text); }

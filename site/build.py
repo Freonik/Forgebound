@@ -27,6 +27,9 @@ LANGS = ['cs', 'en']
 MIRRORED = {'pinning_repeater', 'the_last_act'}   # crossbow textures are stored mirrored for the hold
 DOCS_ICON = {'stitchguard'}
 HIDDEN_SETS = set()                                 # sets not shown on the wiki
+MODE = yaml.safe_load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'season.yml'), encoding='utf-8')) or {}
+TEASER = not MODE.get('season-started', True)       # sneak peek: abilities, stats and recipes stay hidden
+TEASER_HIDDEN = {'forge', 'materials'}              # pages that don't exist before the season
 ARMOR_ROWS = [0, 3]                                 # rows of docs/armor.png shown on the wiki (Heartsteel, Pale Seraph)                         # the pack texture is a shield (model UV), the README icon is the item
 
 COLORS = {'0': '#000', '1': '#0000aa', '2': '#00aa00', '3': '#00aaaa', '4': '#aa0000', '5': '#aa00aa', '6': '#ffaa00',
@@ -234,7 +237,18 @@ def ability_block(a, lang):
     return ''.join(rows)
 
 
+def locked(lang):
+    return f'<div class="abilities"><div class="ab locked"><span class="tag">🔒 {t("locked-tag", lang)}</span><p>{t("locked", lang)}</p></div></div>'
+
+
 def weapon_card(k, v, lang, mythic=False):
+    if TEASER:
+        lore = ''.join(f'<p class="lore">{mc(l)}</p>' for l in lines(v.get('lore')))
+        return f'''<article class="card item" id="{k}" data-search="{esc(plain(v["name"]).lower())}">
+  <header>{sprite(k)}<div><h3>{mc(v["name"])}</h3><div class="sub">???</div></div></header>
+  {lore}
+  {locked(lang)}
+</article>'''
     stats = []
     if v.get('attack-damage'):
         stats.append(f'⚔ {v["attack-damage"]}')
@@ -252,6 +266,13 @@ def weapon_card(k, v, lang, mythic=False):
 
 
 def relic_card(k, v, lang):
+    if TEASER:
+        lore = ''.join(f'<p class="lore">{mc(l)}</p>' for l in lines(v.get('lore')))
+        return f'''<article class="card item" id="{k}" data-search="{esc(plain(v["name"]).lower())}">
+  <header>{sprite(k)}<div><h3>{mc(v["name"])}</h3><div class="sub">???</div></div></header>
+  {lore}
+  {locked(lang)}
+</article>'''
     r = v.get('relic', {})
     slot = SLOTS.get(r.get('slot', ''), (r.get('slot', ''), r.get('slot', '')))
     slot = slot[0] if lang == 'cs' else slot[1]
@@ -285,7 +306,7 @@ def material_card(k, v, lang, uses):
 def layout(lang, slug, title, body):
     other = 'en' if lang == 'cs' else 'cs'
     nav = ''.join(f'<a href="{s}.html" class="{"on" if s == slug else ""}">{p[0] if lang == "cs" else p[1]}</a>'
-                  for s, p in PAGES.items())
+                  for s, p in PAGES.items() if not (TEASER and s in TEASER_HIDDEN))
     return f'''<!doctype html>
 <html lang="{lang}">
 <head>
@@ -328,20 +349,29 @@ def search_box(lang):
     return f'<input class="search" type="search" placeholder="{t("search", lang)}" oninput="filterCards(this.value)">'
 
 
+def unlink(html_text):
+    """Sneak peek: links to pages that don't exist yet become plain text."""
+    if not TEASER:
+        return html_text
+    return re.sub(r'<a href="(?:' + '|'.join(TEASER_HIDDEN) + r')\.html[^"]*">(.*?)</a>', r'\1', html_text)
+
+
 def page_index(lang):
     cards = ''.join(f'<a class="feature" href="{slug}.html"><span class="emoji">{emoji}</span>'
                     f'<b>{PAGES[slug][0] if lang == "cs" else PAGES[slug][1]}</b><small>{t("f-" + slug, lang)}</small></a>'
                     for slug, emoji in [('forge', '⚒'), ('weapons', '⚔'), ('relics', '🛡'), ('materials', '💎'),
                                         ('world', '🌋'), ('events', '☾'), ('quests', '📜'), ('pvp', '☠'),
-                                        ('commands', '⌨')])
+                                        ('commands', '⌨')] if not (TEASER and slug in TEASER_HIDDEN))
     icons = ''.join(sprite(k, 48) for k, _ in weapons()[:8])
+    soon = f'<p class="soon">{t("teaser", lang)}</p>' if TEASER else ''
     return f'''<div class="hero">
   <div class="hero-icons">{icons}</div>
   <p class="tag">{t("tagline", lang)}</p>
+  {soon}
 </div>
-{section(t("start-title", lang), t("start", lang))}
+{section(t("start-title", lang), unlink(t("start", lang)))}
 <div class="features">{cards}</div>
-{section(t("loop-title", lang), t("loop", lang))}'''
+{section(t("loop-title", lang), unlink(t("loop", lang)))}'''
 
 
 def page_forge(lang):
@@ -378,7 +408,7 @@ def page_relics(lang):
     out += section(t("single-relics", lang), f'<div class="grid">{"".join(relic_card(k, v, lang) for k, v in singles)}</div>')
     for sid, pieces in sets.items():
         name, desc = SETS.get(sid, {'cs': (sid, ''), 'en': (sid, '')})[lang]
-        out += section(name, p(desc) + f'<div class="grid">{"".join(relic_card(k, v, lang) for k, v in pieces)}</div>', sid)
+        out += section(name, (p(t('locked-set', lang)) if TEASER else p(desc)) + f'<div class="grid">{"".join(relic_card(k, v, lang) for k, v in pieces)}</div>', sid)
     out += section(t("sets-how-title", lang), t("sets-how", lang))
     return out
 
@@ -472,9 +502,11 @@ def main():
     for lang in LANGS:
         os.makedirs(os.path.join(OUT, lang))
         for slug, build in BUILDERS.items():
+            if TEASER and slug in TEASER_HIDDEN:
+                continue
             title = 'Forgebound' if slug == 'index' else (PAGES[slug][0] if lang == 'cs' else PAGES[slug][1])
             with open(os.path.join(OUT, lang, slug + '.html'), 'w', encoding='utf-8') as f:
-                f.write(layout(lang, slug, title, build(lang)))
+                f.write(layout(lang, slug, title, unlink(build(lang))))
     here = os.path.dirname(os.path.abspath(__file__))
     shutil.copy(os.path.join(here, 'style.css'), OUT)
     shutil.copy(os.path.join(here, 'app.js'), OUT)
@@ -484,7 +516,7 @@ def main():
 <a href="cs/index.html">Čeština</a> · <a href="en/index.html">English</a>''')
     open(os.path.join(OUT, '.nojekyll'), 'w').close()
     copy_images()
-    print(f'wiki built: {OUT} ({len(LANGS) * len(BUILDERS)} pages, {len(USED)} icons, Forgebound {VERSION})')
+    print(f'wiki built: {OUT} ({"sneak peek" if TEASER else "full"}, {len(LANGS) * len(BUILDERS)} pages, {len(USED)} icons, Forgebound {VERSION})')
 
 
 if __name__ == '__main__':
