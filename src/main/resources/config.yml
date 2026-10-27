@@ -1392,9 +1392,12 @@ doppelganger:
   ability-damage: 6
   arrow-damage: 3
   ability-seconds: 5
-  speed: 0.3
+  # walking speed in blocks per tick (0.22 = a walking player, 0.28 = sprinting): a slow tank you can outrun
+  speed: 0.19
   # 0 = flies back like a player when hit, 1 = can't be pushed at all
-  knockback-resistance: 0.4
+  knockback-resistance: 0.0
+  # how much further than a normal mob it flies back when you hit it (1 = normal)
+  knockback-taken: 1.8
   # Below eat-below-percent health it backs off and eats a golden apple (1.6 s): heals and gives
   # absorption. golden-apples = how many it carries per visit.
   golden-apples: 3

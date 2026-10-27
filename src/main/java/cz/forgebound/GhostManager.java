@@ -331,7 +331,7 @@ public final class GhostManager implements Listener {
             m.getPersistentDataContainer().set(ghostKey, PersistentDataType.BYTE, (byte) 1);
             AttributeInstance kb = m.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
             if (kb != null) {
-                kb.setBaseValue(Math.max(0, Math.min(1, cfg("knockback-resistance", 0.4))));
+                kb.setBaseValue(Math.max(0, Math.min(1, cfg("knockback-resistance", 0.0))));
             }
             EntityEquipment eq = m.getEquipment();
             eq.setHelmet(trimmed(Material.NETHERITE_HELMET));
@@ -508,7 +508,7 @@ public final class GhostManager implements Listener {
             if (flat.lengthSquared() > 1.0E-4) {
                 flat.normalize();
             }
-            double speed = cfg("speed", 0.3);
+            double speed = cfg("speed", 0.19);
             // strafe a little when close, so it isn't a straight line
             if (dist < 7) {
                 Vector side = new Vector(-flat.getZ(), 0, flat.getX()).multiply(Math.sin(now / 400.0) * 0.5);
@@ -1106,9 +1106,13 @@ public final class GhostManager implements Listener {
             if (body != null && body.isValid()) {
                 AttributeInstance max = body.getAttribute(Attribute.MAX_HEALTH);
                 body.setHealth(max != null ? max.getValue() : 20);
+                // it flies further than a normal mob when hit (doppelganger.knockback-taken)
+                Vector v = body.getVelocity();
+                double m = cfg("knockback-taken", 1.8);
+                body.setVelocity(finite(new Vector(v.getX() * m, v.getY(), v.getZ() * m)));
             }
         });
-        staggerUntil = System.currentTimeMillis() + 350;
+        staggerUntil = System.currentTimeMillis() + 600;
         take(attacker, amount);                       // the hurt animation and sound come from the real hit
     }
 
