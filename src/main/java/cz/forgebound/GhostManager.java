@@ -461,7 +461,9 @@ public final class GhostManager implements Listener {
     private void tick() {
         long now = System.currentTimeMillis();
         Player victim = Bukkit.getPlayer(target);
-        if (victim == null || !victim.isOnline()) {
+        // offline, or out of reach in creative / spectator: it waits (and leaves after 2 minutes)
+        if (victim == null || !victim.isOnline()
+                || victim.getGameMode() == GameMode.CREATIVE || victim.getGameMode() == GameMode.SPECTATOR) {
             if (offlineSince == 0) {
                 offlineSince = now;
             }
@@ -1081,8 +1083,8 @@ public final class GhostManager implements Listener {
         }
         Player attacker = byEntity.getDamager() instanceof Player p ? p
                 : byEntity.getDamager() instanceof Projectile pr && pr.getShooter() instanceof Player s ? s : null;
-        if (attacker == null) {
-            event.setCancelled(true);
+        if (attacker == null || !survival(attacker)) {
+            event.setCancelled(true);                  // creative / spectator hits don't count
             return;
         }
         double amount = Math.max(0, event.getFinalDamage()) * cfg("damage-taken-multiplier", 0.6);
