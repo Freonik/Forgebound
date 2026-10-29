@@ -28,6 +28,9 @@ MIRRORED = {'pinning_repeater', 'the_last_act'}   # crossbow textures are stored
 DOCS_ICON = {'stitchguard'}
 HIDDEN_SETS = set()                                 # sets not shown on the wiki
 MODE = yaml.safe_load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'season.yml'), encoding='utf-8')) or {}
+FULL = os.environ.get('WIKI_FULL') == '1'           # the unlisted full wiki (/full/): everything, always
+if FULL:
+    MODE = dict(MODE, **{'season-started': True, 'show-enchants': True})
 TEASER = not MODE.get('season-started', True)       # sneak peek: abilities, stats and recipes stay hidden
 TEASER_HIDDEN = {'forge', 'materials'}              # pages that don't exist before the season
 ARMOR_ROWS = [0, 3]                                 # rows of docs/armor.png shown on the wiki (Heartsteel, Pale Seraph)                         # the pack texture is a shield (model UV), the README icon is the item
