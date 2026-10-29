@@ -186,6 +186,17 @@ final class ForgeCommands {
                     plugin.quests().removeNpc(ctx.getSource().getSender());
                     return Command.SINGLE_SUCCESS;
                 })));
+        var spawnBuild = Commands.literal("spawnbuild").requires(ForgeCommands::admin).executes(ctx -> {
+            plugin.spawnBuilder().command(ctx.getSource().getSender(), "");
+            return Command.SINGLE_SUCCESS;
+        });
+        for (String sub : List.of("confirm", "undo", "cancel")) {
+            spawnBuild.then(Commands.literal(sub).executes(ctx -> {
+                plugin.spawnBuilder().command(ctx.getSource().getSender(), sub);
+                return Command.SINGLE_SUCCESS;
+            }));
+        }
+        root.then(spawnBuild);
         var season = Commands.literal("season").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "season"));
         for (String sub : List.of("start", "preview", "cancel")) {
             season.then(Commands.literal(sub).executes(ctx -> forge(ctx, "season", sub)));

@@ -35,6 +35,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     private EnchantManager enchants;
     private Updater updater;
     private AutoRestart autoRestart;
+    private SpawnBuilder spawnBuilder;
     private ScorchedLands scorched;
     private StarManager stars;
     private PvpManager pvp;
@@ -221,6 +222,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(updater, this);
         updater.start();
         autoRestart = new AutoRestart(this);
+        spawnBuilder = new SpawnBuilder(this);
         autoRestart.start();
 
         RecipesCommand command = new RecipesCommand(this, items, rituals, data);
@@ -237,6 +239,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
         }
         if (autoRestart != null) {
             autoRestart.stop();
+        }
+        if (spawnBuilder != null) {
+            spawnBuilder.shutdown();
         }
         if (abilities != null) {
             abilities.shutdown();
@@ -354,6 +359,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
 
     public Updater updater() {
         return updater;
+    }
+
+    public SpawnBuilder spawnBuilder() {
+        return spawnBuilder;
     }
 
     public AutoRestart autoRestart() {

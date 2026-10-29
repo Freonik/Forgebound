@@ -784,6 +784,7 @@ It takes over the settings from Forgebound 2.5 automatically.
 | `/forge bigevent plan <border\|hunt\|boss> <time>` | `forgebound.admin` | plan a big event: `20:00`, `25.10 20:00` or `+2h` (the boss rises where you stand) |
 | `/forge bigevent [list\|start <type>\|cancel <id>\|stop]` | `forgebound.admin` | list the planned events, start one now, cancel one, end the running one without prizes |
 | `/forge npc <set\|remove>` | `forgebound.admin` | put the Questmaster where you stand, or take him away |
+| `/forge spawnbuild [confirm\|undo\|cancel]` | `forgebound.admin` | build the Forge Citadel (a ~70×70 spawn plaza for the season ceremony) centered on you; `undo` puts the old blocks back |
 | `/forge season <start\|preview\|cancel>` | `forgebound.admin` | season start ceremony (countdown, "Welcome to ... SMP", a beam into the sky, everyone scattered into the world); `preview` skips the teleport; without an argument it opens a panel with the theme and the buttons |
 | `/forge update [on\|off\|now]` | `forgebound.admin` | auto-update on/off, or check for a new version now |
 | `/forge scorched` | `forgebound.admin` | where the nearest Scorched Lands are (click to teleport) |
