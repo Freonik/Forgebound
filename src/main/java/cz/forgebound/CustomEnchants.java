@@ -679,6 +679,7 @@ public final class CustomEnchants implements Listener {
                 ItemManager.color("&7Right-click with &e" + rarity.levels + " levels &7to break the seal.").decoration(
                         net.kyori.adventure.text.format.TextDecoration.ITALIC, false)));
         meta.setEnchantmentGlintOverride(true);
+        meta.setCustomModelData(1701 + rarity.ordinal());               // its own texture in the resource pack
         meta.getPersistentDataContainer().set(tomeKey, PersistentDataType.STRING, rarity.name());
         item.setItemMeta(meta);
         return item;
@@ -746,6 +747,7 @@ public final class CustomEnchants implements Listener {
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
         meta.addStoredEnchant(ench.get(spec), level, true);
+        meta.setCustomModelData(1704);                                  // the rune book texture
         book.setItemMeta(meta);
         for (ItemStack left : p.getInventory().addItem(book).values()) {
             p.getWorld().dropItem(p.getLocation(), left);

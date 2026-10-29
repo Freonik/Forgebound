@@ -53,6 +53,8 @@ run('lastact.py', f'{CC}/textures/item')
 run('mythics.py', f'{CC}/textures/item')
 # Totem of the Forge
 run('forge_totem.py', f'{CC}/textures/item')
+# Sealed Tomes (common / rare / legendary) and the rune book they turn into
+run('tomes.py', f'{CC}/textures/item')
 for n in os.listdir(f'{CC}/textures/item/gui'):
     os.remove(f'{CC}/textures/item/gui/{n}')
 run('gui.py', f'{CC}/textures/item/gui')
@@ -135,6 +137,13 @@ wjson(f'{MC}/netherite_axe.json', dispatch([(1006, model("customcraft:item/butch
 # Totem of the Forge
 wjson(f'{CC}/models/item/forge_totem.json', {"parent": "minecraft:item/generated", "textures": {"layer0": "customcraft:item/forge_totem"}})
 wjson(f'{MC}/totem_of_undying.json', dispatch([(1601, model("customcraft:item/forge_totem"))], model("minecraft:item/totem_of_undying")))
+# Sealed Tomes and rune books (enchanted books with custom model data 1701-1704)
+for n in ['sealed_tome_common', 'sealed_tome_rare', 'sealed_tome_legendary', 'rune_book']:
+    wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/generated", "textures": {"layer0": f"customcraft:item/{n}"}})
+wjson(f'{MC}/enchanted_book.json', dispatch([(1701, model("customcraft:item/sealed_tome_common")),
+                                             (1702, model("customcraft:item/sealed_tome_rare")),
+                                             (1703, model("customcraft:item/sealed_tome_legendary")),
+                                             (1704, model("customcraft:item/rune_book"))], model("minecraft:item/enchanted_book")))
 # Knightfall (mace)
 wjson(f'{MC}/mace.json', dispatch([(1010, model("customcraft:item/knightfall"))],
                                   json.load(open('/home/claude/ref/vanilla/i_mace.json'))['model']))

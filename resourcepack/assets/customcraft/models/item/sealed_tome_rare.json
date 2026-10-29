@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "customcraft:item/sealed_tome_rare"
+  }
+}
