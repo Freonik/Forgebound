@@ -335,6 +335,22 @@ public final class StarManager implements Listener {
 
     // ================================================================ Ancient Forges: registry
 
+    /** The anvils of all known Ancient Forges in this world (x, y, z): their area is protected. */
+    public java.util.List<int[]> forgeAnvils(World world) {
+        java.util.List<int[]> out = new java.util.ArrayList<>();
+        for (Site s : sites.values()) {
+            if (s.world.equals(world.getName())) {
+                out.add(new int[]{s.x, s.y, s.z});
+            }
+        }
+        return out;
+    }
+
+    /** Is this block the anvil of an Ancient Forge? */
+    public boolean isForgeAnvil(org.bukkit.block.Block block) {
+        return sites.containsKey(block.getWorld().getName() + ";" + block.getX() + ";" + block.getY() + ";" + block.getZ());
+    }
+
     /** Called by world generation (any thread). */
     public void found(String world, int x, int y, int z) {
         found.add(new Site(world, x, y, z));

@@ -1981,6 +1981,20 @@ forge-totem:
   burst-knockback: 1.4
 
 # ------------------------------------------------------------
+#  PROTECTION
+#  Spawn (the Forge Citadel from /forge spawnbuild) and every Ancient Forge: blocks can be mined and blown up,
+#  but nothing drops, and after regen-minutes they come back (blocks placed there disappear again).
+#  It never puts a block back inside someone or pulls one away from under someone. Admins in creative build freely.
+# ------------------------------------------------------------
+protection:
+  enabled: true
+  spawn: true
+  ancient-forges: true
+  regen-minutes: 25
+  # how far around an Ancient Forge's anvil (blocks)
+  forge-radius: 15
+
+# ------------------------------------------------------------
 #  COMBAT
 #  Hit a player (or get hit) and you are in combat for tag-seconds (a red bar shows how long).
 #  Logging out in combat kills you: your items drop and the last attacker gets the kill (bounty, stars...).

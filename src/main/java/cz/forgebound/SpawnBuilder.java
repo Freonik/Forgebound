@@ -251,6 +251,9 @@ public final class SpawnBuilder {
                 saveUndo(undo);
                 running = null;
                 world.setSpawnLocation(ox, oy + 1, oz);
+                if (plugin.protectedZones() != null) {
+                    plugin.protectedZones().setSpawn(world, ox, oy, oz);
+                }
                 Player p = Bukkit.getPlayer(admin.getUniqueId());
                 if (p != null) {
                     p.sendMessage(ItemManager.color("&a⚒ The Forge Citadel is done. &7World spawn = the center. "
@@ -319,6 +322,9 @@ public final class SpawnBuilder {
             if (at[0] < 1) {
                 task.cancel();
                 task = null;
+                if (plugin.protectedZones() != null) {
+                    plugin.protectedZones().setSpawn(null, 0, 0, 0);
+                }
                 if (undoFile.delete()) {
                     sender.sendMessage(ItemManager.color("&aThe old blocks are back."));
                 }

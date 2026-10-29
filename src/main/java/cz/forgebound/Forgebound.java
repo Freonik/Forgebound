@@ -36,6 +36,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     private Updater updater;
     private AutoRestart autoRestart;
     private SpawnBuilder spawnBuilder;
+    private ProtectedZones protectedZones;
     private ScorchedLands scorched;
     private StarManager stars;
     private PvpManager pvp;
@@ -223,6 +224,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
         updater.start();
         autoRestart = new AutoRestart(this);
         spawnBuilder = new SpawnBuilder(this);
+        protectedZones = new ProtectedZones(this);
+        getServer().getPluginManager().registerEvents(protectedZones, this);
+        protectedZones.start();
         autoRestart.start();
 
         RecipesCommand command = new RecipesCommand(this, items, rituals, data);
@@ -242,6 +246,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
         }
         if (spawnBuilder != null) {
             spawnBuilder.shutdown();
+        }
+        if (protectedZones != null) {
+            protectedZones.shutdown();
         }
         if (abilities != null) {
             abilities.shutdown();
@@ -361,6 +368,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
         return updater;
     }
 
+    public ProtectedZones protectedZones() {
+        return protectedZones;
+    }
+
     public SpawnBuilder spawnBuilder() {
         return spawnBuilder;
     }
@@ -460,7 +471,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     /** Sections where new default entries (new weapons, relics, materials, messages...) are added automatically. */
     private static final java.util.List<String> MERGED_SECTIONS = java.util.List.of("weapons", "relics", "materials",
             "craftable.weapons", "craftable.relics", "craftable.materials", "messages", "ability-settings", "relic-settings",
-            "ritual", "combat", "combat.duel", "big-events", "big-events.border", "big-events.hunt", "big-events.boss", "quests", "forge-totem", "bounty", "meteor", "warden", "economy", "economy.rewards",
+            "ritual", "protection", "combat", "combat.duel", "big-events", "big-events.border", "big-events.hunt", "big-events.boss", "quests", "forge-totem", "bounty", "meteor", "warden", "economy", "economy.rewards",
             "economy.shop.permanent", "economy.shop.rotating",
             "events", "events.blood-moon", "events.rift", "events.legend-hunt", "events.happy-hour", "events.happy-hour.types",
             "events.forge-market", "events.forge-market.offers", "events.golden-shipment", "motd",
