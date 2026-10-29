@@ -305,10 +305,10 @@ T = {
     'clash': ('<p>Zabij hráče, který nese legendu, <b>s legendou v ruce</b> a tvoje zbraň dostane <b>+{stars} ★</b> (nejvýš do {max} ★ – poslední hvězdy dává jen End).</p>',
               '<p>Kill a player who carries a legend <b>with a legend in your hand</b> and your weapon gets <b>+{stars} ★</b> (up to {max} ★ – the last stars only come from the End).</p>'),
     'tomes-title': ('Sealed Tomes a vlastní enchanty', 'Sealed Tomes and custom enchantments'),
-    'tomes': ('<p>V truhlách ve strukturách a v trial vaultech občas najdeš <b>Sealed Tome</b> (Common, Rare nebo Legendary). '
+    'tomes': ('<p><b>Runy spí, dokud hráči neukovou třetinu všech legend.</b> Pak se probudí pro celý server a v truhlách ve strukturách a v trial vaultech začnou vzácně ležet <b>Sealed Tomes</b> (Common, Rare nebo Legendary). Každý enchant existuje za seasonu jen pár kusů (Legendary 2×, Rare 4×, Common 8×). '
               'Pravým klikem ho otevřeš za levely (10 / 20 / 30) a dostaneš knihu s náhodným enchantem, který jinde nezískáš. '
               'Dá se dát jen na <b>normální</b> výbavu, legendy je neberou. Útočné enchanty fungují jen na moby a na hráče, kteří nosí legendu.</p>',
-              '<p>Structure chests and trial vaults sometimes hold a <b>Sealed Tome</b> (Common, Rare or Legendary). '
+              '<p><b>The runes sleep until players have forged a third of all legends.</b> Then they wake up for the whole server and structure chests and trial vaults rarely hold a <b>Sealed Tome</b> (Common, Rare or Legendary). Each enchantment exists only a few times per season (Legendary 2×, Rare 4×, Common 8×). '
               'Right-click it to open it for levels (10 / 20 / 30) and get a book with a random enchantment you can\'t find anywhere else. '
               'Only <b>normal</b> gear takes them, legends don\'t. The weapon ones only work on mobs and on players who carry a legend.</p>'),
     'mace-title': ('Mace a Mending', 'Maces and Mending'),

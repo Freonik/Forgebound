@@ -1982,6 +1982,7 @@ forge-totem:
 
 # ------------------------------------------------------------
 #  CUSTOM ENCHANTMENTS
+#  Locked until a third of the legends are forged, then only a few copies of each per season.
 #  Only from Sealed Tomes: rare finds in structure chests and trial vaults (never in the enchanting table,
 #  on villagers or in vanilla loot). Right-click a tome with enough levels to open it: you get an enchanted book
 #  with a random enchantment of the tome's rarity (lower levels are more common). Apply it with an anvil.
@@ -1993,8 +1994,15 @@ forge-totem:
 #  The enchantments are registered at startup (a restart is needed after an update).
 # ------------------------------------------------------------
 custom-enchants:
-  # off until you want them (the tomes stop dropping and the enchantments stop working)
-  enabled: false
+  # off = never, on = always, unlock = they wake up for the whole server (with a ceremony) once players have forged
+  # unlock-fraction of the legends (admin gifts don't count). /forge enchants [status|unlock|lock|reset]
+  mode: unlock
+  unlock-fraction: 0.334
+  # how many times each enchantment can come out of a tome per season (/forge enchants reset = new season)
+  copies:
+    common: 8
+    rare: 4
+    legendary: 2
   open-levels:
     common: 10
     rare: 20

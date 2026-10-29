@@ -197,6 +197,17 @@ final class ForgeCommands {
             }));
         }
         root.then(spawnBuild);
+        var enchants = Commands.literal("enchants").requires(ForgeCommands::admin).executes(ctx -> {
+            plugin.customEnchants().command(ctx.getSource().getSender(), "status");
+            return Command.SINGLE_SUCCESS;
+        });
+        for (String sub : List.of("status", "unlock", "lock", "reset")) {
+            enchants.then(Commands.literal(sub).executes(ctx -> {
+                plugin.customEnchants().command(ctx.getSource().getSender(), sub);
+                return Command.SINGLE_SUCCESS;
+            }));
+        }
+        root.then(enchants);
         var season = Commands.literal("season").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "season"));
         for (String sub : List.of("start", "preview", "cancel")) {
             season.then(Commands.literal(sub).executes(ctx -> forge(ctx, "season", sub)));

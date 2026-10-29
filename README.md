@@ -417,7 +417,9 @@ Rare **Sealed Tomes** (Common / Rare / Legendary) turn up in structure chests an
 **10 / 20 / 30 levels** to break the seal: you get an enchanted book with a random enchantment of that rarity (lower
 levels are more common). These enchantments exist nowhere else, and only **normal gear** takes them: legendary weapons
 and relics can't, and the weapon ones (Lifesteal, Bleed, Execute, Cripple) only work on mobs and on players who carry
-a legend - they help hunt the legends, never replace them. **Off by default** (`custom-enchants.enabled`).
+a legend - they help hunt the legends, never replace them. They stay **locked until players have forged a third of the legends** (then a server-wide ceremony wakes them up),
+and each enchantment exists only **2 / 4 / 8 times per season** (Legendary / Rare / Common). `/forge enchants` shows the
+progress and what's left; `unlock`, `lock` and `reset` (new season) are for admins.
 
 | Rarity | Enchantments |
 |---|---|

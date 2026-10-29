@@ -481,7 +481,7 @@ def page_pvp(lang):
     return (section(t("combat-title", lang), t("combat", lang).format(sec=c.get('tag-seconds', 20)), 'combat')
             + section(t("clash-title", lang), t("clash", lang).format(stars=d.get('stars', 0.5), max=d.get('max-stars', 4)), 'clash')
             + (section(t("tomes-title", lang), t("tomes", lang) + ('' if TEASER else enchant_table(lang)), 'tomes')
-               if CFG.get('custom-enchants', {}).get('enabled') else '')
+               if str(CFG.get('custom-enchants', {}).get('mode', 'unlock')).lower() != 'off' else '')
             + section(t("mace-title", lang), t("mace", lang))
             + section(t("teams-title", lang), t("teams", lang), 'teams'))
 

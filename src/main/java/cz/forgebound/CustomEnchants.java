@@ -68,7 +68,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * they only come out of Sealed Tomes (rare finds in structure chests and vaults), opened with experience levels.
  * Only normal gear takes them - legendary weapons and relics can't. The offensive ones (Lifesteal, Bleed, Execute,
  * Cripple) only work on mobs and on players who carry a legend, so they help hunt legends and never replace them.
- * Off by default (custom-enchants.enabled).
+ * They wake up for the whole server once a third of the legends are forged (custom-enchants.mode), and every
+ * enchantment exists only a few times per season (custom-enchants.copies).
  */
 public final class CustomEnchants implements Listener {
 
@@ -173,6 +174,8 @@ public final class CustomEnchants implements Listener {
         this.overloadKey = new NamespacedKey(plugin, "overload");
         this.springsKey = new NamespacedKey(plugin, "springs");
         this.springsFallKey = new NamespacedKey(plugin, "springs_fall");
+        this.stateFile = new java.io.File(plugin.getDataFolder(), "custom-enchants.yml");
+        this.state = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(stateFile);
         var registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
         for (Spec s : Spec.values()) {
             Enchantment e = registry.get(s.key());
@@ -194,14 +197,176 @@ public final class CustomEnchants implements Listener {
                     p.setFoodLevel(p.getFoodLevel() + 1);
                 }
             }
+            if (ticks % 60 == 0) {
+                checkUnlock();                              // every 5 minutes
+            }
         }, 100L, 100L);
         for (Player p : Bukkit.getOnlinePlayers()) {
             refresh(p);
         }
     }
 
+    /** custom-enchants.mode: off, unlock (works once a third of the legends are forged) or on. */
+    private String mode() {
+        return plugin.getConfig().getString("custom-enchants.mode", "unlock").toLowerCase(java.util.Locale.ROOT);
+    }
+
     private boolean on() {
-        return plugin.getConfig().getBoolean("custom-enchants.enabled", false);
+        String mode = mode();
+        return mode.equals("on") || mode.equals("unlock") && state.getBoolean("unlocked", false);
+    }
+
+    // ================================================================ unlocking and limited copies
+
+    private final java.io.File stateFile;
+    private final org.bukkit.configuration.file.YamlConfiguration state;
+
+    private void saveState() {
+        try {
+            state.save(stateFile);
+        } catch (java.io.IOException ex) {
+            plugin.getLogger().warning("Couldn't save custom-enchants.yml: " + ex.getMessage());
+        }
+    }
+
+    /** Legends forged by players (rituals, the forge, advancements - not admin gifts) and how many unlock it. */
+    private int[] progress() {
+        int forged = 0;
+        if (plugin.forgeData() != null) {
+            for (ForgeData.Claim c : plugin.forgeData().claims().values()) {
+                if (c.state() == ForgeData.State.FORGED && c.source() != null
+                        && java.util.Set.of("ritual", "forge", "advancement").contains(c.source())) {
+                    forged++;
+                }
+            }
+        }
+        int total = 0;
+        for (ItemManager.Kind k : new ItemManager.Kind[]{ItemManager.Kind.WEAPON, ItemManager.Kind.RELIC}) {
+            total += plugin.items().forgeable(k).size();
+        }
+        double fraction = plugin.getConfig().getDouble("custom-enchants.unlock-fraction", 1.0 / 3);
+        return new int[]{forged, Math.max(1, (int) Math.ceil(total * fraction))};
+    }
+
+    /** Called when a legend is forged (and every few minutes): unlocks the enchantments once enough exist. */
+    public void checkUnlock() {
+        if (!mode().equals("unlock") || state.getBoolean("unlocked", false)) {
+            return;
+        }
+        int[] p = progress();
+        if (p[0] >= p[1]) {
+            unlock(null);
+        }
+    }
+
+    private void unlock(org.bukkit.command.CommandSender by) {
+        state.set("unlocked", true);
+        state.set("unlocked-at", System.currentTimeMillis());
+        saveState();
+        plugin.getLogger().info("[Enchants] The custom enchantments are unlocked" + (by != null ? " by " + by.getName() : ""));
+        ceremony();
+    }
+
+    /** The server-wide moment: runes rise over spawn, everyone sees and hears it. */
+    private void ceremony() {
+        net.kyori.adventure.title.Title title = net.kyori.adventure.title.Title.title(
+                ItemManager.color("&5&l✦ The Forge Remembers ✦"),
+                ItemManager.color("&dForgotten runes are waking up in the world's chests"),
+                net.kyori.adventure.title.Title.Times.times(java.time.Duration.ofMillis(800), java.time.Duration.ofSeconds(5),
+                        java.time.Duration.ofSeconds(2)));
+        Bukkit.broadcast(ItemManager.color("&5&l✦ &dThe Forge remembers. &7Enough legends walk the world again - "
+                + "&5Sealed Tomes &7now hide in structure chests and trial vaults. Only a few of each rune exist."));
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.showTitle(title);
+            p.playSound(p.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.7f, 0.8f);
+            p.playSound(p.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 0.5f);
+        }
+        org.bukkit.World world = Bukkit.getWorlds().get(0);
+        org.bukkit.Location center = world.getSpawnLocation().add(0.5, 0, 0.5);
+        int[] t = {0};
+        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+            if (t[0]++ > 200) {
+                task.cancel();
+                return;
+            }
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.getWorld().spawnParticle(Particle.ENCHANT, p.getLocation().add(0, 2, 0), 12, 1.2, 1.2, 1.2, 1);
+            }
+            if (center.isChunkLoaded()) {
+                double r = 9;
+                for (int i = 0; i < 6; i++) {
+                    double a = Math.toRadians(t[0] * 6 + i * 60);
+                    world.spawnParticle(Particle.ENCHANT, center.clone().add(Math.cos(a) * r, 1 + t[0] * 0.05, Math.sin(a) * r),
+                            6, 0.2, 0.2, 0.2, 0.5);
+                    world.spawnParticle(Particle.END_ROD, center.clone().add(Math.cos(a) * r, 0.2, Math.sin(a) * r), 1, 0, 0, 0, 0);
+                }
+                if (t[0] % 40 == 0) {
+                    double a = Math.toRadians(t[0] * 9);
+                    world.strikeLightningEffect(center.clone().add(Math.cos(a) * 12, 0, Math.sin(a) * 12));
+                }
+            }
+        }, 20L, 1L);
+    }
+
+    private int opened(Spec s) {
+        return state.getInt("opened." + s.id, 0);
+    }
+
+    private int copies(Spec s) {
+        return plugin.getConfig().getInt("custom-enchants.copies." + s.rarity.name().toLowerCase(java.util.Locale.ROOT),
+                s.rarity == Rarity.LEGENDARY ? 2 : s.rarity == Rarity.RARE ? 4 : 8);
+    }
+
+    /** Enchantments of this rarity that still have copies left this season. */
+    private List<Spec> available(Rarity rarity) {
+        List<Spec> pool = new ArrayList<>();
+        for (Spec s : Spec.values()) {
+            if (s.rarity == rarity && ench.containsKey(s)
+                    && plugin.getConfig().getBoolean("custom-enchants.list." + s.id, true)
+                    && opened(s) < copies(s)) {
+                pool.add(s);
+            }
+        }
+        return pool;
+    }
+
+    /** /forge enchants [status|unlock|lock|reset] */
+    public void command(org.bukkit.command.CommandSender sender, String what) {
+        switch (what) {
+            case "unlock" -> {
+                if (state.getBoolean("unlocked", false)) {
+                    sender.sendMessage(ItemManager.color("&7They are already unlocked."));
+                } else {
+                    unlock(sender);
+                }
+            }
+            case "lock" -> {
+                state.set("unlocked", false);
+                saveState();
+                sender.sendMessage(ItemManager.color("&7Locked again &8(they unlock when enough legends are forged)."));
+            }
+            case "reset" -> {
+                state.set("opened", null);
+                state.set("unlocked", false);
+                saveState();
+                sender.sendMessage(ItemManager.color("&aNew season: &7all copies are back and the enchantments are locked again."));
+            }
+            default -> {
+                int[] p = progress();
+                sender.sendMessage(ItemManager.color("&5✦ Custom enchantments &7- mode &f" + mode() + "&7, "
+                        + (on() ? "&aactive" : "&clocked") + " &8(legends forged &f" + p[0] + "&8/&f" + p[1] + "&8)"));
+                for (Rarity r : Rarity.values()) {
+                    StringBuilder sb = new StringBuilder(r.color + r.title + ": ");
+                    for (Spec s : Spec.values()) {
+                        if (s.rarity == r) {
+                            sb.append("&f").append(s.name).append(" &7").append(copies(s) - opened(s)).append("/")
+                                    .append(copies(s)).append("  ");
+                        }
+                    }
+                    sender.sendMessage(ItemManager.color(sb.toString()));
+                }
+            }
+        }
     }
 
     public Enchantment get(Spec s) {
@@ -550,15 +715,14 @@ public final class CustomEnchants implements Listener {
             p.playSound(p.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1f, 0.8f);
             return;
         }
-        List<Spec> pool = new ArrayList<>();
-        for (Spec s : Spec.values()) {
-            if (s.rarity == rarity && ench.containsKey(s)
-                    && plugin.getConfig().getBoolean("custom-enchants.list." + s.id, true)) {
-                pool.add(s);
-            }
+        if (!on()) {
+            p.sendMessage(ItemManager.color("&7The seal doesn't answer yet. &8(the runes wake up once enough legends are forged)"));
+            return;
         }
+        List<Spec> pool = available(rarity);
         if (pool.isEmpty()) {
-            p.sendMessage(ItemManager.color("&7This tome is empty (all its enchantments are turned off)."));
+            p.sendMessage(ItemManager.color("&7The runes of this tome are spent: every " + rarity.title
+                    + " enchantment already exists as many times as it may this season."));
             return;
         }
         Spec spec = pool.get(ThreadLocalRandom.current().nextInt(pool.size()));
@@ -577,6 +741,8 @@ public final class CustomEnchants implements Listener {
             p.setLevel(p.getLevel() - need);
         }
         hand.setAmount(hand.getAmount() - 1);
+        state.set("opened." + spec.id, opened(spec) + 1);
+        saveState();
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
         meta.addStoredEnchant(ench.get(spec), level, true);
@@ -590,7 +756,12 @@ public final class CustomEnchants implements Listener {
         String roman = new String[]{"I", "II", "III", "IV", "V"}[Math.min(4, level - 1)];
         p.sendMessage(ItemManager.color(rarity.color + "✦ &7The seal breaks: " + rarity.color + "&l" + spec.name
                 + (spec.max > 1 ? " " + roman : "") + " &8- &7" + spec.description));
-        plugin.getLogger().info("[Enchants] " + p.getName() + " opened a " + rarity.title + " tome: " + spec.name + " " + level);
+        plugin.getLogger().info("[Enchants] " + p.getName() + " opened a " + rarity.title + " tome: " + spec.name + " " + level
+                + " (" + opened(spec) + "/" + copies(spec) + " of it this season)");
+        if (rarity == Rarity.LEGENDARY) {
+            Bukkit.broadcast(ItemManager.color("&6✦ &f" + p.getName() + " &7broke the seal of a &6&lLegendary &7tome: &6&l"
+                    + spec.name + "&7. &8(" + (copies(spec) - opened(spec)) + " left this season)"));
+        }
     }
 
     // ================================================================ loot
@@ -621,9 +792,9 @@ public final class CustomEnchants implements Listener {
             if (!key.equals(sec.getString(k + ".table"))) {
                 continue;
             }
-            // one tome at most, the rarest that hits
+            // one tome at most, the rarest that hits (and only while that rarity has copies left)
             for (Rarity r : new Rarity[]{Rarity.LEGENDARY, Rarity.RARE, Rarity.COMMON}) {
-                if (roll(sec.getDouble(k + "." + r.name().toLowerCase(), 0) / 100.0)) {
+                if (!available(r).isEmpty() && roll(sec.getDouble(k + "." + r.name().toLowerCase(), 0) / 100.0)) {
                     loot.add(tome(r));
                     return true;
                 }

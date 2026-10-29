@@ -269,6 +269,9 @@ public final class RitualManager implements Listener {
             data.setClaim(r.weapon, new Claim(State.FORGED, r.player, r.name, System.currentTimeMillis(), "ritual"));
         }
         save();
+        if (plugin.customEnchants() != null) {
+            Bukkit.getScheduler().runTaskLater(plugin, plugin.customEnchants()::checkUnlock, 100L);
+        }
         Bukkit.broadcast(plugin.msg("ritual-done", "&6⚒ {item} &7has been forged by &6{player}&7{where}&7!",
                 "item", ItemManager.nameOf(weapon.item), "player", publicName(r.name), "where", where(r)));
         for (Player online : Bukkit.getOnlinePlayers()) {
