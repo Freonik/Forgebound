@@ -556,7 +556,20 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
             seenChanged |= seen.add(restartMark);
         }
-        // vanilla maces can't be crafted any more: Knightfall's forge recipe swaps the mace for breeze rods
+        // quests got much harder (2.27.0): the default pools replace the old ones once
+        String questMark = "changed:quests=hard";
+        if (!seen.contains(questMark)) {
+            for (String pool : new String[]{"quests.daily", "quests.weekly"}) {
+                org.bukkit.configuration.ConfigurationSection def = defaults.getConfigurationSection(pool);
+                if (def != null) {
+                    getConfig().set(pool, null);
+                    getConfig().createSection(pool, (java.util.Map<?, ?>) plain(def));
+                    added.add(pool + " (harder)");
+                }
+            }
+            seenChanged |= seen.add(questMark);
+        }
+                // vanilla maces can't be crafted any more: Knightfall's forge recipe swaps the mace for breeze rods
         String maceMark = "changed:weapons.knightfall.forge=no-mace";
         if (!seen.contains(maceMark)) {
             java.util.List<java.util.Map<?, ?>> forge = getConfig().getMapList("weapons.knightfall.forge");

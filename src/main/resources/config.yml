@@ -1941,29 +1941,30 @@ quests:
   # bonus for finishing all daily quests of a day
   all-daily-bonus-tokens: 2
   daily:
-    zombies: { type: KILL, target: "ZOMBIE,HUSK,DROWNED,ZOMBIE_VILLAGER", amount: 30, name: "Kill 30 zombies", tokens: 1, xp: 100 }
-    skeletons: { type: KILL, target: "SKELETON,STRAY,BOGGED", amount: 25, name: "Kill 25 skeletons", tokens: 1, xp: 100 }
-    creepers: { type: KILL, target: CREEPER, amount: 15, name: "Kill 15 creepers", tokens: 1, xp: 100 }
-    endermen: { type: KILL, target: ENDERMAN, amount: 10, name: "Kill 10 endermen", tokens: 2 }
-    blazes: { type: KILL, target: BLAZE, amount: 15, name: "Kill 15 blazes", tokens: 2 }
-    monsters: { type: KILL, target: ANY_MONSTER, amount: 60, name: "Kill 60 monsters", tokens: 2 }
-    diamonds: { type: MINE, target: "DIAMOND_ORE,DEEPSLATE_DIAMOND_ORE", amount: 8, name: "Mine 8 diamond ores", tokens: 2, icon: DIAMOND }
-    iron: { type: MINE, target: "IRON_ORE,DEEPSLATE_IRON_ORE", amount: 32, name: "Mine 32 iron ores", tokens: 1, icon: RAW_IRON }
-    logs: { type: MINE, target: "#logs", amount: 128, name: "Chop 128 logs", tokens: 1, icon: OAK_LOG }
-    stone: { type: MINE, target: "STONE,DEEPSLATE,COBBLESTONE,TUFF", amount: 512, name: "Mine 512 stone", tokens: 1, icon: STONE_PICKAXE }
-    fishing: { type: FISH, amount: 10, name: "Catch 10 fish", tokens: 1, xp: 150 }
-    travel: { type: TRAVEL, amount: 3000, name: "Travel 3000 blocks on foot", tokens: 1 }
-    wheat: { type: DELIVER, target: WHEAT, amount: 64, name: "Bring 64 wheat", tokens: 1, icon: WHEAT }
-    gold: { type: DELIVER, target: GOLD_INGOT, amount: 32, name: "Bring 32 gold ingots", tokens: 2, icon: GOLD_INGOT }
-    pvp: { type: KILL_PLAYER, amount: 1, name: "Kill a player", tokens: 2 }
+    zombies: { type: KILL, target: "ZOMBIE,HUSK,DROWNED,ZOMBIE_VILLAGER", amount: 80, name: "Kill 80 zombies", tokens: 1, xp: 150 }
+    skeletons: { type: KILL, target: "SKELETON,STRAY,BOGGED", amount: 60, name: "Kill 60 skeletons", tokens: 1, xp: 150 }
+    creepers: { type: KILL, target: CREEPER, amount: 40, name: "Kill 40 creepers", tokens: 1, xp: 150 }
+    endermen: { type: KILL, target: ENDERMAN, amount: 30, name: "Kill 30 endermen", tokens: 2 }
+    blazes: { type: KILL, target: BLAZE, amount: 40, name: "Kill 40 blazes", tokens: 2 }
+    monsters: { type: KILL, target: ANY_MONSTER, amount: 200, name: "Kill 200 monsters", tokens: 2 }
+    diamonds: { type: MINE, target: "DIAMOND_ORE,DEEPSLATE_DIAMOND_ORE", amount: 24, name: "Mine 24 diamond ores", tokens: 2, icon: DIAMOND }
+    iron: { type: MINE, target: "IRON_ORE,DEEPSLATE_IRON_ORE", amount: 96, name: "Mine 96 iron ores", tokens: 1, icon: RAW_IRON }
+    logs: { type: MINE, target: "#logs", amount: 384, name: "Chop 384 logs", tokens: 1, icon: OAK_LOG }
+    stone: { type: MINE, target: "STONE,DEEPSLATE,COBBLESTONE,TUFF", amount: 2048, name: "Mine 2048 stone", tokens: 1, icon: STONE_PICKAXE }
+    fishing: { type: FISH, amount: 30, name: "Catch 30 fish", tokens: 1, xp: 200 }
+    travel: { type: TRAVEL, amount: 10000, name: "Travel 10000 blocks on foot", tokens: 1 }
+    wheat: { type: DELIVER, target: WHEAT, amount: 256, name: "Bring 256 wheat", tokens: 1, icon: WHEAT }
+    gold: { type: DELIVER, target: GOLD_INGOT, amount: 128, name: "Bring 128 gold ingots", tokens: 2, icon: GOLD_INGOT }
+    pvp: { type: KILL_PLAYER, amount: 3, name: "Kill 3 players", tokens: 2 }
+  # weekly quests are meant to take real effort; only the hardest ones give a legendary material
   weekly:
-    debris: { type: MINE, target: ANCIENT_DEBRIS, amount: 12, name: "Mine 12 ancient debris", tokens: 6, materials: 1, icon: ANCIENT_DEBRIS }
-    hunter: { type: KILL_PLAYER, amount: 5, name: "Kill 5 different players", tokens: 6, totems: 1 }
-    slayer: { type: KILL, target: ANY_MONSTER, amount: 400, name: "Kill 400 monsters", tokens: 5, materials: 1 }
-    diamonds: { type: DELIVER, target: DIAMOND, amount: 32, name: "Bring 32 diamonds", tokens: 6, materials: 1, icon: DIAMOND }
-    explorer: { type: TRAVEL, amount: 25000, name: "Travel 25000 blocks on foot", tokens: 5, materials: 1 }
-    wither: { type: KILL, target: WITHER, amount: 1, name: "Kill the Wither", tokens: 6, totems: 1, icon: WITHER_SKELETON_SKULL }
-    guardians: { type: KILL, target: "GUARDIAN,ELDER_GUARDIAN", amount: 40, name: "Kill 40 guardians", tokens: 5, materials: 1, icon: PRISMARINE_SHARD }
+    debris: { type: MINE, target: ANCIENT_DEBRIS, amount: 48, name: "Mine 48 ancient debris", tokens: 6, materials: 1, icon: ANCIENT_DEBRIS }
+    hunter: { type: KILL_PLAYER, amount: 10, name: "Kill 10 different players", tokens: 6, materials: 1, totems: 1 }
+    slayer: { type: KILL, target: ANY_MONSTER, amount: 1500, name: "Kill 1500 monsters", tokens: 6 }
+    diamonds: { type: DELIVER, target: DIAMOND, amount: 128, name: "Bring 128 diamonds", tokens: 6 }
+    explorer: { type: TRAVEL, amount: 100000, name: "Travel 100000 blocks on foot", tokens: 5 }
+    wither: { type: KILL, target: WITHER, amount: 3, name: "Kill the Wither 3 times", tokens: 6, materials: 1, totems: 1, icon: WITHER_SKELETON_SKULL }
+    guardians: { type: KILL, target: "GUARDIAN,ELDER_GUARDIAN", amount: 150, name: "Kill 150 guardians", tokens: 5, icon: PRISMARINE_SHARD }
 
 # ------------------------------------------------------------
 #  TOTEM OF THE FORGE - a totem of undying that also works from anywhere in the inventory (held in a hand it
