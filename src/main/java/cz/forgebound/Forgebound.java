@@ -201,6 +201,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
         stars.start();
         pvp = new PvpManager(this, items);
         getServer().getPluginManager().registerEvents(pvp, this);
+        getServer().getPluginManager().registerEvents(new VillagerRules(this), this);
         pvp.start();
         mythics = new MythicManager(this, items);
         getServer().getPluginManager().registerEvents(mythics, this);

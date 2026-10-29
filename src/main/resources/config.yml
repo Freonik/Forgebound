@@ -2000,6 +2000,8 @@ combat:
   blocked-commands: []
   # vanilla maces can't be crafted (Knightfall is forged without one)
   disable-mace-crafting: true
+  # villagers never sell Mending (a Mending book becomes another enchanted book for the same price)
+  no-villager-mending: true
   duel:
     enabled: true
     stars: 0.5

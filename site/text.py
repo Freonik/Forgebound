@@ -304,9 +304,9 @@ T = {
     'clash-title': ('Souboj legend', 'Clash of legends'),
     'clash': ('<p>Zabij hráče, který nese legendu, <b>s legendou v ruce</b> a tvoje zbraň dostane <b>+{stars} ★</b> (nejvýš do {max} ★ – poslední hvězdy dává jen End).</p>',
               '<p>Kill a player who carries a legend <b>with a legend in your hand</b> and your weapon gets <b>+{stars} ★</b> (up to {max} ★ – the last stars only come from the End).</p>'),
-    'mace-title': ('Mace', 'Maces'),
-    'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p>',
-             '<p>Vanilla maces can\'t be crafted on this server.</p>'),
+    'mace-title': ('Mace a Mending', 'Maces and Mending'),
+    'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p><p>Vesničané <b>neprodávají Mending</b> – najdeš ho jen v truhlách ve strukturách a při rybaření.</p>',
+             '<p>Vanilla maces can\'t be crafted on this server.</p><p>Villagers <b>don\'t sell Mending</b> – you only find it in structure chests and by fishing.</p>'),
     'teams-title': ('Týmy', 'Teams'),
     'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
               'naklikat všechno: založení týmu (až 3 hráči), pozvánky, tag a barva před jménem, týmový chat (<code>!zpráva</code>), spojenci '
