@@ -2,3 +2,6 @@
 # abilities, stats, recipes, set bonuses and the Forge / Materials pages stay hidden.
 # Set it to true (and push) when the season starts - the wiki rebuilds with everything.
 season-started: false
+
+# The Sealed Tomes / custom enchantments section on the PvP page (secret until you want it shown)
+show-enchants: false

@@ -312,8 +312,13 @@ T = {
               'Right-click it to open it for levels (10 / 20 / 30) and get a book with a random enchantment you can\'t find anywhere else. '
               'Only <b>normal</b> gear takes them, legends don\'t. The weapon ones only work on mobs and on players who carry a legend.</p>'),
     'mace-title': ('Mace a Mending', 'Maces and Mending'),
-    'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p><p>Vesničané <b>neprodávají Mending</b> – najdeš ho jen v truhlách ve strukturách a při rybaření.</p>',
-             '<p>Vanilla maces can\'t be crafted on this server.</p><p>Villagers <b>don\'t sell Mending</b> – you only find it in structure chests and by fishing.</p>'),
+    'mace': ('<p>Vanilla mace se na serveru craftit nedá. Po smash útoku (úder při pádu) má každá mace <b>10 s cooldown</b> – další smash v té době dá jen normální úder.</p><p>Vesničané <b>neprodávají Mending</b> – najdeš ho jen v truhlách ve strukturách a při rybaření.</p>',
+             '<p>Vanilla maces can\'t be crafted on this server. After a smash (a hit while falling) every mace has a <b>10 s cooldown</b> – another smash in that time only deals a normal hit.</p><p>Villagers <b>don\'t sell Mending</b> – you only find it in structure chests and by fishing.</p>'),
+    'protect-title': ('Ochrana spawnu a Ancient Forges', 'Protected spawn and Ancient Forges'),
+    'protect': ('<p>Spawn a okolí každé Ancient Forge se dají kopat i vyhodit do vzduchu, ale <b>nic z nich nepadá</b> a po 25 minutách '
+                'se všechno obnoví. Položené bloky zmizí. Nikoho to nezabije – blok se nikdy neobnoví uvnitř hráče ani nezmizí zpod něj.</p>',
+                '<p>Spawn and the area around every Ancient Forge can be mined and blown up, but <b>nothing drops</b> and after 25 minutes '
+                'everything grows back. Placed blocks disappear. It never hurts anyone – a block never comes back inside a player or vanishes from under one.</p>'),
     'teams-title': ('Týmy', 'Teams'),
     'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
               'naklikat všechno: založení týmu (až 3 hráči), pozvánky, tag a barva před jménem, týmový chat (<code>!zpráva</code>), spojenci '
