@@ -91,8 +91,8 @@ wjson(f'{CC}/models/item/stitchguard.json', shield_model('m_shield.json'))
 wjson(f'{CC}/models/item/stitchguard_blocking.json', shield_model('m_shield_blocking.json'))
 # names of Forgebound's enchantments (the server sends English fallbacks, the pack adds translations)
 LANG = {
-    'en_us': {"enchantment.forgebound.forge_touch": "Forge Touch", "enchantment.forgebound.bounty_hunter": "Bounty Hunter"},
-    'cs_cz': {"enchantment.forgebound.forge_touch": "Kovářský dotek", "enchantment.forgebound.bounty_hunter": "Lovec odměn"},
+    'en_us': {"enchantment.forgebound.forge_touch": "Forge Touch", "enchantment.forgebound.bounty_hunter": "Bounty Hunter", "enchantment.forgebound.lifesteal": "Lifesteal", "enchantment.forgebound.bleed": "Bleed", "enchantment.forgebound.execute": "Execute", "enchantment.forgebound.cripple": "Cripple", "enchantment.forgebound.wisdom": "Wisdom", "enchantment.forgebound.overload": "Overload", "enchantment.forgebound.dodge": "Dodge", "enchantment.forgebound.implants": "Implants", "enchantment.forgebound.springs": "Springs", "enchantment.forgebound.warding": "Warding", "enchantment.forgebound.grounded": "Grounded", "enchantment.forgebound.cleanse": "Cleanse", "enchantment.forgebound.telepathy": "Telepathy", "enchantment.forgebound.vein_miner": "Vein Miner"},
+    'cs_cz': {"enchantment.forgebound.forge_touch": "Kovářský dotek", "enchantment.forgebound.bounty_hunter": "Lovec odměn", "enchantment.forgebound.lifesteal": "Vysávání života", "enchantment.forgebound.bleed": "Krvácení", "enchantment.forgebound.execute": "Poprava", "enchantment.forgebound.cripple": "Ochromení", "enchantment.forgebound.wisdom": "Moudrost", "enchantment.forgebound.overload": "Přetížení", "enchantment.forgebound.dodge": "Úhyb", "enchantment.forgebound.implants": "Implantáty", "enchantment.forgebound.springs": "Pružiny", "enchantment.forgebound.warding": "Štít proti legendám", "enchantment.forgebound.grounded": "Ukotvení", "enchantment.forgebound.cleanse": "Očista", "enchantment.forgebound.telepathy": "Telepatie", "enchantment.forgebound.vein_miner": "Těžba žil"},
 }
 for code, entries in LANG.items():
     os.makedirs(f'{CC}/lang', exist_ok=True)

@@ -64,6 +64,7 @@ public final class ForgeboundBootstrap implements PluginBootstrap {
                     .maximumCost(EnchantmentCost.of(40, 9))
                     .anvilCost(4)
                     .activeSlots(EquipmentSlotGroup.MAINHAND));
+            CustomEnchants.register(event);
         });
 
         // the bundled datapack: the Scorched Lands biome and the ruin loot tables. Always loaded, so chunks that
@@ -118,6 +119,10 @@ public final class ForgeboundBootstrap implements PluginBootstrap {
 
     /** Ids of the enchantments, e.g. for the Codex and tests. */
     public static List<Key> all() {
-        return new ArrayList<>(List.of(FORGE_TOUCH, BOUNTY_HUNTER));
+        List<Key> all = new ArrayList<>(List.of(FORGE_TOUCH, BOUNTY_HUNTER));
+        for (CustomEnchants.Spec s : CustomEnchants.Spec.values()) {
+            all.add(s.key());
+        }
+        return all;
     }
 }

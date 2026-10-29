@@ -742,8 +742,10 @@ public final class RelicManager implements Listener {
                         * thornSet.factor();
                 LivingEntity target = attacker;
                 DamageGuard.run(() -> target.damage(reflect, wearer));
+                double cleanse = attacker instanceof Player ap && plugin.customEnchants() != null
+                        ? plugin.customEnchants().cleanseFactor(ap) : 1;
                 wounded.put(attacker.getUniqueId(), System.currentTimeMillis()
-                        + (long) (p.d("wound-seconds", 3) * 1000 * Math.min(1.25, thornSet.factor())));
+                        + (long) (p.d("wound-seconds", 3) * 1000 * Math.min(1.25, thornSet.factor()) * cleanse));
                 Location at = attacker.getLocation().add(0, attacker.getHeight() / 2, 0);
                 attacker.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, at, 4, 0.3, 0.4, 0.3, 0.1);
                 attacker.getWorld().spawnParticle(Particle.DUST, at, 10, 0.3, 0.4, 0.3, 0, BLOOD);

@@ -304,6 +304,13 @@ T = {
     'clash-title': ('Souboj legend', 'Clash of legends'),
     'clash': ('<p>Zabij hráče, který nese legendu, <b>s legendou v ruce</b> a tvoje zbraň dostane <b>+{stars} ★</b> (nejvýš do {max} ★ – poslední hvězdy dává jen End).</p>',
               '<p>Kill a player who carries a legend <b>with a legend in your hand</b> and your weapon gets <b>+{stars} ★</b> (up to {max} ★ – the last stars only come from the End).</p>'),
+    'tomes-title': ('Sealed Tomes a vlastní enchanty', 'Sealed Tomes and custom enchantments'),
+    'tomes': ('<p>V truhlách ve strukturách a v trial vaultech občas najdeš <b>Sealed Tome</b> (Common, Rare nebo Legendary). '
+              'Pravým klikem ho otevřeš za levely (10 / 20 / 30) a dostaneš knihu s náhodným enchantem, který jinde nezískáš. '
+              'Dá se dát jen na <b>normální</b> výbavu, legendy je neberou. Útočné enchanty fungují jen na moby a na hráče, kteří nosí legendu.</p>',
+              '<p>Structure chests and trial vaults sometimes hold a <b>Sealed Tome</b> (Common, Rare or Legendary). '
+              'Right-click it to open it for levels (10 / 20 / 30) and get a book with a random enchantment you can\'t find anywhere else. '
+              'Only <b>normal</b> gear takes them, legends don\'t. The weapon ones only work on mobs and on players who carry a legend.</p>'),
     'mace-title': ('Mace a Mending', 'Maces and Mending'),
     'mace': ('<p>Vanilla mace se na serveru craftit nedá.</p><p>Vesničané <b>neprodávají Mending</b> – najdeš ho jen v truhlách ve strukturách a při rybaření.</p>',
              '<p>Vanilla maces can\'t be crafted on this server.</p><p>Villagers <b>don\'t sell Mending</b> – you only find it in structure chests and by fishing.</p>'),
@@ -318,3 +325,22 @@ T = {
     'cmd-col': ('Příkaz', 'Command'), 'what-col': ('Co dělá', 'What it does'),
 }
 T['daily-title'] = ('Denní questy', 'Daily quests')
+
+# custom enchantments: (id, name, item, rarity, cs, en)
+ENCHANTS = [
+    ('lifesteal', 'Lifesteal', 'weapon', 'Legendary', 'léčí tě o 5 % způsobeného dmg za level', 'heals you for 5 % of the damage you deal per level'),
+    ('overload', 'Overload', 'chestplate', 'Legendary', '+1 srdce max. HP za level', '+1 heart of max health per level'),
+    ('warding', 'Warding', 'armor', 'Legendary', '-2,5 % dmg od legendárních zbraní za level (sčítá se, max -30 %)', '-2.5 % damage from legendary weapons per level (adds up, max -30 %)'),
+    ('bleed', 'Bleed', 'weapon', 'Rare', 'šance, že cíl začne krvácet', 'a chance to make the target bleed'),
+    ('execute', 'Execute', 'weapon', 'Rare', '+6 % dmg za level na cíle pod 30 % HP', '+6 % damage per level against targets under 30 % health'),
+    ('dodge', 'Dodge', 'leggings', 'Rare', '3 / 5 / 7 % šance úplně se vyhnout úderu', 'a 3 / 5 / 7 % chance to dodge a melee hit'),
+    ('grounded', 'Grounded', 'boots', 'Rare', '-20 % dmg a -40 % knockbacku od mace za level', '-20 % damage and -40 % knockback from maces per level'),
+    ('cleanse', 'Cleanse', 'helmet', 'Rare', 'debuffy a Grievous Wounds o 25 % kratší za level', 'debuffs and Grievous Wounds last 25 % shorter per level'),
+    ('vein_miner', 'Vein Miner', 'tool', 'Rare', 'vytěží celou žílu rudy (do 16 bloků)', 'mines the whole ore vein (up to 16 blocks)'),
+    ('cripple', 'Cripple', 'weapon', 'Common', 'šance zpomalit cíl na 2 s', 'a chance to slow the target for 2 s'),
+    ('wisdom', 'Wisdom', 'weapon', 'Common', '+25 % XP z mobů za level', '+25 % XP from mobs per level'),
+    ('implants', 'Implants', 'helmet', 'Common', 'pomalu doplňuje jídlo', 'slowly fills your hunger'),
+    ('springs', 'Springs', 'boots', 'Common', 'vyšší skok, menší pád', 'jump higher, take less fall damage'),
+    ('telepathy', 'Telepathy', 'tool', 'Common', 'vytěžené věci rovnou do inventáře', 'mined drops go straight into your inventory'),
+]
+

@@ -411,6 +411,22 @@ They show up in the item tooltip with their own name (translated with the resour
 Everything is in the `enchantments` section of the config: switch the effect off, take them out of the enchanting table,
 villager trades or loot (needs a restart), change the bonus per level or the list of drops Forge Touch leaves alone.
 
+### Sealed Tomes and custom enchantments
+
+Rare **Sealed Tomes** (Common / Rare / Legendary) turn up in structure chests and trial vaults. Right-click one with
+**10 / 20 / 30 levels** to break the seal: you get an enchanted book with a random enchantment of that rarity (lower
+levels are more common). These enchantments exist nowhere else, and only **normal gear** takes them: legendary weapons
+and relics can't, and the weapon ones (Lifesteal, Bleed, Execute, Cripple) only work on mobs and on players who carry
+a legend - they help hunt the legends, never replace them. **Off by default** (`custom-enchants.enabled`).
+
+| Rarity | Enchantments |
+|---|---|
+| Common | Cripple I–II, Wisdom I–III, Implants I–II, Springs I–III, Telepathy |
+| Rare | Bleed I–II, Execute I–III, Dodge I–III, Grounded I–II, Cleanse I–II, Vein Miner |
+| Legendary | Lifesteal I–III, Overload I–III, Warding I–III |
+
+Chances, opening costs and which enchantments a tome can give are in `custom-enchants`.
+
 ---
 
 ## Bounties

@@ -1981,6 +1981,56 @@ forge-totem:
   burst-knockback: 1.4
 
 # ------------------------------------------------------------
+#  CUSTOM ENCHANTMENTS
+#  Only from Sealed Tomes: rare finds in structure chests and trial vaults (never in the enchanting table,
+#  on villagers or in vanilla loot). Right-click a tome with enough levels to open it: you get an enchanted book
+#  with a random enchantment of the tome's rarity (lower levels are more common). Apply it with an anvil.
+#  Legendary weapons and relics can't take them, and the weapon ones (Lifesteal, Bleed, Execute, Cripple) only work
+#  on mobs and on players who carry a legend - they help hunt the legends, never replace them.
+#  Common: Cripple, Wisdom, Implants, Springs, Telepathy
+#  Rare: Bleed, Execute, Dodge, Grounded, Cleanse, Vein Miner
+#  Legendary: Lifesteal, Overload, Warding
+#  The enchantments are registered at startup (a restart is needed after an update).
+# ------------------------------------------------------------
+custom-enchants:
+  # off until you want them (the tomes stop dropping and the enchantments stop working)
+  enabled: false
+  open-levels:
+    common: 10
+    rare: 20
+    legendary: 30
+  # false = a tome never gives it (it stays on items that already have it)
+  list:
+    lifesteal: true
+    bleed: true
+    execute: true
+    cripple: true
+    wisdom: true
+    overload: true
+    dodge: true
+    implants: true
+    springs: true
+    warding: true
+    grounded: true
+    cleanse: true
+    telepathy: true
+    vein_miner: true
+  # chance in % per chest that it has a tome (the rarest that hits; at most one)
+  loot:
+    ancient-city: { table: "minecraft:chests/ancient_city", common: 1, rare: 0.4, legendary: 0.13 }
+    end-city: { table: "minecraft:chests/end_city_treasure", common: 1, rare: 0.4, legendary: 0.13 }
+    bastion: { table: "minecraft:chests/bastion_treasure", common: 1, rare: 0.4, legendary: 0.13 }
+    ominous-vault: { table: "minecraft:chests/trial_chambers/reward_ominous", common: 1, rare: 0.5, legendary: 0.17 }
+    vault: { table: "minecraft:chests/trial_chambers/reward", common: 0.5, rare: 0.17, legendary: 0.03 }
+    stronghold-library: { table: "minecraft:chests/stronghold_library", common: 1, rare: 0.33, legendary: 0.1 }
+    mansion: { table: "minecraft:chests/woodland_mansion", common: 0.67, rare: 0.27, legendary: 0.07 }
+    buried-treasure: { table: "minecraft:chests/buried_treasure", common: 0.67, rare: 0.2, legendary: 0.05 }
+    desert-pyramid: { table: "minecraft:chests/desert_pyramid", common: 0.33, rare: 0.1, legendary: 0.02 }
+    jungle-temple: { table: "minecraft:chests/jungle_temple", common: 0.33, rare: 0.1, legendary: 0.02 }
+    dungeon: { table: "minecraft:chests/simple_dungeon", common: 0.33, rare: 0.1, legendary: 0.02 }
+    forge-ruin: { table: "forgebound:chests/forge_ruin", common: 0.67, rare: 0.27, legendary: 0.07 }
+
+# ------------------------------------------------------------
 #  PROTECTION
 #  Spawn (the Forge Citadel from /forge spawnbuild) and every Ancient Forge: blocks can be mined and blown up,
 #  but nothing drops, and after regen-minutes they come back (blocks placed there disappear again).
@@ -2014,6 +2064,8 @@ combat:
   blocked-commands: []
   # vanilla maces can't be crafted (Knightfall is forged without one)
   disable-mace-crafting: true
+  # after a mace smash (a hit while falling) the next smash only deals normal damage for this long (seconds, 0 = off)
+  mace-smash-cooldown: 10
   # villagers never sell Mending (a Mending book becomes another enchanted book for the same price)
   no-villager-mending: true
   duel:

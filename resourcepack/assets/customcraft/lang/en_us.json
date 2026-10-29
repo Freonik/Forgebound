@@ -1,4 +1,18 @@
 {
   "enchantment.forgebound.forge_touch": "Forge Touch",
-  "enchantment.forgebound.bounty_hunter": "Bounty Hunter"
+  "enchantment.forgebound.bounty_hunter": "Bounty Hunter",
+  "enchantment.forgebound.lifesteal": "Lifesteal",
+  "enchantment.forgebound.bleed": "Bleed",
+  "enchantment.forgebound.execute": "Execute",
+  "enchantment.forgebound.cripple": "Cripple",
+  "enchantment.forgebound.wisdom": "Wisdom",
+  "enchantment.forgebound.overload": "Overload",
+  "enchantment.forgebound.dodge": "Dodge",
+  "enchantment.forgebound.implants": "Implants",
+  "enchantment.forgebound.springs": "Springs",
+  "enchantment.forgebound.warding": "Warding",
+  "enchantment.forgebound.grounded": "Grounded",
+  "enchantment.forgebound.cleanse": "Cleanse",
+  "enchantment.forgebound.telepathy": "Telepathy",
+  "enchantment.forgebound.vein_miner": "Vein Miner"
 }

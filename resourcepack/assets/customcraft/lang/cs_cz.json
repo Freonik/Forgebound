@@ -1,4 +1,18 @@
 {
   "enchantment.forgebound.forge_touch": "Kovářský dotek",
-  "enchantment.forgebound.bounty_hunter": "Lovec odměn"
+  "enchantment.forgebound.bounty_hunter": "Lovec odměn",
+  "enchantment.forgebound.lifesteal": "Vysávání života",
+  "enchantment.forgebound.bleed": "Krvácení",
+  "enchantment.forgebound.execute": "Poprava",
+  "enchantment.forgebound.cripple": "Ochromení",
+  "enchantment.forgebound.wisdom": "Moudrost",
+  "enchantment.forgebound.overload": "Přetížení",
+  "enchantment.forgebound.dodge": "Úhyb",
+  "enchantment.forgebound.implants": "Implantáty",
+  "enchantment.forgebound.springs": "Pružiny",
+  "enchantment.forgebound.warding": "Štít proti legendám",
+  "enchantment.forgebound.grounded": "Ukotvení",
+  "enchantment.forgebound.cleanse": "Očista",
+  "enchantment.forgebound.telepathy": "Telepatie",
+  "enchantment.forgebound.vein_miner": "Těžba žil"
 }

@@ -15,7 +15,7 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.dirname(__file__))
-from text import T, PAGES, TRIGGERS, SLOTS, SETS, COMMANDS, QUEST_TYPES  # noqa: E402
+from text import T, PAGES, TRIGGERS, SLOTS, SETS, COMMANDS, QUEST_TYPES, ENCHANTS  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, '_site'))
@@ -480,8 +480,17 @@ def page_pvp(lang):
     d = c.get('duel', {})
     return (section(t("combat-title", lang), t("combat", lang).format(sec=c.get('tag-seconds', 20)), 'combat')
             + section(t("clash-title", lang), t("clash", lang).format(stars=d.get('stars', 0.5), max=d.get('max-stars', 4)), 'clash')
+            + (section(t("tomes-title", lang), t("tomes", lang) + ('' if TEASER else enchant_table(lang)), 'tomes')
+               if CFG.get('custom-enchants', {}).get('enabled') else '')
             + section(t("mace-title", lang), t("mace", lang))
             + section(t("teams-title", lang), t("teams", lang), 'teams'))
+
+
+def enchant_table(lang):
+    colors = {'Legendary': '#ffaa00', 'Rare': '#55ffff', 'Common': '#55ff55'}
+    rows = ''.join(f'<tr><td><b style="color:{colors[r]}">{esc(n)}</b></td><td>{esc(item)}</td><td>{esc(r)}</td>'
+                   f'<td>{esc(cs if lang == "cs" else en)}</td></tr>' for _, n, item, r, cs, en in ENCHANTS)
+    return f'<table><tr><th>Enchant</th><th>Item</th><th>Rarity</th><th>{t("what-col", lang)}</th></tr>{rows}</table>'
 
 
 def page_commands(lang):

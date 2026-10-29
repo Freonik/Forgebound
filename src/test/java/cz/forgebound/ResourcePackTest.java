@@ -150,7 +150,8 @@ class ResourcePackTest {
     void enchantmentNamesAreTranslated() {
         for (String lang : List.of("en_us", "cs_cz")) {
             Map<String, Object> entries = TestFiles.yaml(ASSETS.resolve("customcraft/lang/" + lang + ".json"));
-            for (String id : List.of("forge_touch", "bounty_hunter")) {
+            for (String id : List.of("forge_touch", "bounty_hunter", "lifesteal", "bleed", "execute", "cripple", "wisdom",
+                    "overload", "dodge", "implants", "springs", "warding", "grounded", "cleanse", "telepathy", "vein_miner")) {
                 assertTrue(entries.get("enchantment.forgebound." + id) instanceof String,
                         lang + " is missing the name of " + id);
             }

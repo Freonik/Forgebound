@@ -78,6 +78,38 @@ public final class PvpManager implements Listener {
         return until != null && until > System.currentTimeMillis();
     }
 
+    /** player -> when their mace may smash again (ms) */
+    private final Map<UUID, Long> smashReady = new HashMap<>();
+
+    /**
+     * Mace smash cooldown (combat.mace-smash-cooldown): after a smash (a hit while falling) the next one within the
+     * cooldown only does a normal hit's damage. The mace shows the cooldown like an ender pearl.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSmash(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player p) || event.getCause() != org.bukkit.event.entity.EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            return;
+        }
+        ItemStack mace = p.getInventory().getItemInMainHand();
+        double seconds = plugin.getConfig().getDouble("combat.mace-smash-cooldown", 10);
+        if (mace.getType() != org.bukkit.Material.MACE || seconds <= 0 || p.getFallDistance() <= 1.5f) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        Long ready = smashReady.get(p.getUniqueId());
+        if (ready != null && now < ready) {
+            org.bukkit.attribute.AttributeInstance attack = p.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE);
+            double normal = (attack != null ? attack.getValue() : 6) * 1.5;      // a critical hit at most
+            if (event.getDamage() > normal) {
+                event.setDamage(normal);
+            }
+            p.sendActionBar(ItemManager.color("&cMace smash recharging: &f" + ((ready - now) / 1000 + 1) + " s"));
+            return;
+        }
+        smashReady.put(p.getUniqueId(), now + (long) (seconds * 1000));
+        p.setCooldown(mace, (int) (seconds * 20));
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHit(EntityDamageByEntityEvent event) {
         if (!combatOn() || !(event.getEntity() instanceof Player victim)) {
