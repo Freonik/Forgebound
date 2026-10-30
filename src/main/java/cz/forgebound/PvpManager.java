@@ -262,7 +262,15 @@ public final class PvpManager implements Listener {
             return null;
         }
         Entity cause = event.getDamageSource().getCausingEntity();
-        return cause != null && !(cause instanceof Player) ? null : killer;
+        if (cause != null && !(cause instanceof Player)) {
+            return null;
+        }
+        // the Doppelganger hit them last and they then fell or burned: its kill, not the player's who hit them before
+        Forgebound plugin = org.bukkit.plugin.java.JavaPlugin.getPlugin(Forgebound.class);
+        if (cause == null && plugin.ghost() != null && plugin.ghost().hitRecently(victim, 3000)) {
+            return null;
+        }
+        return killer;
     }
 
     @EventHandler(priority = EventPriority.HIGH)

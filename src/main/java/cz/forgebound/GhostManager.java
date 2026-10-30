@@ -659,6 +659,11 @@ public final class GhostManager implements Listener {
         bar.name(title);
     }
 
+    /** Did the copy hurt this player in the last few seconds? */
+    public boolean hitRecently(Player p, long ms) {
+        return active() && target != null && p.getUniqueId().equals(target) && System.currentTimeMillis() - lastHitOnTarget < ms;
+    }
+
     private void hit(Player p, double amount) {
         if (p.equals(Bukkit.getPlayer(target))) {
             lastHitOnTarget = System.currentTimeMillis();
@@ -1243,8 +1248,9 @@ public final class GhostManager implements Listener {
             return;
         }
         Player victim = event.getPlayer();
-        boolean byGhost = System.currentTimeMillis() - lastHitOnTarget < 5000
-                || event.getDamageSource().getCausingEntity() != null && isGhost(event.getDamageSource().getCausingEntity());
+        // the copy's kill unless a player really landed the killing blow (PvpManager.killerOf knows the difference)
+        boolean byGhost = PvpManager.killerOf(event) == null && (System.currentTimeMillis() - lastHitOnTarget < 5000
+                || event.getDamageSource().getCausingEntity() != null && isGhost(event.getDamageSource().getCausingEntity()));
         if (!byGhost) {
             return;
         }
