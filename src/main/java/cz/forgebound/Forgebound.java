@@ -42,6 +42,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     private EmberCrags emberCrags;
     private GlassedPlains glassedPlains;
     private AshenForest ashenForest;
+    private ShatteredPeaks shatteredPeaks;
     private StarManager stars;
     private PvpManager pvp;
     private MythicManager mythics;
@@ -232,6 +233,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
         ashenForest = new AshenForest(this);
         getServer().getPluginManager().registerEvents(ashenForest, this);
         ashenForest.start();
+        shatteredPeaks = new ShatteredPeaks(this);
+        getServer().getPluginManager().registerEvents(shatteredPeaks, this);
+        shatteredPeaks.start();
         updater = new Updater(this);
         getServer().getPluginManager().registerEvents(updater, this);
         updater.start();
@@ -376,6 +380,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
         return totems;
     }
 
+    public AshenForest ashenForest() {
+        return ashenForest;
+    }
+
     public GlassedPlains glassedPlains() {
         return glassedPlains;
     }
@@ -503,6 +511,9 @@ public final class Forgebound extends JavaPlugin implements Listener {
         if (ashenForest != null) {
             ashenForest.load();
         }
+        if (shatteredPeaks != null) {
+            shatteredPeaks.load();
+        }
         if (scorched != null) {
             scorched.load();
         }
@@ -516,7 +527,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     /** Sections where new default entries (new weapons, relics, materials, messages...) are added automatically. */
     private static final java.util.List<String> MERGED_SECTIONS = java.util.List.of("weapons", "relics", "materials",
             "craftable.weapons", "craftable.relics", "craftable.materials", "messages", "ability-settings", "relic-settings",
-            "ritual", "ember-crags", "glassed-plains", "ashen-forest", "end-ruins", "ancient-debris", "protection", "custom-enchants", "custom-enchants.open-levels", "custom-enchants.copies", "custom-enchants.list", "custom-enchants.loot", "combat", "combat.duel", "big-events", "big-events.border", "big-events.hunt", "big-events.boss", "quests", "forge-totem", "bounty", "meteor", "warden", "economy", "economy.rewards",
+            "ritual", "ember-crags", "glassed-plains", "ashen-forest", "shattered-peaks", "end-ruins", "ancient-debris", "protection", "custom-enchants", "custom-enchants.open-levels", "custom-enchants.copies", "custom-enchants.list", "custom-enchants.loot", "combat", "combat.duel", "big-events", "big-events.border", "big-events.hunt", "big-events.boss", "quests", "forge-totem", "bounty", "meteor", "warden", "economy", "economy.rewards",
             "economy.shop.permanent", "economy.shop.rotating",
             "events", "events.blood-moon", "events.rift", "events.legend-hunt", "events.happy-hour", "events.happy-hour.types",
             "events.forge-market", "events.forge-market.offers", "events.golden-shipment", "motd",

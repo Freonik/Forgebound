@@ -1742,6 +1742,14 @@ ashen-forest:
   # chance of a spider nest per 6x6-chunk area deep inside
   nest-chance: 0.5
 
+# Shattered Peaks (frozen ground, ice shards) with the Frozen Vaults caves under them - a rare 3D biome pair on NEW chunks
+shattered-peaks:
+  enabled: true
+  rarity: 0.025
+  zone-size: 900
+  # chance of a frozen vault hall (stray spawner + chest) per 6x6-chunk area deep inside
+  vault-chance: 0.5
+
 # ------------------------------------------------------------
 #  ANCIENT DEBRIS: less netherite. In every NEW nether chunk only keep-percent of the ancient debris stays,
 #  the rest turns into netherrack (works with any nether datapack). 100 = vanilla.
