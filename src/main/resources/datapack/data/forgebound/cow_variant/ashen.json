@@ -1,0 +1,12 @@
+{
+  "asset_id": "forgebound:entity/cow/ashen_cow",
+  "spawn_conditions": [
+    {
+      "condition": {
+        "type": "minecraft:biome",
+        "biomes": "forgebound:scorched_lands"
+      },
+      "priority": 1
+    }
+  ]
+}

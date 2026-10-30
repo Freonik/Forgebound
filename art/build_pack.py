@@ -53,6 +53,8 @@ run('lastact.py', f'{CC}/textures/item')
 run('mythics.py', f'{CC}/textures/item')
 # Totem of the Forge
 run('forge_totem.py', f'{CC}/textures/item')
+# Scorched Lands animal variants (charred pig, ashen cow, cinder chicken, cinder wolf)
+run('animals.py', f'{P}/forgebound/textures/entity')
 # Sealed Tomes (common / rare / legendary) and the rune book they turn into
 run('tomes.py', f'{CC}/textures/item')
 for n in os.listdir(f'{CC}/textures/item/gui'):

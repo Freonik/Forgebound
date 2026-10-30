@@ -1700,6 +1700,18 @@ items:
 #  ONLY NEW CHUNKS: land that's already generated is never changed. /forge scorched = where's the nearest one.
 #  Changes to rarity / zone-size only affect chunks generated afterwards (keep them once the world is played).
 # ------------------------------------------------------------
+# ------------------------------------------------------------
+#  END RUINS: lost forges, workshops and watchtowers on the End's outer islands (end stone and purpur instead of
+#  dirt and wood, with the ruin loot chests and a couple of shulkers on guard). Only in NEW chunks.
+# ------------------------------------------------------------
+end-ruins:
+  enabled: true
+  # one chance per cell of cell-chunks x cell-chunks chunks
+  cell-chunks: 10
+  chance: 0.4
+  # not closer than this to 0,0 (the dragon's island)
+  min-distance: 1000
+
 scorched-lands:
   enabled: true
   # worlds to generate in; empty = every overworld

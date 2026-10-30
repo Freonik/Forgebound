@@ -1,0 +1,16 @@
+{
+  "assets": {
+    "wild": "forgebound:entity/wolf/cinder_wolf",
+    "tame": "forgebound:entity/wolf/cinder_wolf_tame",
+    "angry": "forgebound:entity/wolf/cinder_wolf_angry"
+  },
+  "spawn_conditions": [
+    {
+      "condition": {
+        "type": "minecraft:biome",
+        "biomes": "forgebound:scorched_lands"
+      },
+      "priority": 1
+    }
+  ]
+}

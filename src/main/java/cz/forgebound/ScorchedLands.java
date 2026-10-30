@@ -52,6 +52,7 @@ public final class ScorchedLands implements Listener {
     private final NamespacedKey guardKey;
     private final Populator populator = new Populator();
     private final NetherPopulator netherPopulator = new NetherPopulator();
+    private final EndPopulator endPopulator = new EndPopulator();
     private final Map<Long, ScorchedNoise> noises = new ConcurrentHashMap<>();
     private final Map<String, BlockData> blockCache = new ConcurrentHashMap<>();
     private volatile Settings settings;
@@ -95,6 +96,10 @@ public final class ScorchedLands implements Listener {
         }
         lootBig = Bukkit.getLootTable(LOOT_BIG);
         lootSmall = Bukkit.getLootTable(LOOT_SMALL);
+        endOn = c.getBoolean("end-ruins.enabled", true);
+        endCell = Math.max(4, c.getInt("end-ruins.cell-chunks", 10));
+        endChance = c.getDouble("end-ruins.chance", 0.4);
+        endMinDistance = c.getInt("end-ruins.min-distance", 1000);
     }
 
     public void start() {
@@ -142,6 +147,9 @@ public final class ScorchedLands implements Listener {
         }
         if (world.getEnvironment() == World.Environment.NETHER && !world.getPopulators().contains(netherPopulator)) {
             world.getPopulators().add(netherPopulator);
+        }
+        if (world.getEnvironment() == World.Environment.THE_END && !world.getPopulators().contains(endPopulator)) {
+            world.getPopulators().add(endPopulator);
         }
     }
 
@@ -433,6 +441,157 @@ public final class ScorchedLands implements Listener {
             } catch (RuntimeException ex) {
                 plugin.getLogger().warning("Ancient Forge at nether chunk " + chunkX + "," + chunkZ + ": " + ex);
             }
+        }
+    }
+
+    // ================================================================ the End: lost forges on the outer islands
+
+    /** End ruins settings, read in load(). */
+    private volatile boolean endOn = true;
+    private volatile int endCell = 10;
+    private volatile double endChance = 0.4;
+    private volatile int endMinDistance = 1000;
+
+    private final class EndPopulator extends BlockPopulator {
+        @Override
+        public void populate(WorldInfo info, Random random, int chunkX, int chunkZ, LimitedRegion region) {
+            if (!endOn) {
+                return;
+            }
+            try {
+                endRuin(info, chunkX, chunkZ, region);
+            } catch (RuntimeException ex) {
+                plugin.getLogger().warning("End ruin at chunk " + chunkX + "," + chunkZ + ": " + ex);
+            }
+        }
+    }
+
+    /** The overworld ruin palette turned into the End's: end stone, end stone bricks and purpur instead of dirt, stone and wood. */
+    static String endBlock(String block) {
+        int at = block.indexOf('[');
+        String id = at < 0 ? block : block.substring(0, at);
+        String props = at < 0 ? "" : block.substring(at);
+        String name = id.substring(id.indexOf(':') + 1);
+        String to = switch (name) {
+            case "coarse_dirt", "dirt", "grass_block", "podzol", "gravel", "rooted_dirt", "mud", "sand", "red_sand" -> "end_stone";
+            case "cobblestone", "mossy_cobblestone", "stone", "andesite", "tuff" -> "end_stone_bricks";
+            case "stone_bricks", "mossy_stone_bricks", "cracked_stone_bricks", "chiseled_stone_bricks" -> "end_stone_bricks";
+            case "cobblestone_wall", "mossy_cobblestone_wall", "stone_brick_wall", "mossy_stone_brick_wall" -> "end_stone_brick_wall";
+            case "cobblestone_slab", "stone_brick_slab", "mossy_stone_brick_slab", "stone_slab" -> "end_stone_brick_slab";
+            case "cobblestone_stairs", "stone_brick_stairs", "mossy_stone_brick_stairs", "stone_stairs" -> "end_stone_brick_stairs";
+            default -> null;
+        };
+        if (to == null) {
+            if (name.endsWith("_planks")) {
+                to = "purpur_block";
+                props = "";
+            } else if (name.endsWith("_log") || name.endsWith("_wood")) {
+                to = "purpur_pillar";
+                props = props.contains("axis=") ? props.replaceAll(".*(axis=[xyz]).*", "[$1]") : "";
+            } else if (name.endsWith("_slab") && !name.contains("blackstone")) {
+                to = "purpur_slab";
+            } else if (name.endsWith("_stairs") && !name.contains("blackstone")) {
+                to = "purpur_stairs";
+            } else if (name.equals("torch") || name.equals("wall_torch")) {
+                to = name.equals("torch") ? "end_rod" : "end_rod";
+                props = "";
+            } else if (name.equals("lantern")) {
+                to = "soul_lantern";
+            } else {
+                return block;
+            }
+        }
+        if (to.equals("end_stone_bricks") || to.equals("end_stone") || to.equals("purpur_block")) {
+            props = "";
+        }
+        if (to.equals("end_stone_brick_wall")) {
+            props = "";
+        }
+        return "minecraft:" + to + props;
+    }
+
+    /** One possible lost forge per cell of chunks, on an outer island (far from the dragon's island). */
+    private void endRuin(WorldInfo info, int chunkX, int chunkZ, LimitedRegion region) {
+        int size = endCell;
+        int cellX = Math.floorDiv(chunkX, size);
+        int cellZ = Math.floorDiv(chunkZ, size);
+        SplittableRandom cell = new SplittableRandom(info.getSeed() * 31 + cellX * 73856093L + cellZ * 19349663L + 7);
+        int pickX = 1 + cell.nextInt(size - 2);
+        int pickZ = 1 + cell.nextInt(size - 2);
+        if (Math.floorMod(chunkX, size) != pickX || Math.floorMod(chunkZ, size) != pickZ || cell.nextDouble() >= endChance) {
+            return;
+        }
+        int bx = (chunkX << 4) + 2;
+        int bz = (chunkZ << 4) + 2;
+        if ((long) bx * bx + (long) bz * bz < (long) endMinDistance * endMinDistance) {
+            return;
+        }
+        ForgeRuins.Type type = switch (cell.nextInt(3)) {
+            case 0 -> ForgeRuins.Type.FORGE;
+            case 1 -> ForgeRuins.Type.WORKSHOP;
+            default -> ForgeRuins.Type.WATCHTOWER;
+        };
+        int cx = bx + type.width / 2;
+        int cz = bz + type.depth / 2;
+        // the island's top in the middle of the footprint
+        int floor = Integer.MIN_VALUE;
+        for (int y = 110; y >= 20; y--) {
+            if (region.isInRegion(cx, y, cz) && region.getType(cx, y, cz) == Material.END_STONE) {
+                floor = y;
+                break;
+            }
+        }
+        if (floor == Integer.MIN_VALUE) {
+            return;
+        }
+        // most of the footprint has to stand on the island
+        int grounded = 0;
+        int total = 0;
+        for (int x = bx; x < bx + type.width; x += 2) {
+            for (int z = bz; z < bz + type.depth; z += 2) {
+                total++;
+                for (int y = floor + 2; y >= floor - 3; y--) {
+                    if (region.isInRegion(x, y, z) && region.getType(x, y, z).isSolid()) {
+                        grounded++;
+                        break;
+                    }
+                }
+            }
+        }
+        if (grounded * 10 < total * 8) {
+            return;
+        }
+        ForgeRuins.Canvas base = canvas(region);
+        ForgeRuins.Canvas end = new ForgeRuins.Canvas() {
+            @Override
+            public void set(int x, int y, int z, String block) {
+                base.set(x, y, z, endBlock(block));
+            }
+
+            @Override
+            public String get(int x, int y, int z) {
+                return base.get(x, y, z);
+            }
+        };
+        ForgeRuins.Result result = ForgeRuins.build(type, end, bx, floor + 1, bz, cell);
+        long seed = cell.nextLong();
+        for (int[] p : result.bigChests) {
+            loot(region, p, lootBig, seed++);
+        }
+        for (int[] p : result.smallChests) {
+            loot(region, p, lootSmall, seed++);
+        }
+        // shulkers keep watch instead of husks
+        int n = 0;
+        for (int[] p : result.guards) {
+            if (n++ >= 2 || !region.isInRegion(p[0], p[1], p[2]) || !region.getType(p[0], p[1], p[2]).isAir()) {
+                continue;
+            }
+            region.spawn(new Location(region.getWorld(), p[0] + 0.5, p[1], p[2] + 0.5), org.bukkit.entity.Shulker.class, sh -> {
+                sh.setRemoveWhenFarAway(false);
+                sh.setPersistent(true);
+                sh.getPersistentDataContainer().set(guardKey, PersistentDataType.BYTE, (byte) 1);
+            });
         }
     }
 
