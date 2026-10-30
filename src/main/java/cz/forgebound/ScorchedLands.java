@@ -96,6 +96,7 @@ public final class ScorchedLands implements Listener {
         }
         lootBig = Bukkit.getLootTable(LOOT_BIG);
         lootSmall = Bukkit.getLootTable(LOOT_SMALL);
+        debrisKeep = Math.max(0, Math.min(100, c.getDouble("ancient-debris.keep-percent", 50))) / 100.0;
         endOn = c.getBoolean("end-ruins.enabled", true);
         endCell = Math.max(4, c.getInt("end-ruins.cell-chunks", 10));
         endChance = c.getDouble("end-ruins.chance", 0.4);
@@ -432,6 +433,7 @@ public final class ScorchedLands implements Listener {
     private final class NetherPopulator extends BlockPopulator {
         @Override
         public void populate(WorldInfo info, Random random, int chunkX, int chunkZ, LimitedRegion region) {
+            thinDebris(info, chunkX, chunkZ, region);
             Settings s = settings;
             if (!s.nether() || s.netherChance() <= 0) {
                 return;
@@ -440,6 +442,37 @@ public final class ScorchedLands implements Listener {
                 netherForge(info, chunkX, chunkZ, region, s);
             } catch (RuntimeException ex) {
                 plugin.getLogger().warning("Ancient Forge at nether chunk " + chunkX + "," + chunkZ + ": " + ex);
+            }
+        }
+    }
+
+    /** ancient-debris.keep-percent: how much of the nether's ancient debris stays (the rest becomes netherrack). */
+    private volatile double debrisKeep = 0.5;
+
+    /** Less netherite: part of the ancient debris in a new nether chunk turns into netherrack (the same blocks for a seed). */
+    private void thinDebris(WorldInfo info, int chunkX, int chunkZ, LimitedRegion region) {
+        double keep = debrisKeep;
+        if (keep >= 1) {
+            return;
+        }
+        int x0 = chunkX << 4;
+        int z0 = chunkZ << 4;
+        int min = Math.max(info.getMinHeight(), 0);
+        int max = Math.min(info.getMaxHeight() - 1, 200);
+        for (int x = x0; x < x0 + 16; x++) {
+            for (int z = z0; z < z0 + 16; z++) {
+                for (int y = min; y <= max; y++) {
+                    if (region.getType(x, y, z) != Material.ANCIENT_DEBRIS) {
+                        continue;
+                    }
+                    long h = info.getSeed() ^ (x * 341873128712L) ^ (z * 132897987541L) ^ (y * 0x9E3779B97F4A7C15L);
+                    h ^= h >>> 29;
+                    h *= 0xBF58476D1CE4E5B9L;
+                    h ^= h >>> 32;
+                    if ((h >>> 11) * 0x1.0p-53 >= keep) {
+                        region.setType(x, y, z, Material.NETHERRACK);
+                    }
+                }
             }
         }
     }

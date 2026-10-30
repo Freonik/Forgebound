@@ -1701,6 +1701,13 @@ items:
 #  Changes to rarity / zone-size only affect chunks generated afterwards (keep them once the world is played).
 # ------------------------------------------------------------
 # ------------------------------------------------------------
+#  ANCIENT DEBRIS: less netherite. In every NEW nether chunk only keep-percent of the ancient debris stays,
+#  the rest turns into netherrack (works with any nether datapack). 100 = vanilla.
+# ------------------------------------------------------------
+ancient-debris:
+  keep-percent: 50
+
+# ------------------------------------------------------------
 #  END RUINS: lost forges, workshops and watchtowers on the End's outer islands (end stone and purpur instead of
 #  dirt and wood, with the ruin loot chests and a couple of shulkers on guard). Only in NEW chunks.
 # ------------------------------------------------------------
