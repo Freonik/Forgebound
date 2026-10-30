@@ -1731,6 +1731,18 @@ glassed-plains:
   budding-amethyst: false
 
 # ------------------------------------------------------------
+#  ASHEN FOREST (surface) and HOLLOW ROOTS (the caves under it): a rare 3D biome pair on NEW chunks.
+#  White trunks, thin grey crowns and hanging pale moss; below, caves wrapped in roots with glow lichen and webs,
+#  and now and then a spider nest hall (cave spider spawner + chest). The other Forgebound biomes win where they overlap.
+# ------------------------------------------------------------
+ashen-forest:
+  enabled: true
+  rarity: 0.025
+  zone-size: 900
+  # chance of a spider nest per 6x6-chunk area deep inside
+  nest-chance: 0.5
+
+# ------------------------------------------------------------
 #  ANCIENT DEBRIS: less netherite. In every NEW nether chunk only keep-percent of the ancient debris stays,
 #  the rest turns into netherrack (works with any nether datapack). 100 = vanilla.
 # ------------------------------------------------------------
