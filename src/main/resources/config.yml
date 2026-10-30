@@ -1701,6 +1701,21 @@ items:
 #  Changes to rarity / zone-size only affect chunks generated afterwards (keep them once the world is played).
 # ------------------------------------------------------------
 # ------------------------------------------------------------
+#  EMBER CRAGS (surface) and MOLTEN DEPTHS (the caves under them): a rare 3D biome pair on NEW overworld chunks.
+#  Barren basalt ground with magma veins, spires and lava pools; below, the caves get basalt walls, magma,
+#  gold-flecked blackstone, lava instead of water and now and then a big lava hall with a loot chest.
+#  Works on top of terrain datapacks (Terralith, Tectonic...). The Scorched Lands win where both would be.
+# ------------------------------------------------------------
+ember-crags:
+  enabled: true
+  # share of the world (0.02 = 2 %)
+  rarity: 0.02
+  # bigger = larger but fewer areas
+  zone-size: 900
+  # chance of a lava hall per 6x6-chunk area deep inside
+  hall-chance: 0.5
+
+# ------------------------------------------------------------
 #  ANCIENT DEBRIS: less netherite. In every NEW nether chunk only keep-percent of the ancient debris stays,
 #  the rest turns into netherrack (works with any nether datapack). 100 = vanilla.
 # ------------------------------------------------------------
