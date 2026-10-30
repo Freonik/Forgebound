@@ -182,7 +182,7 @@ public final class BountyManager implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getPlayer();
-        Player killer = victim.getKiller();
+        Player killer = PvpManager.killerOf(event);
         if (!enabled() || killer == null || killer.equals(victim)) {
             return;
         }

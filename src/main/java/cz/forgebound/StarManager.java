@@ -266,7 +266,7 @@ public final class StarManager implements Listener {
             return;
         }
         Player player = event.getEntity();
-        Player killer = player.getKiller();
+        Player killer = PvpManager.killerOf(event);
         boolean pvp = killer != null && !killer.equals(player);
         int loss = (int) Math.round(plugin.getConfig().getDouble(pvp ? "stars.lose-on-player-kill" : "stars.lose-on-other-death",
                 pvp ? 2 : 0.5) * 2);

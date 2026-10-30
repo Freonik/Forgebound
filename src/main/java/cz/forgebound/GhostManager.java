@@ -1243,10 +1243,8 @@ public final class GhostManager implements Listener {
             return;
         }
         Player victim = event.getPlayer();
-        // a player who lands the killing blow gets the kill (and the legend stays in the drops), even if the copy hit just before
-        boolean byPlayer = victim.getKiller() != null && !victim.getKiller().equals(victim);
-        boolean byGhost = !byPlayer && (System.currentTimeMillis() - lastHitOnTarget < 5000
-                || event.getDamageSource().getCausingEntity() != null && isGhost(event.getDamageSource().getCausingEntity()));
+        boolean byGhost = System.currentTimeMillis() - lastHitOnTarget < 5000
+                || event.getDamageSource().getCausingEntity() != null && isGhost(event.getDamageSource().getCausingEntity());
         if (!byGhost) {
             return;
         }

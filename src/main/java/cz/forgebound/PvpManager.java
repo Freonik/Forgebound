@@ -251,11 +251,25 @@ public final class PvpManager implements Listener {
 
     // ================================================================ clash of legends
 
+    /**
+     * Who killed this player. Vanilla credits the last player who hit them even when a mob (or the Doppelganger)
+     * landed the killing blow; that doesn't count here. Falling or burning after a player's hit still does.
+     */
+    public static Player killerOf(PlayerDeathEvent event) {
+        Player victim = event.getPlayer();
+        Player killer = victim.getKiller();
+        if (killer == null || killer.equals(victim)) {
+            return null;
+        }
+        Entity cause = event.getDamageSource().getCausingEntity();
+        return cause != null && !(cause instanceof Player) ? null : killer;
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
         untag(victim.getUniqueId());
-        Player killer = victim.getKiller();
+        Player killer = killerOf(event);
         if (killer == null || killer.equals(victim) || !plugin.getConfig().getBoolean("combat.duel.enabled", true)
                 || (plugin.teams() != null && plugin.teams().allies(killer, victim))) {
             return;
