@@ -136,6 +136,12 @@ public final class SpawnBuilder {
                     sender.sendMessage(ItemManager.color("&cOnly players can use this command."));
                     return;
                 }
+                if (undoFile.isFile()) {
+                    // a second build would overwrite the undo of the first one: the old citadel couldn't be removed any more
+                    p.sendMessage(ItemManager.color("&cThere already is a citadel. &7Remove it first with &f/forge spawnbuild undo&7, "
+                            + "then build the new one."));
+                    return;
+                }
                 confirm.put(p.getUniqueId(), System.currentTimeMillis());
                 p.sendMessage(ItemManager.color("&6⚒ Forge Citadel &7- a round plaza about &f70×70&7 with the ceremony circle "
                         + "in the middle, centered on &fyour feet&7 (stand where the season should start)."));
