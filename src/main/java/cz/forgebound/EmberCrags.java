@@ -87,7 +87,7 @@ public final class EmberCrags implements Listener {
         }
     }
 
-    private ScorchedNoise noise(long seed) {
+    ScorchedNoise noise(long seed) {
         return noises.computeIfAbsent(seed, k -> new ScorchedNoise(k ^ SALT, zoneSize, rarity));
     }
 

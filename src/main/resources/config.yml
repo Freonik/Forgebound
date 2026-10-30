@@ -1716,6 +1716,21 @@ ember-crags:
   hall-chance: 0.5
 
 # ------------------------------------------------------------
+#  GLASSED PLAINS (surface) and CRYSTAL HOLLOWS (the caves under them): a rare 3D biome pair on NEW chunks.
+#  Ground fused by an old meteor storm (calcite, glass, tinted glass, amethyst growing out of it, small craters
+#  with an obsidian heart); below, geode-like caves full of crystals and now and then a giant hollow geode
+#  with a loot chest. The Scorched Lands and the Ember Crags win where they overlap.
+# ------------------------------------------------------------
+glassed-plains:
+  enabled: true
+  rarity: 0.02
+  zone-size: 900
+  # chance of a giant geode per 6x6-chunk area deep inside
+  geode-chance: 0.5
+  # false = the cave walls get plain amethyst blocks instead of budding amethyst (no free crystal farms)
+  budding-amethyst: false
+
+# ------------------------------------------------------------
 #  ANCIENT DEBRIS: less netherite. In every NEW nether chunk only keep-percent of the ancient debris stays,
 #  the rest turns into netherrack (works with any nether datapack). 100 = vanilla.
 # ------------------------------------------------------------
