@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eventy · Forgebound Wiki</title>
+<meta name="description" content="Legendární zbraně, které existují jen jednou. Ukovej je, ubraň je, nenech si je vzít.">
+<link rel="icon" href="../img/forge_totem.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('menu')">☰</button>
+  <a class="brand" href="index.html">⚒ <span>Forgebound</span> <small>wiki</small></a>
+  <div class="spacer"></div>
+  <a class="lang" href="../en/events.html">English</a>
+</header>
+<nav class="side"><a href="index.html" class="">Domů</a><a href="forge.html" class="">Kovárna a hvězdy</a><a href="weapons.html" class="">Zbraně</a><a href="relics.html" class="">Relikvie a sety</a><a href="materials.html" class="">Legendární materiály</a><a href="world.html" class="">Svět</a><a href="events.html" class="on">Eventy</a><a href="quests.html" class="">Questy a ekonomika</a><a href="pvp.html" class="">PvP a týmy</a><a href="commands.html" class="">Příkazy</a><div class="ver">Forgebound 2.32.1</div></nav>
+<main>
+<h1>Eventy</h1>
+<p><code>/events</code> ukáže, co se právě děje. Běžné eventy startují samy, když je online aspoň pár hráčů.</p><section><h2>☾ Blood Moon</h2><p>Někdy v noci vyjde krvavý měsíc. Do rána mají monstra víc života a víc bolí, chodí ve dvojicích, objevují se <b>Blood-crazed elity</b> (3× XP a Bounty Tokeny), legendární materiály padají častěji a <b>nejde spát</b>.</p></section><section><h2>✷ Rift</h2><p>Každé 1,5–3 hodiny se u náhodného hráče otevře trhlina. Souřadnice se ohlásí hned, po 3 minutách z ní vyleze <b>5 vln</b> monster až po Rift Ravagera a Rift Evokera. Odměna se dělí podle toho, kdo kolik udělal; nejlepší dostane i legendární materiál.</p></section><section><h2>☠ Legend Hunt</h2><p>Každé 2–4 hodiny je náhodný držitel legendy <b>hodinu loven</b>: svítí, jeho oblast se každých 5 minut ohlásí a jeho bounty se počítá dvakrát. Zato se mu schopnosti nabíjejí dvakrát rychleji. Když hodinu přežije, dostane tokeny.</p></section><section><h2>Malé eventy</h2><ul><li><b>✦ Happy Hour</b> – dvojnásobné XP, dvojnásobné dropy materiálů, nebo rituály dvakrát rychleji.</li><li><b>⚖ Forge Market</b> – speciální nabídky v <code>/shop</code>.</li><li><b>✉ Golden Shipment</b> – někde nedaleko spawnu se snese bedna; kdo ji najde první, ten bere.</li></ul></section><section id="big"><h2>⚔ Velké eventy</h2><p>Velké eventy plánuje admin dopředu – server je ohlásí den, hodinu, 10 minut a minutu předem a posledních 10 minut běží odpočet.</p><ul><li><b>☠ The Closing World</b> – border se stahuje k jednomu místu. Smrt, odpojení nebo odchod ze světa = konec. Vyhrává poslední, kdo zůstane.</li><li><b>⚔ The Hunt</b> – všichni jsou vidět na locator baru. Vyhrává nejvíc zabitých hráčů.</li><li><b>☠ The Forge Colossus</b> – obří boss: dupe, hází ohnivé koule, přitahuje a volá kostlivce. Ublížit mu můžou jen hráči. Vyhrává nejvíc poškození.</li></ul><p>Vítěz dostane <a href="#mythic">mytickou zbraň</a> na 7 dní, ostatní tokeny, materiály a <a href="quests.html#totem">Totem of the Forge</a>.</p></section><section id="mythic"><h2>✦ Mytické zbraně</h2><p>Mnohem silnější než legendy – ale po 7 dnech <b>vyprchají</b>, ať jsou kdekoli. Nemají hvězdy, nedají se ukovat a může jich být víc.</p><div class="grid"><article class="card item" id="worldsplitter" data-search="worldsplitter">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/worldsplitter.png)"></span><div><h3> <span style="color:#ff55ff;font-weight:700;">Worldsplitter </span></h3><div class="sub">Netherite Axe · ⚔ 14 · ⚡ 1.0</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">The world closed in. This is what was left.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Pasivně</span><p>Resistance I, Strength I</p></div><div class="ab onhit"><span class="tag">Při zásahu</span><p>Crushing Weight: fall onto the target for +1.2 dmg per block fallen (max +24). Standing above it: +2 per block (max +10).</p></div><div class="ab active"><span class="tag"><span style="color:#ff55ff;font-weight:700;">Split the World</span></span><span class="meta"><kbd>F</kbd> · ⏱ 25 s</span><p>Lift every enemy around you into the air, then slam them down (max 16 damage).</p></div><div class="ab active"><span class="tag"><span style="color:#aa00aa;">Event Horizon</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 30 s</span><p>A 9-block gravity field for 7s. Enemies inside are slowed and yanked back if they try to leave.</p></div></div>
+  
+</article><article class="card item" id="bloodfang" data-search="bloodfang">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/bloodfang.png)"></span><div><h3> <span style="color:#ff5555;font-weight:700;">Bloodfang </span></h3><div class="sub">Netherite Sword · ⚔ 11 · ⚡ 1.8</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Taken from the last hunter standing.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Pasivně</span><p>Speed II. Below 35% HP you regenerate 2% of your max HP every second.</p></div><div class="ab onhit"><span class="tag">Při zásahu</span><p>Heals 20% of damage dealt</p></div><div class="ab onhit"><span class="tag">Při zásahu</span><p>Cleave: charged hits deal 40% damage to everyone within 3 blocks.</p></div><div class="ab active"><span class="tag"><span style="color:#ff5555;">Blood Crescent</span></span><span class="meta"><kbd>F</kbd> · ⏱ 8 s</span><p>Spin a full circle: 10 damage to everyone around you, +1.5 hearts healed per enemy hit.</p></div><div class="ab active"><span class="tag"><span style="color:#aa0000;font-weight:700;">Feeding Frenzy</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 50 s</span><p>Pay 10% of your current health, then regenerate 50% of your MAX health over 8s with Speed III. Debuffs don&#x27;t stick.</p></div></div>
+  
+</article><article class="card item" id="titans_echo" data-search="titan&#x27;s echo">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/titans_echo.png)"></span><div><h3> <span style="color:#ffff55;font-weight:700;">Titan&#x27;s Echo </span></h3><div class="sub">Netherite Sword · ⚔ 12 · ⚡ 1.6</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Torn from the Forge Colossus.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Pasivně</span><p>Resistance I</p></div><div class="ab onhit"><span class="tag">Při zásahu</span><p>Echo: 1.25s later the hit repeats for 60% of its damage.</p></div><div class="ab active"><span class="tag"><span style="color:#ffaa00;">Titan&#x27;s Return</span></span><span class="meta"><kbd>F</kbd> · ⏱ 20 s</span><p>Snap back to where you stood 5s ago and regain the health you had then.</p></div><div class="ab active"><span class="tag"><span style="color:#ffff55;font-weight:700;">Colossal Resonance</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 30 s</span><p>Everyone you hurt in the last 10s takes 70% of that damage again (max 20).</p></div></div>
+  
+</article></div></section>
+<footer>Forgebound je plugin pro Paper 1.21.11. Tahle wiki se generuje z configu, takže čísla sedí s verzí na serveru.</footer>
+</main>
+<script src="../app.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relikvie a sety · Forgebound Wiki</title>
+<meta name="description" content="Legendární zbraně, které existují jen jednou. Ukovej je, ubraň je, nenech si je vzít.">
+<link rel="icon" href="../img/forge_totem.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('menu')">☰</button>
+  <a class="brand" href="index.html">⚒ <span>Forgebound</span> <small>wiki</small></a>
+  <div class="spacer"></div>
+  <a class="lang" href="../en/relics.html">English</a>
+</header>
+<nav class="side"><a href="index.html" class="">Domů</a><a href="forge.html" class="">Kovárna a hvězdy</a><a href="weapons.html" class="">Zbraně</a><a href="relics.html" class="on">Relikvie a sety</a><a href="materials.html" class="">Legendární materiály</a><a href="world.html" class="">Svět</a><a href="events.html" class="">Eventy</a><a href="quests.html" class="">Questy a ekonomika</a><a href="pvp.html" class="">PvP a týmy</a><a href="commands.html" class="">Příkazy</a><div class="ver">Forgebound 2.32.1</div></nav>
+<main>
+<h1>Relikvie a sety</h1>
+<p>Relikvie fungují jen ve svém slotu. Nosit můžeš jednu na slot: helma, hrudník, kalhoty, boty a druhá ruka.</p><input class="search" type="search" placeholder="Hledat…" oninput="filterCards(this.value)"><section><h2>Samostatné relikvie</h2><div class="grid"><article class="card item" id="stasis_hourglass" data-search="stasis hourglass">
+  <header><span class="icon anim " style="--s:64px;--n:16;--d:4.00s;background-image:url(../img/stasis_hourglass.png)"></span><div><h3><span style="color:#ffaa00;font-weight:700;">Stasis Hourglass</span></h3><div class="sub">druhá ruka · ⏱ 120 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Time stops for whoever holds it.</span></p>
+  <div class="abilities"><div class="ab"><p>Right-click: turn into a golden statue for 2.5s. You can&#x27;t be hurt, but you can&#x27;t move or attack either.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">4× Clock</span><span class="chip">16× Gold Block</span><span class="chip">32× Amethyst Shard</span><a class="chip legendary" href="materials.html#chrono_sand"><span class="icon anim " style="--s:24px;--n:8;--d:1.20s;background-image:url(../img/chrono_sand.png)"></span><b>Chrono Sand</b></a></div>
+</article><article class="card item" id="stitchguard" data-search="stitchguard">
+  <header><img class="icon " src="../img/stitchguard.png" width="64" height="64" alt=""><div><h3><span style="color:#ffff55;font-weight:700;">Stitchguard</span></h3><div class="sub">druhá ruka</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Woven shell, needle-sharp answer.</span></p>
+  <div class="abilities"><div class="ab"><p>Parry: raise the shield right before a hit (0.35s) - the hit is cancelled and you stitch through to the attacker&#x27;s back for 8 damage. Shell: while blocking, 3 hits from ANY side are absorbed (regrows 20s after cracking).</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Shield</span><span class="chip">16× Armadillo Scute</span><span class="chip">64× String</span><span class="chip">8× Gold Block</span><a class="chip legendary" href="materials.html#carapace_shard"><span class="icon anim " style="--s:24px;--n:16;--d:1.60s;background-image:url(../img/carapace_shard.png)"></span><b>Carapace Shard</b></a></div>
+</article></div></section><section id="pale_seraph"><h2>Pale Seraph</h2><p>Dva efekty, každý kus přidává k oběma. <b>Duše</b>: nabité údery plní Soul (max 99), drž Shift 1,5 s na místě a 33 Soul se změní na 3 srdce. <b>Křídla</b>: když bys umřel, vrátíš se s 50 % HP a 3 s ochrany; poloviční pád.</p><div class="grid"><article class="card item" id="angels_wings" data-search="angel&#x27;s wings">
+  <header><img class="icon " src="../img/angels_wings.png" width="64" height="64" alt=""><div><h3><span style="color:#fff;font-weight:700;">Angel&#x27;s Wings</span></h3><div class="sub">boty · ⏱ 600 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Light as a feather, stubborn as a saint.</span></p>
+  <div class="abilities"><div class="ab"><p>Pale Seraph set: when you would die, come back with 50% HP and 3s of protection (every 10 min with the full set; fewer pieces = longer). Less fall damage.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Boots</span><span class="chip">2× Totem Of Undying</span><span class="chip">32× Phantom Membrane</span><span class="chip">64× Feather</span><a class="chip legendary" href="materials.html#seraph_feather"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/seraph_feather.png)"></span><b>Seraph Feather</b></a></div>
+</article><article class="card item" id="soul_vessel_mask" data-search="soul vessel mask">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/soul_vessel_mask.png)"></span><div><h3><span style="color:#fff;font-weight:700;">Soul Vessel Mask</span></h3><div class="sub">helma</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Empty inside. It fills with every blow.</span></p>
+  <div class="abilities"><div class="ab"><p>Pale Seraph set: charged hits fill your Soul (max 99). Hold Shift and stand still for 1.5s: 33 Soul becomes 3 hearts. Getting hit breaks the focus. Soul is lost on death.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Helmet</span><span class="chip">32× Bone Block</span><span class="chip">8× Ghast Tear</span><span class="chip">32× Quartz Block</span><a class="chip legendary" href="materials.html#pale_fragment"><span class="icon anim " style="--s:24px;--n:12;--d:1.20s;background-image:url(../img/pale_fragment.png)"></span><b>Pale Fragment</b></a></div>
+</article><article class="card item" id="seraph_mantle" data-search="seraph mantle">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/seraph_mantle.png)"></span><div><h3><span style="color:#fff;font-weight:700;">Seraph Mantle</span></h3><div class="sub">hrudník</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Porcelain over the heart, feathers on the back.</span></p>
+  <div class="abilities"><div class="ab"><p>Pale Seraph set: adds to both effects - the Soul Vessel (charged hits fill your Soul, Shift to heal) and the Angel&#x27;s Wings (come back once when you&#x27;d die).</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Chestplate</span><span class="chip">64× Feather</span><span class="chip">32× Bone Block</span><span class="chip">8× Ghast Tear</span><a class="chip legendary" href="materials.html#seraph_feather"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/seraph_feather.png)"></span><b>Seraph Feather</b></a></div>
+</article><article class="card item" id="seraph_greaves" data-search="seraph greaves">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/seraph_greaves.png)"></span><div><h3><span style="color:#fff;font-weight:700;">Seraph Greaves</span></h3><div class="sub">kalhoty</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Every step is a little lighter.</span></p>
+  <div class="abilities"><div class="ab"><p>Pale Seraph set: adds to both effects - the Soul Vessel (charged hits fill your Soul, Shift to heal) and the Angel&#x27;s Wings (come back once when you&#x27;d die).</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Leggings</span><span class="chip">64× Feather</span><span class="chip">32× Quartz Block</span><span class="chip">8× Ghast Tear</span><a class="chip legendary" href="materials.html#pale_fragment"><span class="icon anim " style="--s:24px;--n:12;--d:1.20s;background-image:url(../img/pale_fragment.png)"></span><b>Pale Fragment</b></a></div>
+</article></div></section><section id="thorn"><h2>Thorn</h2><p>Vrací 2 + 25 % poškození zblízka (proti šípům polovinu) a útočník dostane <b>Grievous Wounds</b> – 3 s se nemůže léčit.</p><div class="grid"><article class="card item" id="thorn_plate" data-search="thorn plate">
+  <header><img class="icon " src="../img/thorn_plate.png" width="64" height="64" alt=""><div><h3><span style="color:#00aa00;font-weight:700;">Thorn Plate</span></h3><div class="sub">hrudník</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Every blow has a price.</span></p>
+  <div class="abilities"><div class="ab"><p>Thorn set: reflects 2 + 25% of melee damage (half vs. arrows). Attackers get Grievous Wounds: no healing for 3s.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Chestplate</span><span class="chip">64× Cactus</span><span class="chip">32× Pointed Dripstone</span><span class="chip">16× Iron Block</span><a class="chip legendary" href="materials.html#thornheart_seed"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/thornheart_seed.png)"></span><b>Thornheart Seed</b></a></div>
+</article><article class="card item" id="thorn_crown" data-search="thorn crown">
+  <header><img class="icon " src="../img/thorn_crown.png" width="64" height="64" alt=""><div><h3><span style="color:#00aa00;font-weight:700;">Thorn Crown</span></h3><div class="sub">helma</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Heavy is the head.</span></p>
+  <div class="abilities"><div class="ab"><p>Thorn set: reflects melee damage and gives attackers Grievous Wounds.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Helmet</span><span class="chip">32× Cactus</span><span class="chip">16× Pointed Dripstone</span><a class="chip legendary" href="materials.html#thornheart_seed"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/thornheart_seed.png)"></span><b>Thornheart Seed</b></a></div>
+</article><article class="card item" id="thorn_greaves" data-search="thorn greaves">
+  <header><img class="icon " src="../img/thorn_greaves.png" width="64" height="64" alt=""><div><h3><span style="color:#00aa00;font-weight:700;">Thorn Greaves</span></h3><div class="sub">kalhoty</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Brambles grow where you stand.</span></p>
+  <div class="abilities"><div class="ab"><p>Thorn set: reflects melee damage and gives attackers Grievous Wounds.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Leggings</span><span class="chip">48× Cactus</span><span class="chip">24× Pointed Dripstone</span><a class="chip legendary" href="materials.html#thornheart_seed"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/thornheart_seed.png)"></span><b>Thornheart Seed</b></a></div>
+</article><article class="card item" id="thorn_treads" data-search="thorn treads">
+  <header><img class="icon " src="../img/thorn_treads.png" width="64" height="64" alt=""><div><h3><span style="color:#00aa00;font-weight:700;">Thorn Treads</span></h3><div class="sub">boty</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Leave a trail of thorns.</span></p>
+  <div class="abilities"><div class="ab"><p>Thorn set: reflects melee damage and gives attackers Grievous Wounds.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Boots</span><span class="chip">32× Cactus</span><span class="chip">16× Pointed Dripstone</span><a class="chip legendary" href="materials.html#thornheart_seed"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/thornheart_seed.png)"></span><b>Thornheart Seed</b></a></div>
+</article></div></section><section id="heartsteel"><h2>Heartsteel</h2><p>Nabitý úder do <b>hráče</b> dá navíc 3 + 5 % tvého max. HP a <b>natrvalo</b> ti zvedne max. HP (až o +10 srdcí, každý kus si pamatuje svůj díl). Jednou za 30 s na hráče, moby se nepočítají.</p><div class="grid"><article class="card item" id="heartsteel_core" data-search="heartsteel core">
+  <header><span class="icon anim " style="--s:64px;--n:10;--d:1.00s;background-image:url(../img/heartsteel_core.png)"></span><div><h3><span style="color:#ff5555;font-weight:700;">Heartsteel Core</span></h3><div class="sub">hrudník</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">It beats louder with every fight.</span></p>
+  <div class="abilities"><div class="ab"><p>Heartsteel set: a charged hit on a player deals 3 + 5% of your max HP and PERMANENTLY grows your max HP (+½ heart, up to +10 hearts). Once per player every 30s.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Chestplate</span><span class="chip">1× Heart Of The Sea</span><span class="chip">2× Enchanted Golden Apple</span><span class="chip">32× Redstone Block</span><a class="chip legendary" href="materials.html#crimson_heart"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/crimson_heart.png)"></span><b>Crimson Heart</b></a></div>
+</article><article class="card item" id="heartsteel_helm" data-search="heartsteel helm">
+  <header><span class="icon anim " style="--s:64px;--n:10;--d:1.00s;background-image:url(../img/heartsteel_helm.png)"></span><div><h3><span style="color:#ff5555;font-weight:700;">Heartsteel Helm</span></h3><div class="sub">helma</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">The heartbeat is loudest in your ears.</span></p>
+  <div class="abilities"><div class="ab"><p>Heartsteel set: charged hits on players deal bonus damage and grow your max HP.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Helmet</span><span class="chip">16× Redstone Block</span><span class="chip">4× Golden Apple</span><a class="chip legendary" href="materials.html#crimson_heart"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/crimson_heart.png)"></span><b>Crimson Heart</b></a></div>
+</article><article class="card item" id="heartsteel_greaves" data-search="heartsteel greaves">
+  <header><span class="icon anim " style="--s:64px;--n:10;--d:1.00s;background-image:url(../img/heartsteel_greaves.png)"></span><div><h3><span style="color:#ff5555;font-weight:700;">Heartsteel Greaves</span></h3><div class="sub">kalhoty</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Steel that remembers every fight.</span></p>
+  <div class="abilities"><div class="ab"><p>Heartsteel set: charged hits on players deal bonus damage and grow your max HP.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Leggings</span><span class="chip">24× Redstone Block</span><span class="chip">6× Golden Apple</span><a class="chip legendary" href="materials.html#crimson_heart"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/crimson_heart.png)"></span><b>Crimson Heart</b></a></div>
+</article><article class="card item" id="heartsteel_treads" data-search="heartsteel treads">
+  <header><span class="icon anim " style="--s:64px;--n:10;--d:1.00s;background-image:url(../img/heartsteel_treads.png)"></span><div><h3><span style="color:#ff5555;font-weight:700;">Heartsteel Treads</span></h3><div class="sub">boty</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Every step a heartbeat.</span></p>
+  <div class="abilities"><div class="ab"><p>Heartsteel set: charged hits on players deal bonus damage and grow your max HP.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Boots</span><span class="chip">16× Redstone Block</span><span class="chip">4× Golden Apple</span><a class="chip legendary" href="materials.html#crimson_heart"><span class="icon anim " style="--s:24px;--n:10;--d:1.00s;background-image:url(../img/crimson_heart.png)"></span><b>Crimson Heart</b></a></div>
+</article></div></section><section id="thick_hide"><h2>Thick Hide</h2><p>40 % poškození, které dostaneš, se změní na <b>šedé zdraví</b>, které během ~3 s mizí. <b>Dvojitý Shift</b> ho setřese, takže o něj nepřijdeš (cooldown 20 s).</p><div class="grid"><article class="card item" id="thick_hide" data-search="thick hide">
+  <header><img class="icon " src="../img/thick_hide.png" width="64" height="64" alt=""><div><h3><span style="color:#00aaaa;font-weight:700;">Thick Hide</span></h3><div class="sub">kalhoty · ⏱ 20 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Hits sink in slowly. Then you shake them off.</span></p>
+  <div class="abilities"><div class="ab"><p>Thick Hide set: 40% of the damage you take turns into grey health and is lost over ~3s (up to 50% of your max HP). Double-tap Shift: shrug the grey health off - you never lose it.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Leggings</span><span class="chip">64× Leather</span><span class="chip">16× Armadillo Scute</span><span class="chip">16× Slime Block</span><a class="chip legendary" href="materials.html#behemoth_hide"><span class="icon anim " style="--s:24px;--n:16;--d:1.60s;background-image:url(../img/behemoth_hide.png)"></span><b>Behemoth Hide</b></a></div>
+</article><article class="card item" id="hide_cowl" data-search="hide cowl">
+  <header><img class="icon " src="../img/hide_cowl.png" width="64" height="64" alt=""><div><h3><span style="color:#00aaaa;font-weight:700;">Hide Cowl</span></h3><div class="sub">helma · ⏱ 20 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Thick skull, thicker skin.</span></p>
+  <div class="abilities"><div class="ab"><p>Thick Hide set: part of the damage you take turns into grey health. Double-tap Shift to shrug it off.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Helmet</span><span class="chip">64× Leather</span><span class="chip">16× Armadillo Scute</span><span class="chip">16× Slime Block</span><a class="chip legendary" href="materials.html#behemoth_hide"><span class="icon anim " style="--s:24px;--n:16;--d:1.60s;background-image:url(../img/behemoth_hide.png)"></span><b>Behemoth Hide</b></a></div>
+</article><article class="card item" id="hide_mantle" data-search="hide mantle">
+  <header><img class="icon " src="../img/hide_mantle.png" width="64" height="64" alt=""><div><h3><span style="color:#00aaaa;font-weight:700;">Hide Mantle</span></h3><div class="sub">hrudník · ⏱ 20 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Arrows get stuck halfway.</span></p>
+  <div class="abilities"><div class="ab"><p>Thick Hide set: part of the damage you take turns into grey health. Double-tap Shift to shrug it off.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Chestplate</span><span class="chip">64× Leather</span><span class="chip">16× Armadillo Scute</span><span class="chip">16× Slime Block</span><a class="chip legendary" href="materials.html#behemoth_hide"><span class="icon anim " style="--s:24px;--n:16;--d:1.60s;background-image:url(../img/behemoth_hide.png)"></span><b>Behemoth Hide</b></a></div>
+</article><article class="card item" id="hide_stompers" data-search="hide stompers">
+  <header><img class="icon " src="../img/hide_stompers.png" width="64" height="64" alt=""><div><h3><span style="color:#00aaaa;font-weight:700;">Hide Stompers</span></h3><div class="sub">boty · ⏱ 20 s</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">The ground feels it first.</span></p>
+  <div class="abilities"><div class="ab"><p>Thick Hide set: part of the damage you take turns into grey health. Double-tap Shift to shrug it off.</p></div></div>
+  <h4>Cena ve kovárně</h4><div class="chips"><span class="chip">1× Netherite Boots</span><span class="chip">64× Leather</span><span class="chip">16× Armadillo Scute</span><span class="chip">16× Slime Block</span><a class="chip legendary" href="materials.html#behemoth_hide"><span class="icon anim " style="--s:24px;--n:16;--d:1.60s;background-image:url(../img/behemoth_hide.png)"></span><b>Behemoth Hide</b></a></div>
+</article></div></section><section><h2>Jak fungují sety</h2><p>Každý kus setu je vlastní legenda (vlastní rituál, jedna na server). <b>Každý kus dává 1/4 efektu, všechny čtyři dohromady 5/4.</b> Kusy různých setů jde kombinovat, ale celý set je jasně nejsilnější. Action bar ukazuje, kolik kusů máš (2/4, 4/4 ✦).</p></section>
+<footer>Forgebound je plugin pro Paper 1.21.11. Tahle wiki se generuje z configu, takže čísla sedí s verzí na serveru.</footer>
+</main>
+<script src="../app.js"></script>
+</body>
+</html>

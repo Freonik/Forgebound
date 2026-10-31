@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events · Forgebound Wiki</title>
+<meta name="description" content="Legendary weapons that exist only once. Forge them, defend them, don&#x27;t let anyone take them.">
+<link rel="icon" href="../img/forge_totem.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<header class="top">
+  <button class="burger" aria-label="Menu" onclick="document.body.classList.toggle('menu')">☰</button>
+  <a class="brand" href="index.html">⚒ <span>Forgebound</span> <small>wiki</small></a>
+  <div class="spacer"></div>
+  <a class="lang" href="../cs/events.html">Čeština</a>
+</header>
+<nav class="side"><a href="index.html" class="">Home</a><a href="forge.html" class="">Forge & stars</a><a href="weapons.html" class="">Weapons</a><a href="relics.html" class="">Relics & sets</a><a href="materials.html" class="">Legendary materials</a><a href="world.html" class="">The world</a><a href="events.html" class="on">Events</a><a href="quests.html" class="">Quests & economy</a><a href="pvp.html" class="">PvP & teams</a><a href="commands.html" class="">Commands</a><div class="ver">Forgebound 2.32.1</div></nav>
+<main>
+<h1>Events</h1>
+<p><code>/events</code> shows what's happening right now. Regular events start on their own when a few players are online.</p><section><h2>☾ Blood Moon</h2><p>Some nights the Blood Moon rises. Until dawn monsters have more health and hit harder, come in pairs, <b>Blood-crazed elites</b> appear (3× XP and Bounty Tokens), legendary materials drop more often and <b>nobody can sleep</b>.</p></section><section><h2>✷ Rift</h2><p>Every 1.5–3 hours a Rift opens near a random player. The coordinates are announced right away and after 3 minutes <b>5 waves</b> of monsters pour out, up to a Rift Ravager and a Rift Evoker. Rewards are split by how much everyone did; the best player also gets a legendary material.</p></section><section><h2>☠ Legend Hunt</h2><p>Every 2–4 hours a random legend holder is <b>hunted for an hour</b>: they glow, their area is announced every 5 minutes and their bounty counts double. In return their abilities recharge twice as fast. Survive the hour and they get tokens.</p></section><section><h2>Small events</h2><ul><li><b>✦ Happy Hour</b> – double XP, double material drops or rituals twice as fast.</li><li><b>⚖ Forge Market</b> – special offers in <code>/shop</code>.</li><li><b>✉ Golden Shipment</b> – a crate floats down somewhere near spawn; first come, first served.</li></ul></section><section id="big"><h2>⚔ Big events</h2><p>Big events are planned ahead by an admin – the server announces them a day, an hour, 10 minutes and a minute before, and the last 10 minutes count down.</p><ul><li><b>☠ The Closing World</b> – the border closes in on one spot. Dying, logging out or leaving the world puts you out. The last one standing wins.</li><li><b>⚔ The Hunt</b> – everyone shows on the locator bar. The most player kills wins.</li><li><b>☠ The Forge Colossus</b> – a giant boss: it slams, throws fire, drags people in and calls skeletons. Only players can hurt it. The most damage wins.</li></ul><p>The winner gets a <a href="#mythic">mythic weapon</a> for 7 days; everyone else tokens, materials and a <a href="quests.html#totem">Totem of the Forge</a>.</p></section><section id="mythic"><h2>✦ Mythic weapons</h2><p>Far stronger than legends – but they <b>fade</b> after 7 days, wherever they are. No stars, they can't be forged and there can be several.</p><div class="grid"><article class="card item" id="worldsplitter" data-search="worldsplitter">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/worldsplitter.png)"></span><div><h3> <span style="color:#ff55ff;font-weight:700;">Worldsplitter </span></h3><div class="sub">Netherite Axe · ⚔ 14 · ⚡ 1.0</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">The world closed in. This is what was left.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Passive</span><p>Resistance I, Strength I</p></div><div class="ab onhit"><span class="tag">On hit</span><p>Crushing Weight: fall onto the target for +1.2 dmg per block fallen (max +24). Standing above it: +2 per block (max +10).</p></div><div class="ab active"><span class="tag"><span style="color:#ff55ff;font-weight:700;">Split the World</span></span><span class="meta"><kbd>F</kbd> · ⏱ 25 s</span><p>Lift every enemy around you into the air, then slam them down (max 16 damage).</p></div><div class="ab active"><span class="tag"><span style="color:#aa00aa;">Event Horizon</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 30 s</span><p>A 9-block gravity field for 7s. Enemies inside are slowed and yanked back if they try to leave.</p></div></div>
+  
+</article><article class="card item" id="bloodfang" data-search="bloodfang">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/bloodfang.png)"></span><div><h3> <span style="color:#ff5555;font-weight:700;">Bloodfang </span></h3><div class="sub">Netherite Sword · ⚔ 11 · ⚡ 1.8</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Taken from the last hunter standing.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Passive</span><p>Speed II. Below 35% HP you regenerate 2% of your max HP every second.</p></div><div class="ab onhit"><span class="tag">On hit</span><p>Heals 20% of damage dealt</p></div><div class="ab onhit"><span class="tag">On hit</span><p>Cleave: charged hits deal 40% damage to everyone within 3 blocks.</p></div><div class="ab active"><span class="tag"><span style="color:#ff5555;">Blood Crescent</span></span><span class="meta"><kbd>F</kbd> · ⏱ 8 s</span><p>Spin a full circle: 10 damage to everyone around you, +1.5 hearts healed per enemy hit.</p></div><div class="ab active"><span class="tag"><span style="color:#aa0000;font-weight:700;">Feeding Frenzy</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 50 s</span><p>Pay 10% of your current health, then regenerate 50% of your MAX health over 8s with Speed III. Debuffs don&#x27;t stick.</p></div></div>
+  
+</article><article class="card item" id="titans_echo" data-search="titan&#x27;s echo">
+  <header><span class="icon anim " style="--s:64px;--n:12;--d:1.80s;background-image:url(../img/titans_echo.png)"></span><div><h3> <span style="color:#ffff55;font-weight:700;">Titan&#x27;s Echo </span></h3><div class="sub">Netherite Sword · ⚔ 12 · ⚡ 1.6</div></div></header>
+  <p class="lore"><span style="color:#aaaaaa;">Torn from the Forge Colossus.</span></p>
+  <div class="abilities"><div class="ab passive"><span class="tag">Passive</span><p>Resistance I</p></div><div class="ab onhit"><span class="tag">On hit</span><p>Echo: 1.25s later the hit repeats for 60% of its damage.</p></div><div class="ab active"><span class="tag"><span style="color:#ffaa00;">Titan&#x27;s Return</span></span><span class="meta"><kbd>F</kbd> · ⏱ 20 s</span><p>Snap back to where you stood 5s ago and regain the health you had then.</p></div><div class="ab active"><span class="tag"><span style="color:#ffff55;font-weight:700;">Colossal Resonance</span></span><span class="meta"><kbd>Shift + F</kbd> · ⏱ 30 s</span><p>Everyone you hurt in the last 10s takes 70% of that damage again (max 20).</p></div></div>
+  
+</article></div></section>
+<footer>Forgebound is a plugin for Paper 1.21.11. This wiki is generated from the config, so the numbers match the server.</footer>
+</main>
+<script src="../app.js"></script>
+</body>
+</html>
