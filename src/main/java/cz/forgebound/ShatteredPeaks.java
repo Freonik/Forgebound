@@ -88,6 +88,11 @@ public final class ShatteredPeaks implements Listener {
         }
     }
 
+    /** Whether this biome pair generates at all (on, and the datapack biomes are there). */
+    boolean on() {
+        return enabled && peaks != null;
+    }
+
     ScorchedNoise noise(long seed) {
         return noises.computeIfAbsent(seed, k -> new ScorchedNoise(k ^ SALT, zoneSize, rarity));
     }

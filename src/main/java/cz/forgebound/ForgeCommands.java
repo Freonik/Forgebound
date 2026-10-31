@@ -221,6 +221,16 @@ final class ForgeCommands {
             plugin.scorched().locate(ctx.getSource().getSender());
             return Command.SINGLE_SUCCESS;
         }));
+        root.then(Commands.literal("locate").requires(ForgeCommands::admin)
+                .then(Commands.argument("biome", StringArgumentType.word())
+                        .suggests((ctx, b) -> {
+                            BiomeLocator.NAMES.forEach(b::suggest);
+                            return b.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            BiomeLocator.locate(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "biome").toLowerCase(Locale.ROOT));
+                            return Command.SINGLE_SUCCESS;
+                        })));
         root.then(Commands.literal("ancient").requires(ForgeCommands::admin)
                 .executes(ctx -> {
                     plugin.stars().list(ctx.getSource().getSender());

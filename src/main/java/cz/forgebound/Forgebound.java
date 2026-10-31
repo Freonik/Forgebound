@@ -380,6 +380,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
         return totems;
     }
 
+    public ShatteredPeaks shatteredPeaks() {
+        return shatteredPeaks;
+    }
+
     public AshenForest ashenForest() {
         return ashenForest;
     }

@@ -152,6 +152,11 @@ final class ScorchedNoise {
 
     /** The nearest scorched spot from (x, z), searching outwards in rings (null if none within maxRadius). */
     int[] nearest(int x, int z, int maxRadius) {
+        return nearest(x, z, maxRadius, null);
+    }
+
+    /** Like {@link #nearest(int, int, int)}, skipping spots where {@code blocked} says another biome wins. */
+    int[] nearest(int x, int z, int maxRadius, java.util.function.BiPredicate<Integer, Integer> blocked) {
         int step = (int) Math.max(16, scale / 16);
         for (int r = 0; r <= maxRadius; r += step) {
             int[] best = null;
@@ -161,7 +166,7 @@ final class ScorchedNoise {
                 double a = 2 * Math.PI * k / points;
                 int px = x + (int) Math.round(Math.cos(a) * r);
                 int pz = z + (int) Math.round(Math.sin(a) * r);
-                if (value(px, pz) > threshold + 0.03) {           // a bit inside, not on the very edge
+                if (value(px, pz) > threshold + 0.03 && (blocked == null || !blocked.test(px, pz))) {           // a bit inside, not on the very edge
                     double d = (double) (px - x) * (px - x) + (double) (pz - z) * (pz - z);
                     if (d < bestDist) {
                         bestDist = d;
