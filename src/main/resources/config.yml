@@ -2749,7 +2749,8 @@ relics:
 #  LEGENDARY MATERIALS
 #  Every weapon and relic needs one of these in its forge recipe.
 #  They drop from bosses and rare mobs (only when a PLAYER kills them, so farms
-#  don't work) and are sometimes found in structure chests and trial vaults.
+#  don't work). Structure chests and trial vaults can hold them too, but only with
+#  loot-settings.chest-drops: true (off by default).
 #  Mob drops fall on the ground where the mob died (glowing, can't burn or despawn).
 #  The materials can't be placed, eaten, traded, brewed or used in vanilla crafting.
 #
@@ -2761,6 +2762,9 @@ relics:
 #    broadcast: false   -> only the finder gets a message
 # ------------------------------------------------------------
 loot-settings:
+  # false = legendary materials never come from chests or trial vaults (structure chests,
+  # Ancient Forge ruins) - only from mobs. The 'loot-table' drops below are then ignored.
+  chest-drops: false
   # Hard cap for every drop chance (legendary = never guaranteed)
   max-chance: 45
   # Each Looting level raises a mob drop chance by this many % of itself (Looting III = +60%)

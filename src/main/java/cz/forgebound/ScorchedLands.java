@@ -749,7 +749,7 @@ public final class ScorchedLands implements Listener {
             int max = Math.max(min, c.getInt("scorched-lands.loot.tokens-max", big ? 3 : 2));
             event.getLoot().add(plugin.bounty().token(min + r.nextInt(max - min + 1)));
         }
-        if (big && r.nextDouble() * 100 < c.getDouble("scorched-lands.loot.material-chance", 3)) {
+        if (big && c.getBoolean("loot-settings.chest-drops", false) && r.nextDouble() * 100 < c.getDouble("scorched-lands.loot.material-chance", 3)) {
             List<ItemManager.Entry> mats = plugin.bounty().enabledMaterials();
             if (!mats.isEmpty()) {
                 event.getLoot().add(mats.get(r.nextInt(mats.size())).item.clone());

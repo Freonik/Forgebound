@@ -274,7 +274,7 @@ public final class LootManager implements Listener {
     }
 
     private boolean addLoot(LootTable table, List<ItemStack> loot, Player player) {
-        if (table == null || chestDrops.isEmpty()) {
+        if (table == null || chestDrops.isEmpty() || !plugin.getConfig().getBoolean("loot-settings.chest-drops", false)) {
             return false;
         }
         NamespacedKey key = table.getKey();
