@@ -259,7 +259,7 @@ craftable:
 # ------------------------------------------------------------
 ritual:
   enabled: true
-  duration-minutes: 15
+  duration-minutes: 25
   # Who sees the ritual boss bar: ALL, NEARBY or NONE
   bossbar: ALL
   bossbar-radius: 64
@@ -271,13 +271,13 @@ ritual:
   show-coordinates: true
   # A ritual can only start with at least this many players online (0 = no limit),
   # so nobody forges a legend alone at 3 am.
-  min-players: 3
+  min-players: 6
   # If players leave during a ritual and fewer than min-players are online, the timer pauses.
   pause-below-min-players: true
   # Reveal the location step by step during the ritual (chat announcement + boss bar).
   # at-percent: how far into the ritual (0-100). radius: -1 = only the dimension,
   # n = an area of ±n blocks (randomly shifted, so its centre isn't the table), 0 = exact coordinates.
-  # For a 15 minute ritual: 0 min, 5 min, 10 min and 13 min.
+  # For a 25 minute ritual: 0 min, about 8 min, 16.5 min and 22 min.
   location-reveal:
     enabled: true
     stages:

@@ -130,7 +130,7 @@ T = {
                'nejdřív jen dimenze, v 33 % oblast ±500 bloků, v 66 % ±100 bloků a v 87 % přesné souřadnice.</li>'
                '<li>Předmět se točí nad stolem a stůl nejde rozbít, spálit ani vyhodit do vzduchu.</li>'
                '<li>Na konci udeří blesk a legenda <b>spadne na stůl</b>. Kdo ji sebere, toho je.</li>'
-               '<li>Rituál potřebuje aspoň <b>{min} hráče online</b>; když jich ubude, čas se zastaví.</li></ul>',
+               '<li>Rituál potřebuje aspoň <b>{min} hráčů online</b>; když jich ubude, čas se zastaví.</li></ul>',
                '<ul><li>The materials are taken and the whole server learns <b>what</b> is being forged – but not by whom.</li>'
                '<li>A boss bar shows the time left and a hint where it is. The location is revealed step by step: '
                'first only the dimension, at 33 % an area of ±500 blocks, at 66 % ±100 blocks and at 87 % the exact coordinates.</li>'

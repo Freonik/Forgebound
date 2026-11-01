@@ -87,7 +87,7 @@ public final class RitualManager implements Listener {
 
     /** Ritual length for a weapon (per-weapon "ritual-minutes" overrides the global value). */
     public long durationMs(ItemManager.Entry weapon) {
-        double global = plugin.getConfig().getDouble("ritual.duration-minutes", 15);
+        double global = plugin.getConfig().getDouble("ritual.duration-minutes", 25);
         double minutes = plugin.getConfig().getDouble(ItemManager.configPath(weapon) + ".ritual-minutes", global);
         return Math.max(1000L, (long) (minutes * 60_000));
     }
@@ -366,7 +366,7 @@ public final class RitualManager implements Listener {
 
     /** Players needed online to start a ritual (and to keep its timer running). 0 = no limit. */
     public int minPlayers() {
-        return Math.max(0, plugin.getConfig().getInt("ritual.min-players", 3));
+        return Math.max(0, plugin.getConfig().getInt("ritual.min-players", 6));
     }
 
     public boolean enoughPlayers() {

@@ -386,7 +386,7 @@ def page_forge(lang):
                  f'<td><div class="chips">{items}</div></td></tr>')
     mx = CFG.get('ancient-forge', {}).get('max-stars', {})
     return (section(t("forge-menu-title", lang), t("forge-menu", lang) + '<img class="shot" src="../img/forge-menu.png" alt="">')
-            + section(t("ritual-title", lang), t("ritual", lang).format(min=CFG['ritual'].get('min-players', 3)))
+            + section(t("ritual-title", lang), t("ritual", lang).format(min=CFG['ritual'].get('min-players', 6)))
             + section(t("unique-title", lang), t("unique", lang))
             + section(t("stars-title", lang), t("stars", lang).format(
                 pvp=CFG['stars'].get('lose-on-player-kill', 2), other=CFG['stars'].get('lose-on-other-death', 0.5),

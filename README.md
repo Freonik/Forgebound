@@ -5,7 +5,7 @@
 <p align="center">
   <b>Legendary one-of-a-kind weapons, relics and forge rituals for Paper servers.</b><br>
   Every weapon has its own abilities, exists only <b>once</b> on the whole server and has to be earned:
-  hunt bosses for legendary materials, then forge it in a 15-minute ritual the whole server can see.
+  hunt bosses for legendary materials, then forge it in a 25-minute ritual the whole server can see.
 </p>
 
 <p align="center"><b>📖 <a href="https://freonik.github.io/Forgebound-releases/">Wiki – every weapon, relic, material and event (CZ / EN)</a></b></p>
@@ -56,7 +56,7 @@
   a growing heart, grey health, soul focus, a parrying shield)
 - **Tank builds**: some abilities scale with your **max HP**, so they get stronger with Heartsteel Core
 - **21 legendary materials** that drop from bosses and rare mobs or hide in structure chests, **45 % max chance**
-- **Forge rituals**: forging takes 15 minutes on a crafting table and the location is revealed step by step
+- **Forge rituals**: forging takes 25 minutes on a crafting table and the location is revealed step by step
 - **One of each**: every weapon and relic can exist only once per server
 - **Two new enchantments**: Forge Touch (auto-smelting) and Bounty Hunter I–III, straight from the enchanting table
 - **Living legends**: `/legends` shows every legend and your own stats with it; abandoned legends return to the forge
@@ -121,7 +121,7 @@
 ```
  kill bosses / loot structures  →  legendary material  →  forge at a crafting table
                                                               │
-                                     15 min ritual, location revealed step by step
+                                     25 min ritual, location revealed step by step
                                                               │
                                               weapon drops on the table (only one exists)
 ```
@@ -146,7 +146,7 @@ Press **FORGE** when you have everything.
 - The item floats and spins above the table. The table can't be broken, burned, blown up or moved while the ritual runs.
 - When the time is up, lightning strikes and the item **drops on the table**. Whoever picks it up owns it, so defend it.
 - The timer only runs while the server is online and survives restarts.
-- A ritual needs at least **3 players online** to start, so nobody forges a legend alone at 3 am.
+- A ritual needs at least **6 players online** to start, so nobody forges a legend alone at 3 am.
   If players leave and fewer than 3 are online, the timer **pauses** until they're back.
   Change it with `ritual.min-players` (0 = no limit) and `ritual.pause-below-min-players`.
 
@@ -839,8 +839,8 @@ craftable:
 ### Ritual
 ```yaml
 ritual:
-  duration-minutes: 15
-  min-players: 3          # players online needed to start (0 = no limit)
+  duration-minutes: 25
+  min-players: 6          # players online needed to start (0 = no limit)
   pause-below-min-players: true
   bossbar: ALL            # ALL, NEARBY or NONE
   show-player: false      # hide who is forging
