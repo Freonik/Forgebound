@@ -774,7 +774,7 @@ public final class EventManager implements Listener {
             }
         }
         if (plugin.bounty() != null
-                && r.nextDouble(100) < plugin.getConfig().getDouble("events.golden-shipment.material-chance", 15)) {
+                && r.nextDouble(100) < plugin.getConfig().getDouble("events.golden-shipment.material-chance", 15) * LootManager.dropMultiplier(plugin)) {
             List<ItemManager.Entry> materials = plugin.bounty().enabledMaterials();
             if (!materials.isEmpty()) {
                 inv.setItem(4, materials.get(r.nextInt(materials.size())).item.clone());

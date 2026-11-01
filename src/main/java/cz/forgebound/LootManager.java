@@ -107,13 +107,18 @@ public final class LootManager implements Listener {
         return new WeaponAbilities.Params(map);
     }
 
+    /** loot-settings.drop-multiplier: scales every legendary drop chance (0.85 = 15 % fewer drops). */
+    static double dropMultiplier(Forgebound plugin) {
+        return Math.max(0, plugin.getConfig().getDouble("loot-settings.drop-multiplier", 0.85));
+    }
+
     private double maxChance() {
         return plugin.getConfig().getDouble("loot-settings.max-chance", 45);
     }
 
     private boolean roll(double chance) {
         double boost = plugin.events() == null ? 1 : plugin.events().lootMultiplier();
-        return ThreadLocalRandom.current().nextDouble(100) < Math.min(maxChance(), chance * boost);
+        return ThreadLocalRandom.current().nextDouble(100) < Math.min(maxChance(), chance * boost * dropMultiplier(plugin));
     }
 
     private void announce(Player player, ItemStack stack, boolean broadcast) {

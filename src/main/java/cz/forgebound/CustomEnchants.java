@@ -796,7 +796,7 @@ public final class CustomEnchants implements Listener {
             }
             // one tome at most, the rarest that hits (and only while that rarity has copies left)
             for (Rarity r : new Rarity[]{Rarity.LEGENDARY, Rarity.RARE, Rarity.COMMON}) {
-                if (!available(r).isEmpty() && roll(sec.getDouble(k + "." + r.name().toLowerCase(), 0) / 100.0)) {
+                if (!available(r).isEmpty() && roll(sec.getDouble(k + "." + r.name().toLowerCase(), 0) / 100.0 * LootManager.dropMultiplier(plugin))) {
                     loot.add(tome(r));
                     return true;
                 }
