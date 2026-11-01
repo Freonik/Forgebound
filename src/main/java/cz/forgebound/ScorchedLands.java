@@ -458,7 +458,7 @@ public final class ScorchedLands implements Listener {
         int x0 = chunkX << 4;
         int z0 = chunkZ << 4;
         int min = Math.max(info.getMinHeight(), 0);
-        int max = Math.min(info.getMaxHeight() - 1, 200);
+        int max = info.getMaxHeight() - 1;                  // the whole height: Amplified Nether makes the nether taller
         for (int x = x0; x < x0 + 16; x++) {
             for (int z = z0; z < z0 + 16; z++) {
                 for (int y = min; y <= max; y++) {
@@ -566,9 +566,9 @@ public final class ScorchedLands implements Listener {
         };
         int cx = bx + type.width / 2;
         int cz = bz + type.depth / 2;
-        // the island's top in the middle of the footprint
+        // the island's top in the middle of the footprint (the whole height: End datapacks like Nullscape build higher islands)
         int floor = Integer.MIN_VALUE;
-        for (int y = 110; y >= 20; y--) {
+        for (int y = info.getMaxHeight() - 24; y >= info.getMinHeight() + 20; y--) {
             if (region.isInRegion(cx, y, cz) && region.getType(cx, y, cz) == Material.END_STONE) {
                 floor = y;
                 break;
