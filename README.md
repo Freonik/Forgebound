@@ -139,9 +139,9 @@ Press **FORGE** when you have everything.
   | Ritual progress | Location shown |
   |---|---|
   | start | only the dimension ("somewhere in the Overworld") |
-  | 33 % | an area of ±500 blocks (randomly shifted, the centre is not the table) |
-  | 66 % | an area of ±100 blocks |
-  | 87 % | exact coordinates |
+  | 33 % | the quarter of the map (north-east, south-west...) |
+  | 66 % | an area of ±500 blocks (randomly shifted, the centre is not the table) |
+  | 87 % | an area of ±70 blocks - the exact table is never announced |
 
 - The item floats and spins above the table. The table can't be broken, burned, blown up or moved while the ritual runs.
 - When the time is up, lightning strikes and the item **drops on the table**. Whoever picks it up owns it, so defend it.
@@ -847,9 +847,9 @@ ritual:
   location-reveal:
     stages:
       - { at-percent: 0,  radius: -1 }    # only the dimension
-      - { at-percent: 33, radius: 500 }
-      - { at-percent: 66, radius: 100 }
-      - { at-percent: 87, radius: 0 }     # exact coordinates
+      - { at-percent: 33, radius: -2 }    # the quarter of the map
+      - { at-percent: 66, radius: 500 }
+      - { at-percent: 87, radius: 70 }    # 0 = exact coordinates
 ```
 
 ### Live MOTD

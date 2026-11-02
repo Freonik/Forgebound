@@ -602,6 +602,17 @@ public final class Forgebound extends JavaPlugin implements Listener {
             seenChanged |= seen.add(mark);
         }
         // the nightly restart only works where the host starts the server again after it stops: off until an admin turns it on
+        // the ritual reveal (2.34.2): quarter -> ±500 -> ±70, never the exact table; replaces the old default stages once
+        String revealMark = "changed:ritual.location-reveal.stages=quadrant";
+        if (!seen.contains(revealMark)) {
+            java.util.List<java.util.Map<?, ?>> now = getConfig().getMapList("ritual.location-reveal.stages");
+            String old = "[{at-percent=0, radius=-1}, {at-percent=33, radius=500}, {at-percent=66, radius=100}, {at-percent=87, radius=0}]";
+            if (now.toString().equals(old)) {
+                getConfig().set("ritual.location-reveal.stages", defaults.getMapList("ritual.location-reveal.stages"));
+                added.add("ritual.location-reveal.stages (quarter -> ±500 -> ±70)");
+            }
+            seenChanged |= seen.add(revealMark);
+        }
         String restartMark = "changed:auto-update.restart.enabled=false";
         if (!seen.contains(restartMark)) {
             if (getConfig().getBoolean("auto-update.restart.enabled", false)) {

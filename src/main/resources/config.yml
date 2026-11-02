@@ -61,6 +61,7 @@ messages:
   ritual-where: " &7at &f{x} {y} {z}"
   ritual-where-area: " &7around &f{x} {z} &8(±{radius} blocks)"
   ritual-where-world: " &7somewhere in &f{world}"
+  ritual-where-quadrant: " &7in the &f{quadrant} &7quarter of &f{world} &8(x{xs}, z{zs})"
   ritual-reveal-area: "&5📍 &7The forge of {item} &7is narrowing down{where}&7."
   ritual-reveal-exact: "&5📍 &7The forge of {item} &7has been revealed{where}&7!"
   ritual-busy-table: "&cThis crafting table is already performing a ritual."
@@ -275,16 +276,17 @@ ritual:
   # If players leave during a ritual and fewer than min-players are online, the timer pauses.
   pause-below-min-players: true
   # Reveal the location step by step during the ritual (chat announcement + boss bar).
-  # at-percent: how far into the ritual (0-100). radius: -1 = only the dimension,
-  # n = an area of ±n blocks (randomly shifted, so its centre isn't the table), 0 = exact coordinates.
+  # at-percent: how far into the ritual (0-100). radius: -1 = only the dimension, -2 = the quarter of the map
+  # (north-east, south-west... around the world border's centre), n = an area of ±n blocks (randomly shifted,
+  # so its centre isn't the table), 0 = exact coordinates.
   # For a 27 minute ritual: 0 min, about 9 min, 18 min and 23.5 min.
   location-reveal:
     enabled: true
     stages:
       - { at-percent: 0, radius: -1 }
-      - { at-percent: 33, radius: 500 }
-      - { at-percent: 66, radius: 100 }
-      - { at-percent: 87, radius: 0 }
+      - { at-percent: 33, radius: -2 }
+      - { at-percent: 66, radius: 500 }
+      - { at-percent: 87, radius: 70 }
 
 # ------------------------------------------------------------
 #  UNIQUE WEAPONS AND RELICS

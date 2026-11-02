@@ -577,7 +577,7 @@ public final class RitualManager implements Listener {
 
     private record Stage(double percent, int radius) { }
 
-    /** Reveal stages sorted by time. radius: -1 = only the world, 0 = exact, n = area of ±n blocks. */
+    /** Reveal stages sorted by time. radius: -1 = only the world, -2 = the quarter of the map, 0 = exact, n = area of ±n blocks. */
     private List<Stage> stages() {
         List<Stage> list = new ArrayList<>();
         if (plugin.getConfig().getBoolean("ritual.location-reveal.enabled", true)) {
@@ -656,7 +656,15 @@ public final class RitualManager implements Listener {
         String text;
         int x = r.table.getBlockX();
         int z = r.table.getBlockZ();
-        if (stage.radius() < 0) {
+        if (stage.radius() == -2) {
+            // the quarter of the map (around the world border's centre): north = -Z, east = +X
+            Location c = r.table.getWorld().getWorldBorder().getCenter();
+            boolean east = x >= c.getBlockX();
+            boolean south = z >= c.getBlockZ();
+            String quadrant = (south ? "south" : "north") + "-" + (east ? "east" : "west");
+            text = plugin.getConfig().getString("messages.ritual-where-quadrant", " &7in the &f{quadrant} &7quarter of &f{world} &8(x{xs}, z{zs})")
+                    .replace("{quadrant}", quadrant).replace("{xs}", east ? "+" : "−").replace("{zs}", south ? "+" : "−");
+        } else if (stage.radius() < 0) {
             text = plugin.getConfig().getString("messages.ritual-where-world", " &7somewhere in &f{world}");
         } else if (stage.radius() == 0) {
             text = plugin.getConfig().getString("messages.ritual-where", " &7at &f{x} {y} {z}");
