@@ -126,6 +126,21 @@ public final class BountyManager implements Listener {
         return map;
     }
 
+    /** Clears the bounty of these players. Returns how many had one. */
+    public int purge(java.util.Set<UUID> players) {
+        int n = 0;
+        for (UUID u : players) {
+            if (data.isSet("bounty." + u)) {
+                data.set("bounty." + u, null);
+                n++;
+            }
+        }
+        if (n > 0) {
+            save();
+        }
+        return n;
+    }
+
     public int bountyOf(UUID player) {
         return data.getInt("bounty." + player, 0);
     }

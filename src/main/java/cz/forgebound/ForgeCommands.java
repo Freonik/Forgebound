@@ -139,6 +139,26 @@ final class ForgeCommands {
                                         .executes(ctx -> forge(ctx, "give", onePlayer(ctx, "player").getName(),
                                                 ref(ctx.getArgument("item", Key.class)),
                                                 String.valueOf(IntegerArgumentType.getInteger(ctx, "amount"))))))));
+        root.then(Commands.literal("purge").requires(ForgeCommands::admin)
+                .then(Commands.argument("name", StringArgumentType.word())
+                        .executes(ctx -> {
+                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), false);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                        .then(Commands.literal("confirm").executes(ctx -> {
+                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), true);
+                            return Command.SINGLE_SUCCESS;
+                        }))));
+        root.then(Commands.literal("release").requires(ForgeCommands::admin)
+                .then(Commands.literal("all-admin")
+                        .executes(ctx -> {
+                            Purge.releaseAdminGiven(plugin, ctx.getSource().getSender(), false);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                        .then(Commands.literal("confirm").executes(ctx -> {
+                            Purge.releaseAdminGiven(plugin, ctx.getSource().getSender(), true);
+                            return Command.SINGLE_SUCCESS;
+                        }))));
         for (String sub : List.of("release", "finish")) {
             root.then(Commands.literal(sub).requires(ForgeCommands::admin)
                     .then(Commands.argument("legend", ArgumentTypes.key()).suggests(suggest(this::legendIds))

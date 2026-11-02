@@ -130,6 +130,35 @@ public final class LegendManager implements Listener {
     }
 
     /** No copy is valid any more (the legend went back to the forge). */
+    /** Legends someone holds that nobody forged (given with /forge give, e.g. while testing): ref -> holder name. */
+    public java.util.Map<String, String> adminGiven() {
+        java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
+        for (ItemManager.Kind kind : new ItemManager.Kind[] {ItemManager.Kind.WEAPON, ItemManager.Kind.RELIC}) {
+            for (ItemManager.Entry entry : items.all(kind)) {
+                String base = "holder." + key(entry.ref());
+                if (legends.isSet(base + ".name") && plugin.rituals().claim(entry) == null) {
+                    map.put(entry.ref(), legends.getString(base + ".name", "?"));
+                }
+            }
+        }
+        return map;
+    }
+
+    /** Removes the legend stats (kills, mob kills, damage) of these players. Returns how many players had some. */
+    public int purgeStats(java.util.Set<UUID> players) {
+        int n = 0;
+        for (UUID u : players) {
+            if (stats.isSet(u.toString())) {
+                stats.set(u.toString(), null);
+                n++;
+            }
+        }
+        if (n > 0) {
+            saveStats();
+        }
+        return n;
+    }
+
     public void revoke(String ref) {
         legends.set("current." + key(ref), "revoked-" + UUID.randomUUID());
         legends.set("holder." + key(ref), null);

@@ -125,6 +125,37 @@ public final class TopManager {
         }
     }
 
+    /** Every UUID the records know under this name (any letter case). */
+    public java.util.Set<UUID> uuidsNamed(String name) {
+        java.util.Set<UUID> set = new java.util.HashSet<>();
+        for (String k : records.getKeys(false)) {
+            if (name.equalsIgnoreCase(records.getString(k + ".name", ""))) {
+                try {
+                    set.add(UUID.fromString(k));
+                } catch (IllegalArgumentException ignored) {
+                    // not a player entry
+                }
+            }
+        }
+        return set;
+    }
+
+    /** Removes the records (wardens, rifts, stars...) of these players. Returns how many had some. */
+    public int purge(java.util.Set<UUID> players) {
+        int n = 0;
+        for (UUID u : players) {
+            if (records.isSet(u.toString())) {
+                records.set(u.toString(), null);
+                n++;
+            }
+        }
+        if (n > 0) {
+            plugin.saveYaml(records, file);
+        }
+        rebuild();
+        return n;
+    }
+
     public void rebuild() {
         scanStars();
         for (String cat : CATEGORIES.keySet()) {
