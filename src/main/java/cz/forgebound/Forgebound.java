@@ -154,6 +154,13 @@ public final class Forgebound extends JavaPlugin implements Listener {
         advancements.start();
         bounty = new BountyManager(this, items);
         getServer().getPluginManager().registerEvents(bounty, this);
+        // Forgebound Teams asks these: a player's bounty (team bounty) and new Bounty Tokens (team stash rewards, war pots)
+        java.util.function.ToIntFunction<java.util.UUID> bountyOf = u -> bounty.bountyOf(u);
+        getServer().getServicesManager().register(java.util.function.ToIntFunction.class, bountyOf, this,
+                org.bukkit.plugin.ServicePriority.Normal);
+        java.util.function.IntFunction<org.bukkit.inventory.ItemStack> tokens = n -> bounty.token(n);
+        getServer().getServicesManager().register(java.util.function.IntFunction.class, tokens, this,
+                org.bukkit.plugin.ServicePriority.Normal);
         bounty.start();
         shop = new ShopManager(this);
         getServer().getPluginManager().registerEvents(shop, this);

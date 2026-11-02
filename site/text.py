@@ -322,10 +322,22 @@ T = {
     'teams-title': ('Týmy', 'Teams'),
     'teams': ('<p>Týmy přidává plugin <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a>. <code>/team</code> otevře menu, kde jde '
               'naklikat všechno: založení týmu (až 3 hráči), pozvánky, tag a barva před jménem, týmový chat (<code>!zpráva</code>), spojenci '
-              '(<code>@zpráva</code>), války a žebříček týmů. Spoluhráči a spojenci si neublíží – ani schopnostmi legend.</p>',
+              '(<code>@zpráva</code>), války a žebříček týmů. Spoluhráči a spojenci si neublíží – ani schopnostmi legend.</p>'
+              '<ul><li><b>Vlastní banner</b> (vyrob ho na tkalcovském stavu, drž v ruce a dej <code>/team banner</code>) a přes 30 barev, i vlastní <code>#rrggbb</code>.</li>'
+              '<li><b>Týmový stash</b> (<code>/team stash</code>): společná truhla na Bounty Tokeny.</li>'
+              '<li><b>Týmová bounty:</b> kdo zabije člena týmu, dostane navíc 10 % z bounty zbytku týmu.</li>'
+              '<li><b>Sázky ve válce:</b> oba týmy vsadí tokeny ze stashe, kdo má víc killů, bere všechno.</li>'
+              '<li><b>Týdenní odměny:</b> každou neděli ve 20:00 dostanou 3 nejlepší týmy týdne 30 / 20 / 10 tokenů do stashe.</li>'
+              '<li><b>Spolu:</b> členové do 16 bloků od sebe mají Regeneration I.</li></ul>',
               '<p>Teams come from the <a href="https://github.com/Freonik/Forgebound-releases">Forgebound Teams</a> plugin. <code>/team</code> opens a menu where '
               'everything can be clicked: create a team (up to 3 players), invites, a tag and color in front of the names, team chat (<code>!message</code>), allies '
-              '(<code>@message</code>), wars and the team leaderboard. Teammates and allies can\'t hurt each other – not even with legend abilities.</p>'),
+              '(<code>@message</code>), wars and the team leaderboard. Teammates and allies can\'t hurt each other – not even with legend abilities.</p>'
+              '<ul><li><b>Your own banner</b> (make it at a loom, hold it and run <code>/team banner</code>) and over 30 colors, even your own <code>#rrggbb</code>.</li>'
+              '<li><b>Team stash</b> (<code>/team stash</code>): a shared chest for Bounty Tokens.</li>'
+              '<li><b>Team bounty:</b> killing a member also pays 10 % of the bounties of the rest of the team.</li>'
+              '<li><b>War stakes:</b> both teams bet tokens from their stash, the one with more kills takes it all.</li>'
+              '<li><b>Weekly rewards:</b> every Sunday at 20:00 the 3 best teams of the week get 30 / 20 / 10 tokens into their stash.</li>'
+              '<li><b>Together:</b> members within 16 blocks of each other get Regeneration I.</li></ul>'),
 
     'cmd-col': ('Příkaz', 'Command'), 'what-col': ('Co dělá', 'What it does'),
 }
