@@ -259,7 +259,7 @@ craftable:
 # ------------------------------------------------------------
 ritual:
   enabled: true
-  duration-minutes: 25
+  duration-minutes: 27
   # Who sees the ritual boss bar: ALL, NEARBY or NONE
   bossbar: ALL
   bossbar-radius: 64
@@ -277,7 +277,7 @@ ritual:
   # Reveal the location step by step during the ritual (chat announcement + boss bar).
   # at-percent: how far into the ritual (0-100). radius: -1 = only the dimension,
   # n = an area of ±n blocks (randomly shifted, so its centre isn't the table), 0 = exact coordinates.
-  # For a 25 minute ritual: 0 min, about 8 min, 16.5 min and 22 min.
+  # For a 27 minute ritual: 0 min, about 9 min, 18 min and 23.5 min.
   location-reveal:
     enabled: true
     stages:

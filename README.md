@@ -5,7 +5,7 @@
 <p align="center">
   <b>Legendary one-of-a-kind weapons, relics and forge rituals for Paper servers.</b><br>
   Every weapon has its own abilities, exists only <b>once</b> on the whole server and has to be earned:
-  hunt bosses for legendary materials, then forge it in a 25-minute ritual the whole server can see.
+  hunt bosses for legendary materials, then forge it in a 27-minute ritual the whole server can see.
 </p>
 
 <p align="center"><b>📖 <a href="https://freonik.github.io/Forgebound-releases/">Wiki – every weapon, relic, material and event (CZ / EN)</a></b></p>
@@ -56,7 +56,7 @@
   a growing heart, grey health, soul focus, a parrying shield)
 - **Tank builds**: some abilities scale with your **max HP**, so they get stronger with Heartsteel Core
 - **21 legendary materials** that drop from bosses and rare mobs or hide in structure chests, **45 % max chance**
-- **Forge rituals**: forging takes 25 minutes on a crafting table and the location is revealed step by step
+- **Forge rituals**: forging takes 27 minutes on a crafting table and the location is revealed step by step
 - **One of each**: every weapon and relic can exist only once per server
 - **Two new enchantments**: Forge Touch (auto-smelting) and Bounty Hunter I–III, straight from the enchanting table
 - **Living legends**: `/legends` shows every legend and your own stats with it; abandoned legends return to the forge
@@ -121,7 +121,7 @@
 ```
  kill bosses / loot structures  →  legendary material  →  forge at a crafting table
                                                               │
-                                     25 min ritual, location revealed step by step
+                                     27 min ritual, location revealed step by step
                                                               │
                                               weapon drops on the table (only one exists)
 ```
@@ -839,7 +839,7 @@ craftable:
 ### Ritual
 ```yaml
 ritual:
-  duration-minutes: 25
+  duration-minutes: 27
   min-players: 6          # players online needed to start (0 = no limit)
   pause-below-min-players: true
   bossbar: ALL            # ALL, NEARBY or NONE
