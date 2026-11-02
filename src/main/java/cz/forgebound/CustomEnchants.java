@@ -229,23 +229,36 @@ public final class CustomEnchants implements Listener {
         }
     }
 
-    /** Legends forged by players (rituals, the forge, advancements - not admin gifts) and how many unlock it. */
+    /**
+     * Legends forged by players (rituals, the forge, advancements - not admin gifts) and how many unlock it.
+     * A whole armor set counts as ONE legend (any of its pieces forged = the set counts).
+     */
     private int[] progress() {
-        int forged = 0;
+        java.util.Set<String> forged = new java.util.HashSet<>();
         if (plugin.forgeData() != null) {
-            for (ForgeData.Claim c : plugin.forgeData().claims().values()) {
+            for (java.util.Map.Entry<String, ForgeData.Claim> e : plugin.forgeData().claims().entrySet()) {
+                ForgeData.Claim c = e.getValue();
                 if (c.state() == ForgeData.State.FORGED && c.source() != null
                         && java.util.Set.of("ritual", "forge", "advancement").contains(c.source())) {
-                    forged++;
+                    forged.add(unit(plugin.items().get(e.getKey()), e.getKey()));
                 }
             }
         }
-        int total = 0;
+        java.util.Set<String> all = new java.util.HashSet<>();
         for (ItemManager.Kind k : new ItemManager.Kind[]{ItemManager.Kind.WEAPON, ItemManager.Kind.RELIC}) {
-            total += plugin.items().forgeable(k).size();
+            for (ItemManager.Entry entry : plugin.items().forgeable(k)) {
+                all.add(unit(entry, entry.ref()));
+            }
         }
+        int count = plugin.getConfig().getInt("custom-enchants.unlock-count", 5);
         double fraction = plugin.getConfig().getDouble("custom-enchants.unlock-fraction", 1.0 / 3);
-        return new int[]{forged, Math.max(1, (int) Math.ceil(total * fraction))};
+        int needed = count > 0 ? count : (int) Math.ceil(all.size() * fraction);
+        return new int[]{forged.size(), Math.max(1, needed)};
+    }
+
+    /** One "legend" for the unlock: an armor set as a whole, anything else on its own. */
+    private static String unit(ItemManager.Entry entry, String ref) {
+        return entry != null && entry.relic != null && entry.relic.set() != null ? "set:" + entry.relic.set() : ref;
     }
 
     /** Called when a legend is forged (and every few minutes): unlocks the enchantments once enough exist. */

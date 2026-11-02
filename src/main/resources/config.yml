@@ -2065,8 +2065,10 @@ forge-totem:
 # ------------------------------------------------------------
 custom-enchants:
   # off = never, on = always, unlock = they wake up for the whole server (with a ceremony) once players have forged
-  # unlock-fraction of the legends (admin gifts don't count). /forge enchants [status|unlock|lock|reset]
+  # unlock-count legends (admin gifts don't count; a whole armor set counts as one legend).
+  # unlock-count: 0 = use unlock-fraction of all the legends instead. /forge enchants [status|unlock|lock|reset]
   mode: unlock
+  unlock-count: 5
   unlock-fraction: 0.334
   # how many times each enchantment can come out of a tome per season (/forge enchants reset = new season)
   copies:
