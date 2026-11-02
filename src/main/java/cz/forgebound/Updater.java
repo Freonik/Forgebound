@@ -86,9 +86,11 @@ public final class Updater implements Listener {
                     String before = pending;
                     check();
                     String after = pending;
+                    if (after != null && !after.equals(before)) {
+                        return;           // tell() already wrote it to the console and to every admin online
+                    }
                     Bukkit.getScheduler().runTask(plugin, () -> sender.sendMessage(ItemManager.color(
-                            after != null && !after.equals(before) ? "&8[&6Update&8] " + after
-                                    : downloaded != null ? "&aVersion &f" + downloaded + " &ais already downloaded, restart to use it."
+                            downloaded != null ? "&aVersion &f" + downloaded + " &ais already downloaded, restart to use it."
                                     : lastError != null ? "&cCouldn't check for updates: &7" + lastError
                                     : "&7You have the newest version &8(" + plugin.getPluginMeta().getVersion() + ")")));
                 });
