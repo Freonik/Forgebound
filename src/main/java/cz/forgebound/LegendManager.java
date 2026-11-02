@@ -335,7 +335,12 @@ public final class LegendManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onOpen(InventoryOpenEvent event) {
-        if (event.getPlayer() instanceof Player player && !(event.getInventory().getHolder() instanceof LegendsHolder)) {
+        // only real storage (chests, barrels, shulkers, ender chests, minecarts, donkeys...) - never a plugin menu,
+        // whose legend icons are pictures, not copies
+        InventoryHolder holder = event.getInventory().getHolder(false);
+        boolean storage = holder instanceof org.bukkit.inventory.BlockInventoryHolder || holder instanceof org.bukkit.block.DoubleChest
+                || holder instanceof org.bukkit.entity.Entity || event.getInventory().getType() == org.bukkit.event.inventory.InventoryType.ENDER_CHEST;
+        if (event.getPlayer() instanceof Player player && storage) {
             Bukkit.getScheduler().runTask(plugin, () -> sweep(event.getInventory(), player));
         }
     }
