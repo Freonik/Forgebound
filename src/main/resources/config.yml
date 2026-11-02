@@ -2766,8 +2766,8 @@ loot-settings:
   # Ancient Forge ruins) - only from mobs. The 'loot-table' drops below are then ignored.
   chest-drops: false
   # Every legendary drop chance is multiplied by this (mob drops, Sealed Tomes, event and ruin
-  # materials): 0.85 = 15 % fewer drops, 1 = the chances exactly as written
-  drop-multiplier: 0.85
+  # materials): 0.357 = 15 %, then 30 %, then 40 % fewer drops, 1 = the chances exactly as written
+  drop-multiplier: 0.357
   # Hard cap for every drop chance (legendary = never guaranteed)
   max-chance: 45
   # Each Looting level raises a mob drop chance by this many % of itself (Looting III = +60%)

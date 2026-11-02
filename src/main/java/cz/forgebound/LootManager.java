@@ -107,9 +107,9 @@ public final class LootManager implements Listener {
         return new WeaponAbilities.Params(map);
     }
 
-    /** loot-settings.drop-multiplier: scales every legendary drop chance (0.85 = 15 % fewer drops). */
+    /** loot-settings.drop-multiplier: scales every legendary drop chance (0.357 = about 64 % fewer drops). */
     static double dropMultiplier(Forgebound plugin) {
-        return Math.max(0, plugin.getConfig().getDouble("loot-settings.drop-multiplier", 0.85));
+        return Math.max(0, plugin.getConfig().getDouble("loot-settings.drop-multiplier", 0.357));
     }
 
     private double maxChance() {

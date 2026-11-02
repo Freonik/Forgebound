@@ -581,7 +581,8 @@ public final class Forgebound extends JavaPlugin implements Listener {
                 {"doppelganger.speed", "0.3", "0.19"},
                 {"doppelganger.knockback-resistance", "0.4", "0"},
                 {"ritual.min-players", "3", "6"}, {"ritual.duration-minutes", "15", "25"},
-                {"ritual.duration-minutes", "25", "27"}};
+                {"ritual.duration-minutes", "25", "27"},
+                {"loot-settings.drop-multiplier", "0.85", "0.357"}};
         for (String[] c : changedDefaults) {
             String mark = "changed:" + c[0] + "=" + c[2];
             if (seen.contains(mark)) {
