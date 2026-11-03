@@ -64,7 +64,7 @@ run('menu.py', f'{CC}/textures/font')
 
 # ---- models
 for n in ['echo_blade', 'graviton_hammer', 'soulbinder', 'butcher_cleaver', 'abyssal_maw', 'clawline_pick', 'silk_needle',
-          'knightfall', 'rimebreaker', 'rimebreaker_thrown', 'worldsplitter', 'bloodfang', 'titans_echo']:
+          'knightfall', 'rimebreaker', 'rimebreaker_thrown', 'worldsplitter', 'bloodfang', 'titans_echo', 'chainbreaker']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": f"customcraft:item/{n}"}})
 for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
@@ -135,7 +135,8 @@ wjson(f'{MC}/netherite_pickaxe.json', dispatch([(1008, model("customcraft:item/c
 wjson(f'{MC}/netherite_axe.json', dispatch([(1006, model("customcraft:item/butcher_cleaver")),
                                             (1011, model("customcraft:item/rimebreaker")),
                                             (1014, model("customcraft:item/rimebreaker_thrown")),
-                                            (1101, model("customcraft:item/worldsplitter"))], model("minecraft:item/netherite_axe")))
+                                            (1101, model("customcraft:item/worldsplitter")),
+                                            (1104, model("customcraft:item/chainbreaker"))], model("minecraft:item/netherite_axe")))
 # Totem of the Forge
 wjson(f'{CC}/models/item/forge_totem.json', {"parent": "minecraft:item/generated", "textures": {"layer0": "customcraft:item/forge_totem"}})
 wjson(f'{MC}/totem_of_undying.json', dispatch([(1601, model("customcraft:item/forge_totem"))], model("minecraft:item/totem_of_undying")))

@@ -797,7 +797,7 @@ public final class BigEventManager implements Listener {
                     "player", name(winner)));
             plugin.getLogger().info("[BigEvent] border won by " + name(winner) + " (" + everyone.size() + " players, kills "
                     + kills.getOrDefault(winner, 0) + ")");
-            reward(winner, c.getInt("winner-tokens", 10), c.getString("mythic", "worldsplitter"), 1, type(),
+            reward(winner, c.getInt("winner-tokens", 10), c.getString("mythic", "chainbreaker"), 1, type(),
                     c.getInt("winner-totems", 1));
             Set<UUID> rest = new LinkedHashSet<>(everyone);
             rest.remove(winner);

@@ -174,8 +174,18 @@ public final class AbilityManager implements Listener {
     private final Map<UUID, Map<String, Integer>> chargeUse = new HashMap<>();
     /** attacker -> charged hits counted for Silk Bind */
     private final Map<UUID, Integer> silkHits = new HashMap<>();
+    /** Chainbreaker: player -> empowered hits left (Shattered Shackles) */
+    private final Map<UUID, Integer> shackles = new HashMap<>();
+    /** Chainbreaker: player -> Lashing Chain ready again at (ms) */
+    private final Map<UUID, Long> lashReady = new HashMap<>();
+    /** Chainbreaker: thief -> the ultimate it holds (Usurp) */
+    private final Map<UUID, Stolen> stolen = new HashMap<>();
+    /** victim -> its ultimate, held by a thief (can't be used until the thief uses it or it runs out) */
+    private final Map<UUID, Stolen> sealed = new HashMap<>();
     private RelicManager relics;
     private int ticks;
+
+    private record Stolen(UUID thief, UUID victim, String weaponRef, String activeKey, String name, long until) { }
 
     private record Snapshot(Location location, double health, long time) { }
 
@@ -332,6 +342,19 @@ public final class AbilityManager implements Listener {
                 }
             }
             bloodrush.values().removeIf(t -> t < now);
+            for (Iterator<Map.Entry<UUID, Stolen>> it = stolen.entrySet().iterator(); it.hasNext(); ) {
+                Stolen st = it.next().getValue();
+                Player thief = Bukkit.getPlayer(st.thief());
+                if (st.until() < now || thief == null || thief.isDead()) {
+                    it.remove();
+                    releaseSeal(st);
+                    if (thief != null && st.until() < now) {
+                        thief.sendActionBar(plugin.raw("ability-usurp-faded", "&8⛓ &7The usurped &d{ability} &7slipped away.",
+                                "ability", ItemManager.color(st.name())));
+                    }
+                }
+            }
+            sealed.values().removeIf(st -> st.until() < now);
             frozenBy.values().removeIf(f -> f.until() < now);
             pinArmed.values().removeIf(t -> t < now);
             seaKing.values().removeIf(t -> t < now);
@@ -360,6 +383,11 @@ public final class AbilityManager implements Listener {
                 bar.append("&bRECALL");
             } else if (active.type() == ActiveType.TIDAL_SURGE && seaKing(player)) {
                 bar.append("&b∞");
+            } else if (active.type() == ActiveType.USURP && stolen.containsKey(player.getUniqueId())) {
+                Stolen st = stolen.get(player.getUniqueId());
+                bar.append("&d⛓ ").append(st.name()).append(" &7").append(seconds(st.until() - now)).append("s");
+            } else if (sealedFor(player, weapon, active) != null) {
+                bar.append("&5⛓ ").append(seconds(sealedFor(player, weapon, active).until() - now)).append("s");
             } else if (charges > 1 && left <= 0) {
                 Map<String, Integer> use = chargeUse.get(player.getUniqueId());
                 int used = use == null ? 0 : use.getOrDefault(weapon.ref() + ":" + active.key(), 0);
@@ -468,6 +496,19 @@ public final class AbilityManager implements Listener {
         if (last != null && now - last < 150) {
             return true;
         }
+        // Usurp: while holding a stolen ultimate, Shift+F unleashes it (the Usurp cooldown keeps running)
+        if (active.type() == ActiveType.USURP && stolen.containsKey(player.getUniqueId())) {
+            castStolen(player, weapon);
+            return true;
+        }
+        Stolen seal = sealedFor(player, weapon, active);
+        if (seal != null) {
+            Player thief = Bukkit.getPlayer(seal.thief());
+            player.sendActionBar(plugin.raw("ability-usurped", "&5⛓ &d{ability} &7was usurped by &c{thief}&7! &8({time}s)",
+                    "ability", ItemManager.color(active.name()), "thief", thief == null ? "?" : thief.getName(),
+                    "time", String.valueOf(seconds(seal.until() - now))));
+            return true;
+        }
         // Rimebreaker: pressing F again calls the thrown axe back (no cooldown)
         if (active.type() == ActiveType.AXE_THROW && axes.containsKey(player.getUniqueId())) {
             recallAxe(player);
@@ -514,6 +555,7 @@ public final class AbilityManager implements Listener {
                                     * (plugin.stars() == null ? 1 : plugin.stars().cooldownMultiplier(player))));
                 }
             }
+            empower(player, weapon);
             if (plugin.legends() != null) {
                 plugin.legends().ability(player, weapon.ref(),
                         trigger == Trigger.SHIFT_SWAP || trigger == Trigger.SHIFT_RIGHT_CLICK);
@@ -584,6 +626,8 @@ public final class AbilityManager implements Listener {
             case GREAT_TIDE -> greatTide(player, p);
             case SPOTLIGHT -> spotlight(player, p);
             case FINALE -> finale(player, weapon, p);
+            case REGICIDE -> regicide(player, p);
+            case USURP -> usurp(player, p);
         };
     }
 
@@ -3078,6 +3122,52 @@ public final class AbilityManager implements Listener {
                     world.playSound(at, Sound.BLOCK_WOOL_PLACE, 1.4f, 0.6f);
                 }
             }
+            case SHACKLES -> {
+                Integer left = shackles.get(attacker.getUniqueId());
+                if (left == null || left <= 0) {
+                    break;
+                }
+                if (left <= 1) {
+                    shackles.remove(attacker.getUniqueId());
+                } else {
+                    shackles.put(attacker.getUniqueId(), left - 1);
+                }
+                event.setDamage(event.getDamage() * (1 + p.d("bonus-percent", 30) / 100.0));
+                double splash = event.getDamage() * p.d("splash-percent", 50) / 100.0;
+                double radius = p.d("radius", 3);
+                for (LivingEntity near : targets(attacker, victim.getLocation(), radius)) {
+                    if (!near.equals(victim)) {
+                        hurt(attacker, near, splash);
+                        world.spawnParticle(Particle.DUST, near.getLocation().add(0, 1, 0), 8, 0.3, 0.4, 0.3, 0, CHAIN_EMBER);
+                    }
+                }
+                ring(victim.getLocation().add(0, 0.3, 0), radius, 24,
+                        l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0.05, 0, 0, CHAIN_EMBER));
+                world.spawnParticle(Particle.BLOCK, at, 24, 0.4, 0.4, 0.4, 0, CHAIN_BLOCK);
+                world.playSound(at, Sound.BLOCK_CHAIN_BREAK, 1.4f, 0.6f);
+                world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.7f);
+            }
+            case LASHING_CHAIN -> {
+                long now = System.currentTimeMillis();
+                if (lashReady.getOrDefault(attacker.getUniqueId(), 0L) > now) {
+                    break;
+                }
+                LivingEntity next = null;
+                double best = Double.MAX_VALUE;
+                for (LivingEntity other : targets(attacker, victim.getLocation(), p.d("range", 5))) {
+                    double d = other.getLocation().distanceSquared(victim.getLocation());
+                    if (!other.equals(victim) && d < best) {
+                        best = d;
+                        next = other;
+                    }
+                }
+                if (next == null) {
+                    break;
+                }
+                lashReady.put(attacker.getUniqueId(), now + (long) (p.d("cooldown", 4) * 1000));
+                LivingEntity lashed = next;
+                Bukkit.getScheduler().runTask(plugin, () -> lash(attacker, lashed, p));
+            }
             case LIFESTEAL -> {
                 double heal = event.getFinalDamage() * p.d("percent", 20) / 100.0;
                 attacker.setHealth(Math.min(maxHealth(attacker), attacker.getHealth() + heal(attacker, heal)));
@@ -3190,6 +3280,231 @@ public final class AbilityManager implements Listener {
             if (map.isEmpty()) {
                 cooldowns.remove(id);
             }
+        }
+    }
+
+    // ================================================================ CHAINBREAKER (mythic)
+
+    private static final Particle.DustOptions CHAIN_EMBER = new Particle.DustOptions(Color.fromRGB(230, 70, 80), 1.1f);
+    private static final org.bukkit.block.data.BlockData CHAIN_BLOCK = Material.IRON_CHAIN.createBlockData();
+
+    /** Shattered Shackles: every ability the weapon fires makes the next hits stronger. */
+    private void empower(Player player, ItemManager.Entry weapon) {
+        OnHit hit = weapon.abilities.onHit(HitType.SHACKLES);
+        if (hit != null) {
+            shackles.put(player.getUniqueId(), Math.max(1, hit.params().i("hits", 2)));
+            player.getWorld().spawnParticle(Particle.DUST, player.getLocation().add(0, 1, 0), 12, 0.35, 0.5, 0.35, 0, CHAIN_EMBER);
+        }
+    }
+
+    /** Lashing Chain: a chain jumps to the next enemy, hurts and slows it, and pulls you to it. */
+    private void lash(Player player, LivingEntity target, Params p) {
+        if (!player.isOnline() || player.isDead() || !target.isValid() || target.isDead()
+                || target.getWorld() != player.getWorld()) {
+            return;
+        }
+        World world = player.getWorld();
+        hurt(player, target, p.d("damage", 4));
+        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, p.i("slow-ticks", 40), Math.max(0, p.i("slow-level", 2) - 1)));
+        Vector pull = target.getLocation().toVector().subtract(player.getLocation().toVector());
+        double distance = pull.length();
+        if (distance > 1.5) {
+            pull.normalize().multiply(Math.min(2.2, (0.45 + distance * 0.2) * p.d("pull", 1.0)));
+            pull.setY(Math.max(pull.getY(), 0) + 0.25);
+            player.setVelocity(pull);
+            noFall.put(player.getUniqueId(), System.currentTimeMillis() + 2500);
+        }
+        world.playSound(target.getLocation(), Sound.BLOCK_CHAIN_HIT, 1.4f, 0.8f);
+        world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 0.8f, 0.6f);
+        Object chain = new Object();
+        repeat(1, 8, step -> {
+            if (!player.isOnline() || !target.isValid() || target.getWorld() != player.getWorld()) {
+                ChainVisual.remove(chain);
+                return false;
+            }
+            ChainVisual.draw(plugin, chain, player.getLocation().add(0, 1.1, 0),
+                    target.getLocation().add(0, target.getHeight() / 2, 0));
+            return true;
+        });
+    }
+
+    /** Regicide: a chain hooks the target, you dash to it and strike; the lower your health, the more you heal. */
+    private boolean regicide(Player player, Params p) {
+        LivingEntity target = lookTarget(player, p.d("range", 10));
+        if (target == null) {
+            fail(player, "ability-regicide-miss", "&cNo enemy in sight.");
+            return false;
+        }
+        World world = player.getWorld();
+        double damage = p.d("damage", 8);
+        double speed = p.d("speed", 1.5);
+        noFall.put(player.getUniqueId(), System.currentTimeMillis() + 3000);
+        world.playSound(player.getLocation(), Sound.BLOCK_CHAIN_PLACE, 1.4f, 0.6f);
+        world.playSound(player.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 1f, 0.8f);
+        Object chain = new Object();
+        repeat(1, p.i("ticks", 14), step -> {
+            if (!player.isOnline() || player.isDead() || !target.isValid() || target.isDead()
+                    || target.getWorld() != world) {
+                ChainVisual.remove(chain);
+                return false;
+            }
+            Location hand = player.getLocation().add(0, 1.1, 0);
+            Location aim = target.getLocation().add(0, target.getHeight() / 2, 0);
+            ChainVisual.draw(plugin, chain, hand, aim);
+            Vector to = aim.toVector().subtract(hand.toVector());
+            if (to.lengthSquared() < 2.4 * 2.4) {
+                ChainVisual.remove(chain);
+                player.setVelocity(player.getVelocity().multiply(0.15));
+                hurt(player, target, damage);
+                double max = maxHealth(player);
+                double missing = Math.max(0, 1 - player.getHealth() / max);
+                double add = heal(player, p.d("heal", 2) + missing * p.d("heal-low-bonus", 8));
+                if (add > 0 && !player.isDead()) {
+                    player.setHealth(Math.min(max, player.getHealth() + add));
+                }
+                world.spawnParticle(Particle.SWEEP_ATTACK, aim, 2, 0.3, 0.2, 0.3, 0);
+                world.spawnParticle(Particle.BLOCK, aim, 30, 0.4, 0.5, 0.4, 0, CHAIN_BLOCK);
+                world.spawnParticle(Particle.DUST, player.getLocation().add(0, 1, 0), 14, 0.35, 0.5, 0.35, 0, CHAIN_EMBER);
+                world.playSound(aim, Sound.BLOCK_CHAIN_BREAK, 1.5f, 0.5f);
+                world.playSound(aim, Sound.ENTITY_IRON_GOLEM_ATTACK, 1.2f, 0.7f);
+                return false;
+            }
+            Vector v = to.normalize().multiply(speed);
+            v.setY(Math.max(-0.6, Math.min(0.8, v.getY() + 0.1)));
+            player.setVelocity(v);
+            world.spawnParticle(Particle.DUST, hand, 3, 0.25, 0.3, 0.25, 0, CHAIN_DUST);
+            return true;
+        });
+        return true;
+    }
+
+    /** Ultimates Usurp can't take (they need their own weapon state). */
+    private static boolean stealable(Active active) {
+        return active.type() != ActiveType.USURP && active.type() != ActiveType.FINALE && active.type() != ActiveType.AXE_THROW;
+    }
+
+    /** The victim's ultimate that is held by a thief right now, or null. */
+    private Stolen sealedFor(Player player, ItemManager.Entry weapon, Active active) {
+        Stolen st = sealed.get(player.getUniqueId());
+        if (st == null || st.until() < System.currentTimeMillis() || !st.weaponRef().equals(weapon.ref())
+                || !st.activeKey().equals(active.key())) {
+            return null;
+        }
+        return st;
+    }
+
+    private void releaseSeal(Stolen st) {
+        if (sealed.remove(st.victim(), st)) {
+            Player victim = Bukkit.getPlayer(st.victim());
+            if (victim != null) {
+                victim.sendActionBar(plugin.raw("ability-usurp-back", "&a⛓ &d{ability} &ais yours again.",
+                        "ability", ItemManager.color(st.name())));
+            }
+        }
+    }
+
+    /** Usurp: rip the ultimate out of the nearest enemy legend; you can use it once, they can't until then. */
+    private boolean usurp(Player player, Params p) {
+        double radius = p.d("radius", 12);
+        double r2 = radius * radius;
+        Player victim = null;
+        ItemManager.Entry from = null;
+        Active ult = null;
+        double best = Double.MAX_VALUE;
+        for (Entity entity : player.getNearbyEntities(radius, radius, radius)) {
+            if (!(entity instanceof Player other) || !valid(player, other) || sealed.containsKey(other.getUniqueId())) {
+                continue;
+            }
+            double d = other.getLocation().distanceSquared(player.getLocation());
+            if (d > r2 || d >= best) {
+                continue;
+            }
+            List<ItemStack> stacks = new ArrayList<>();
+            stacks.add(other.getInventory().getItemInMainHand());
+            stacks.addAll(java.util.Arrays.asList(other.getInventory().getContents()));
+            for (ItemStack stack : stacks) {
+                ItemManager.Entry w = stack == null ? null : weaponOf(stack);
+                Active a = w == null ? null : w.abilities.active(Trigger.SHIFT_SWAP);
+                if (a != null && stealable(a)) {
+                    victim = other;
+                    from = w;
+                    ult = a;
+                    best = d;
+                    break;
+                }
+            }
+        }
+        if (victim == null) {
+            fail(player, "ability-usurp-none", "&cNo enemy legend close enough to usurp.");
+            return false;
+        }
+        long hold = (long) (p.d("hold-seconds", 30) * 1000);
+        Stolen st = new Stolen(player.getUniqueId(), victim.getUniqueId(), from.ref(), ult.key(), ult.name(),
+                System.currentTimeMillis() + hold);
+        Stolen old = stolen.put(player.getUniqueId(), st);
+        if (old != null) {
+            releaseSeal(old);
+        }
+        sealed.put(victim.getUniqueId(), st);
+        World world = player.getWorld();
+        Player target = victim;
+        Object chain = new Object();
+        repeat(1, 10, step -> {
+            if (!player.isOnline() || !target.isOnline() || target.getWorld() != player.getWorld()) {
+                ChainVisual.remove(chain);
+                return false;
+            }
+            Location a = player.getLocation().add(0, 1.1, 0);
+            Location b = target.getLocation().add(0, 1.1, 0);
+            // the chain shoots out, then reels back in with the ultimate
+            double t = step < 5 ? (step + 1) / 5.0 : (10 - step) / 5.0;
+            ChainVisual.draw(plugin, chain, a, a.clone().add(b.toVector().subtract(a.toVector()).multiply(Math.max(0.05, t))));
+            if (step == 4) {
+                world.spawnParticle(Particle.BLOCK, b, 25, 0.3, 0.5, 0.3, 0, CHAIN_BLOCK);
+                world.spawnParticle(Particle.DUST, b, 15, 0.3, 0.5, 0.3, 0, CHAIN_EMBER);
+                world.playSound(b, Sound.BLOCK_CHAIN_BREAK, 1.5f, 0.7f);
+            }
+            return true;
+        });
+        world.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.2f, 0.6f);
+        long secs = hold / 1000;
+        victim.sendMessage(plugin.raw("ability-usurp-victim", "&5⛓ &c{thief} &7usurped your &d{ability}&7! &8(up to {time}s)",
+                "thief", player.getName(), "ability", ItemManager.color(ult.name()), "time", String.valueOf(secs)));
+        player.sendMessage(plugin.raw("ability-usurp-thief", "&5⛓ &7You hold &d{ability}&7: &fShift+F &7unleashes it. &8({time}s)",
+                "ability", ItemManager.color(ult.name()), "time", String.valueOf(secs)));
+        return true;
+    }
+
+    /** Fires the held ultimate; it is spent only if it actually went off. */
+    private void castStolen(Player player, ItemManager.Entry weapon) {
+        Stolen st = stolen.get(player.getUniqueId());
+        ItemManager.Entry from = items.get(st.weaponRef());
+        Active ult = null;
+        if (from != null) {
+            for (Active a : from.abilities.actives) {
+                if (a.key().equals(st.activeKey())) {
+                    ult = a;
+                }
+            }
+        }
+        if (ult == null || st.until() < System.currentTimeMillis()) {
+            stolen.remove(player.getUniqueId());
+            releaseSeal(st);
+            return;
+        }
+        boolean used;
+        try {
+            used = execute(player, from, ult);
+        } catch (RuntimeException ex) {
+            plugin.getLogger().warning("Usurped ability " + from.ref() + "/" + ult.key() + " failed: " + ex);
+            used = false;
+        }
+        if (used) {
+            stolen.remove(player.getUniqueId());
+            releaseSeal(st);
+            empower(player, weapon);
+            player.sendActionBar(plugin.raw("ability-usurp-cast", "&5⛓ &d{ability}&5 unleashed!",
+                    "ability", ItemManager.color(ult.name())));
         }
     }
 

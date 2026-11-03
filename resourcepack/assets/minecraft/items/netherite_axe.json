@@ -30,6 +30,13 @@
           "type": "minecraft:model",
           "model": "customcraft:item/worldsplitter"
         }
+      },
+      {
+        "threshold": 1104,
+        "model": {
+          "type": "minecraft:model",
+          "model": "customcraft:item/chainbreaker"
+        }
       }
     ],
     "fallback": {

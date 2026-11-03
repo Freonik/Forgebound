@@ -661,6 +661,15 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
             seenChanged |= seen.add(maceMark);
         }
+        // 2.38.0: the Closing World gives the Chainbreaker instead of the Worldsplitter (old copies keep working)
+        String chainMark = "changed:big-events.border.mythic=chainbreaker";
+        if (!seen.contains(chainMark)) {
+            if ("worldsplitter".equals(getConfig().getString("big-events.border.mythic"))) {
+                getConfig().set("big-events.border.mythic", "chainbreaker");
+                added.add("big-events.border.mythic (worldsplitter -> chainbreaker)");
+            }
+            seenChanged |= seen.add(chainMark);
+        }
         if (!added.isEmpty()) {
             saveConfig();
             getLogger().info("Added new default config entries: " + String.join(", ", added));

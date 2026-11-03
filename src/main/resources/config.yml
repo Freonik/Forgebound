@@ -162,6 +162,14 @@ messages:
   # weapon abilities (shown in the action bar)
   ability-cooldown: "&c{ability} &7is recharging: &c{time}s"
   ability-used: "&a» {ability}&a!"
+  ability-regicide-miss: "&cNo enemy in sight."
+  ability-usurp-none: "&cNo enemy legend close enough to usurp."
+  ability-usurp-victim: "&5⛓ &c{thief} &7usurped your &d{ability}&7! &8(up to {time}s)"
+  ability-usurp-thief: "&5⛓ &7You hold &d{ability}&7: &fShift+F &7unleashes it. &8({time}s)"
+  ability-usurp-cast: "&5⛓ &d{ability}&5 unleashed!"
+  ability-usurp-back: "&a⛓ &d{ability} &ais yours again."
+  ability-usurp-faded: "&8⛓ &7The usurped &d{ability} &7slipped away."
+  ability-usurped: "&5⛓ &d{ability} &7was usurped by &c{thief}&7! &8({time}s)"
   ability-no-target: "&cNo target in range."
   ability-rewind-none: "&cNo echo to return to yet."
   ability-rewind-blocked: "&cYour past position is blocked."
@@ -1068,6 +1076,61 @@ weapons:
 
   # ---------------- MYTHIC WEAPONS: only the winners of big events get them (see big-events), they fade after
   # big-events.mythic-days. Not legends: no stars, no forge, no serial numbers.
+  chainbreaker:
+    mythic: true
+    material: NETHERITE_AXE
+    name: "&4&k|&r &c&lChainbreaker &4&k|"
+    lore:
+      - "&7Every chain it ever wore, it broke."
+    custom-model-data: 1104
+    unbreakable: true
+    attack-damage: 13
+    attack-speed: 1.0
+    enchants:
+      sharpness: 6
+    abilities:
+      passive:
+        effects: { strength: 0 }
+        description: "Strength I"
+      on-hit:
+        - type: SHACKLES
+          chance: 100
+          hits: 2
+          bonus-percent: 30
+          splash-percent: 50
+          radius: 3
+          description: ["Shattered Shackles: after any ability, your", "next 2 hits deal +30% and 50% of it", "to everyone around the target (3 blocks)."]
+        - type: LASHING_CHAIN
+          chance: 20
+          range: 5
+          damage: 4
+          slow-ticks: 40
+          slow-level: 2
+          pull: 1.0
+          cooldown: 4
+          description: ["Lashing Chain (20%, every 4s at most): a chain", "jumps to the nearest other enemy (5 blocks),", "4 damage, Slowness II, and pulls you to it."]
+      active:
+        regicide:
+          type: REGICIDE
+          name: "&c&lRegicide"
+          trigger: SWAP
+          cooldown: 14
+          description: ["Hook the enemy you look at (10 blocks),", "dash to it and strike for 8 damage.", "Heals 2 + up to 8 more the lower your health."]
+          range: 10
+          damage: 8
+          speed: 1.5
+          heal: 2
+          heal-low-bonus: 8
+        usurp:
+          type: USURP
+          name: "&4&lUsurp"
+          trigger: SHIFT_SWAP
+          cooldown: 90
+          description: ["Rip the Shift+F ultimate out of the nearest", "enemy legend (12 blocks). For 30s it's yours:", "Shift+F unleashes it once. Until then", "its owner can't use it."]
+          radius: 12
+          hold-seconds: 30
+
+  # no longer an event reward - only given by an admin: /forge legend give <player> weapon:worldsplitter
   worldsplitter:
     mythic: true
     material: NETHERITE_AXE
@@ -1970,7 +2033,7 @@ big-events:
     winner-tokens: 10
     winner-totems: 1
     player-tokens: 2
-    mythic: worldsplitter
+    mythic: chainbreaker
   hunt:
     minutes: 30
     same-victim-minutes: 5

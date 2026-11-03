@@ -176,7 +176,77 @@ def titans_echo(f, n):
     return c.image()
 
 
-ALL = {'worldsplitter': worldsplitter, 'bloodfang': bloodfang, 'titans_echo': titans_echo}
+IRON = [(14, 14, 18), (30, 30, 36), (50, 50, 58), (76, 76, 86), (110, 110, 122), (150, 150, 162), (196, 196, 206)]
+EMBER = [(70, 10, 30), (140, 20, 50), (210, 50, 70), (255, 120, 110), (255, 210, 190)]
+
+
+# ============================================================ Chainbreaker: a dark iron axe, a chain coiled up the haft,
+# a broken shackle hanging from the head
+def chainbreaker(f, n):
+    c = Canvas()
+    pulse = 0.5 + 0.5 * math.sin(2 * math.pi * f / n)
+    shine = (f / n) * 30 - 6
+    HU = 22.0
+
+    def haft(u, v):
+        if 1.6 <= u <= HU + 3.0 and abs(v) <= 1.0:
+            # a chain coiled around the haft: links alternate along it
+            k = (u * 0.9) % 3.0
+            if 3.0 <= u <= HU - 1.0 and k < 1.4:
+                ring = abs(abs(v) - 0.5) < 0.6 and (k < 0.5 or k > 0.9)
+                return ramp(IRON, (0.75 if ring else 0.55) + 0.2 * lit(v, 1.0))
+            return ramp(DARK, 0.2 + 0.8 * lit(v, 1.0))
+        if math.hypot(u - 0.9, v) <= 1.7:
+            return ramp(EMBER, 0.35 + 0.5 * pulse)          # ember pommel
+        return None
+    c.fill(U(haft), 'haft')
+
+    def head(u, v):
+        du = u - HU
+        if v > -1.1:                                        # single bit, on one side
+            return None
+        depth = -v - 1.0
+        R = 9.8
+        dd = math.hypot(du * 0.9, depth - 0.6)
+        if dd > R or depth > 9.6:
+            return None
+        if math.hypot(du + 7.8, depth - 3.0) < 4.2:
+            return None                                     # bearded underside
+        if R - dd < 1.1:                                    # edge with a sliding glint
+            g = max(0, 1 - abs((du + depth) - shine + 10) / 2.4)
+            return ramp(IRON, min(0.99, 0.72 + 0.27 * g))
+        # rivets of the shackle band near the haft
+        if depth < 2.2 and abs(du) < 3.4:
+            if int(du + 4) % 3 == 0 and depth > 0.8:
+                return ramp(IRON, 0.85)
+            return ramp(IRON, 0.45)
+        # ember cracks from the broken chains
+        k = du + 1.3 * math.sin(depth * 1.5)
+        if abs(k - 1.5) < 0.5 and depth > 2.4:
+            return ramp(EMBER, 0.4 + 0.5 * pulse)
+        if R - dd < 1.9:
+            return ramp(IRON, 0.5)
+        return ramp(IRON, 0.34 + 0.035 * depth + (0.08 if du > 0 else 0))
+    c.fill(U(head), 'head')
+    c.outline((6, 4, 8, 255))
+    # the broken shackle hanging off the back of the head (pixel-placed, swings a little)
+    sw = 1 if pulse > 0.66 else (0 if pulse > 0.33 else -1)
+    for dx, dy in [(0, 0), (1, 0), (2, 0), (3, 1), (3, 2), (3, 3), (2, 4), (1, 4), (0, 4), (-1, 3), (-1, 2), (-1, 1)]:
+        x, y = 18 + dx + sw, 14 + dy
+        if 0 <= x < 32 and 0 <= y < 32 and c.kind.get((x, y)) != 'head':
+            c.set(x, y, ramp(IRON, 0.85 if dy < 2 else 0.65), 'shackle')
+    for x, y in [(20 + sw, 19), (21 + sw, 20)]:
+        if c.kind.get((x, y)) != 'head':
+            c.set(x, y, ramp(EMBER, 0.6 + 0.3 * pulse), 'shackle')        # the snapped, glowing end
+    for i in range(2):
+        a = (f / n + i * 0.5) % 1.0
+        x, y = int(12 + 5 * a), int(6 - 4 * a + i * 5)
+        if (x, y) not in c.px and 0 <= x < 32 and 0 <= y < 32 and a < 0.8:
+            c.set(x, y, ramp(EMBER, 0.9 - a), 'spark')
+    return c.image()
+
+
+ALL = {'worldsplitter': worldsplitter, 'bloodfang': bloodfang, 'titans_echo': titans_echo, 'chainbreaker': chainbreaker}
 if __name__ == '__main__':
     previews = []
     for name, fn in ALL.items():

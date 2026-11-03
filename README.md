@@ -572,7 +572,8 @@ numbers: there can be many of them, and each one is only a short reign.
 
 | | Weapon | From | Abilities |
 |---|---|---|---|
-| <img src="docs/items/worldsplitter.png" width="40" alt=""> | **Worldsplitter** (axe) | The Closing World | Crushing Weight, *Split the World* (a bigger Upheaval), *Event Horizon* (a bigger Gravity Anchor), Resistance + Strength |
+| <img src="docs/items/chainbreaker.png" width="40" alt=""> | **Chainbreaker** (axe) | The Closing World | *Shattered Shackles* (after an ability the next 2 hits are stronger and hit an area), *Lashing Chain* (on hit: a chain pulls you to the next enemy), *Regicide* (dash + strike, heals more at low health), *Usurp* (steal an enemy legend's Shift+F ultimate for one use), Strength |
+| <img src="docs/items/worldsplitter.png" width="40" alt=""> | **Worldsplitter** (axe) | admins only (`/forge legend give <player> weapon:worldsplitter`) | Crushing Weight, *Split the World* (a bigger Upheaval), *Event Horizon* (a bigger Gravity Anchor), Resistance + Strength |
 | <img src="docs/items/bloodfang.png" width="40" alt=""> | **Bloodfang** (sword) | The Hunt | lifesteal + Cleave, *Blood Crescent*, *Feeding Frenzy*, Speed II and regeneration at low health |
 | <img src="docs/items/titans_echo.png" width="40" alt=""> | **Titan's Echo** (greatsword) | The Forge Colossus | a 60 % Echo on every hit, *Titan's Return* (Rewind), *Colossal Resonance*, Resistance |
 
