@@ -44,6 +44,13 @@
           "type": "minecraft:model",
           "model": "customcraft:item/warden_of_the_pit"
         }
+      },
+      {
+        "threshold": 1106,
+        "model": {
+          "type": "minecraft:model",
+          "model": "customcraft:item/dawnspire"
+        }
       }
     ],
     "fallback": {

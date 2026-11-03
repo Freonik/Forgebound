@@ -174,6 +174,7 @@ messages:
   ability-dominion-busy: "&cThat fight is already sealed in a realm."
   ability-dominion-victim: "&8☗ &c{player} &7dragged you into the &8Dominion of Ash&7. Only one walks out."
   ability-dominion-won: "&8☗ &7You walked out of the Dominion: &cthe loser's power is yours &8({time}s)"
+  ability-prism-rooted: "&eYou're caught in a &fprism&e!"
   ability-no-target: "&cNo target in range."
   ability-rewind-none: "&cNo echo to return to yet."
   ability-rewind-blocked: "&cYour past position is blocked."
@@ -1292,6 +1293,60 @@ weapons:
           health-cost-percent: 10
           speed-level: 3
 
+  dawnspire:
+    mythic: true
+    material: NETHERITE_SWORD
+    name: "&e&k|&r &6&lDawnspire &e&k|"
+    lore:
+      - "&7The colossus fell at dawn. The light stayed."
+    custom-model-data: 1106
+    unbreakable: true
+    attack-damage: 12
+    attack-speed: 1.4
+    enchants:
+      sharpness: 6
+    abilities:
+      passive:
+        effects: { speed: 0 }
+        description: "Speed I"
+      on-hit:
+        - type: RADIANT_MARK
+          chance: 100
+          burst: 5
+          seconds: 6
+          description: ["Radiant Mark: Dawnspire's abilities mark", "what they touch for 6s. Your next hit on a", "marked enemy bursts it for +5 damage."]
+        - type: SUNSHARD
+          chance: 100
+          every: 3
+          damage: 4
+          radius: 3
+          slow-ticks: 40
+          description: ["Sunshard: every 3rd hit throws a ball of", "light that bursts on the target: 4 damage,", "Slowness II and a Radiant Mark (3 blocks)."]
+      active:
+        prism:
+          type: PRISM_SNARE
+          name: "&d&lPrism Snare"
+          trigger: SWAP
+          cooldown: 14
+          description: ["A prism of light flies forward (18 blocks):", "the first 2 enemies it passes are rooted", "for 2s, take 4 damage and get marked."]
+          range: 18
+          targets: 2
+          root-seconds: 2
+          damage: 4
+        daybreak:
+          type: DAYBREAK_LANCE
+          name: "&6&lDaybreak Lance"
+          trigger: SHIFT_SWAP
+          cooldown: 60
+          description: ["Gather the light (0.8s), then fire a beam", "32 blocks long: 10 damage and fire to all", "it touches - marked enemies take 60% more."]
+          charge-ticks: 16
+          range: 32
+          width: 1.2
+          damage: 10
+          marked-multiplier: 1.6
+          fire-ticks: 40
+
+  # no longer an event reward - only given by an admin: /forge legend give <player> weapon:titans_echo
   titans_echo:
     mythic: true
     material: NETHERITE_SWORD
@@ -2116,7 +2171,7 @@ big-events:
     # everyone else with at least 2% of the damage
     player-tokens: 3
     material-chance: 30
-    mythic: titans_echo
+    mythic: dawnspire
 
 # ------------------------------------------------------------
 #  QUESTS - the Questmaster (an NPC): /forge world npc set puts it where you stand, /forge world npc remove.

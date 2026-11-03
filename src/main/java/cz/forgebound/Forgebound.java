@@ -679,6 +679,15 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
             seenChanged |= seen.add(wardenMark);
         }
+        // 2.46.0: the Forge Colossus gives the Dawnspire instead of Titan's Echo (old copies keep working)
+        String dawnMark = "changed:big-events.boss.mythic=dawnspire";
+        if (!seen.contains(dawnMark)) {
+            if ("titans_echo".equals(getConfig().getString("big-events.boss.mythic"))) {
+                getConfig().set("big-events.boss.mythic", "dawnspire");
+                added.add("big-events.boss.mythic (titans_echo -> dawnspire)");
+            }
+            seenChanged |= seen.add(dawnMark);
+        }
         if (!added.isEmpty()) {
             saveConfig();
             getLogger().info("Added new default config entries: " + String.join(", ", added));

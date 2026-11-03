@@ -122,6 +122,7 @@ public final class AbilityManager implements Listener {
     private final NamespacedKey pinKey;
     private final NamespacedKey finaleKey;
     private final NamespacedKey pinShotKey;
+    private final NamespacedKey rootKey;
 
     /** player -> (weapon:ability -> cooldown end in ms) */
     private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
@@ -190,6 +191,10 @@ public final class AbilityManager implements Listener {
     private final Map<UUID, Shield> shields = new HashMap<>();
     /** Dominion of Ash: participant -> the other one */
     private final Map<UUID, UUID> realms = new HashMap<>();
+    /** Dawnspire: entity -> Radiant Mark until (ms) */
+    private final Map<UUID, Long> radiant = new HashMap<>();
+    /** Dawnspire: hits counted toward the next Sunshard */
+    private final Map<UUID, Integer> sunHits = new HashMap<>();
     private RelicManager relics;
     private int ticks;
 
@@ -249,6 +254,7 @@ public final class AbilityManager implements Listener {
         this.pinKey = Forgebound.key("pinned");
         this.finaleKey = Forgebound.key("finale_root");
         this.pinShotKey = Forgebound.key("pin_shot");
+        this.rootKey = Forgebound.key("prism_root");
     }
 
     /** Starts the repeating task: history, HUD, passive effects, marks. */
@@ -354,6 +360,17 @@ public final class AbilityManager implements Listener {
                 }
             }
             bloodrush.values().removeIf(t -> t < now);
+            for (Iterator<Map.Entry<UUID, Long>> it = radiant.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<UUID, Long> e = it.next();
+                Entity entity = Bukkit.getEntity(e.getKey());
+                if (e.getValue() < now || entity == null || !entity.isValid()) {
+                    it.remove();
+                    continue;
+                }
+                Location top = entity.getLocation().add(0, entity.getHeight() + 0.35, 0);
+                ring(top, 0.5, 10, l -> l.getWorld().spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, DAWN));
+                entity.getWorld().spawnParticle(Particle.END_ROD, top, 1, 0.05, 0.05, 0.05, 0);
+            }
             shields.values().removeIf(sh -> sh.fades() < now);
             for (Iterator<Map.Entry<UUID, Aura>> it = auras.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<UUID, Aura> e = it.next();
@@ -672,6 +689,8 @@ public final class AbilityManager implements Listener {
             case USURP -> usurp(player, p);
             case GRIP -> grip(player, p);
             case DOMINION -> dominion(player, p);
+            case PRISM_SNARE -> prismSnare(player, p);
+            case DAYBREAK_LANCE -> daybreakLance(player, p);
         };
     }
 
@@ -3191,6 +3210,24 @@ public final class AbilityManager implements Listener {
                 world.playSound(at, Sound.BLOCK_CHAIN_BREAK, 1.4f, 0.6f);
                 world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.7f);
             }
+            case RADIANT_MARK -> {
+                if (marked(victim)) {
+                    radiant.remove(victim.getUniqueId());
+                    event.setDamage(event.getDamage() + scaled(victim, p.d("burst", 5)));
+                    world.spawnParticle(Particle.END_ROD, at, 18, 0.3, 0.5, 0.3, 0.12);
+                    world.spawnParticle(Particle.DUST, at, 16, 0.4, 0.5, 0.4, 0, DAWN);
+                    world.playSound(at, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.4f, 1.6f);
+                    world.playSound(at, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 0.8f, 1.4f);
+                }
+            }
+            case SUNSHARD -> {
+                int every = Math.max(1, p.i("every", 3));
+                int count = sunHits.merge(attacker.getUniqueId(), 1, Integer::sum);
+                if (count >= every) {
+                    sunHits.remove(attacker.getUniqueId());
+                    Bukkit.getScheduler().runTask(plugin, () -> sunshard(attacker, victim, p));
+                }
+            }
             case IRON_AURA -> {
                 int every = Math.max(1, p.i("every", 3));
                 int count = auraHits.merge(attacker.getUniqueId(), 1, Integer::sum);
@@ -3799,6 +3836,195 @@ public final class AbilityManager implements Listener {
         winner.getWorld().playSound(winner.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1f, 0.6f);
         winner.sendMessage(plugin.raw("ability-dominion-won", "&8☗ &7You walked out of the Dominion: &cthe loser's power is yours &8({time}s)",
                 "time", String.valueOf(ticks / 20)));
+    }
+
+    // ================================================================ DAWNSPIRE (mythic)
+
+    private static final Particle.DustOptions DAWN = new Particle.DustOptions(Color.fromRGB(255, 232, 140), 1.3f);
+    private static final Particle.DustOptions DAWN_PINK = new Particle.DustOptions(Color.fromRGB(255, 170, 214), 1.1f);
+    private static final Particle.DustOptions DAWN_WHITE = new Particle.DustOptions(Color.fromRGB(255, 255, 240), 1.6f);
+
+    private boolean marked(LivingEntity entity) {
+        Long until = radiant.get(entity.getUniqueId());
+        return until != null && until > System.currentTimeMillis();
+    }
+
+    /** Radiant Mark: Dawnspire's abilities mark what they touch; the next hit on it bursts the mark. */
+    private void mark(Player owner, LivingEntity target) {
+        ItemManager.Entry weapon = weaponOf(owner.getInventory().getItemInMainHand());
+        OnHit hit = weapon == null ? null : weapon.abilities.onHit(HitType.RADIANT_MARK);
+        double seconds = hit == null ? 6 : hit.params().d("seconds", 6);
+        radiant.put(target.getUniqueId(), System.currentTimeMillis() + (long) (seconds * 1000));
+        target.getWorld().spawnParticle(Particle.DUST, target.getLocation().add(0, target.getHeight() / 2, 0), 10, 0.3, 0.4, 0.3, 0, DAWN);
+    }
+
+    /** Roots a target in place for a while (no chain, a cage of light). */
+    private void root(LivingEntity target, double seconds) {
+        for (Attribute attribute : new Attribute[] {Attribute.MOVEMENT_SPEED, Attribute.JUMP_STRENGTH}) {
+            AttributeInstance inst = target.getAttribute(attribute);
+            if (inst != null) {
+                inst.removeModifier(rootKey);
+                inst.addTransientModifier(new org.bukkit.attribute.AttributeModifier(rootKey, -1,
+                        org.bukkit.attribute.AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+            }
+        }
+        if (target instanceof Player victim) {
+            victim.sendActionBar(plugin.raw("ability-prism-rooted", "&eYou're caught in a &fprism&e!"));
+        }
+        World world = target.getWorld();
+        int steps = (int) Math.ceil(seconds * 10);
+        repeat(2, steps + 1, step -> {
+            boolean done = step >= steps || !target.isValid() || target.isDead();
+            if (done) {
+                for (Attribute attribute : new Attribute[] {Attribute.MOVEMENT_SPEED, Attribute.JUMP_STRENGTH}) {
+                    AttributeInstance inst = target.getAttribute(attribute);
+                    if (inst != null) {
+                        inst.removeModifier(rootKey);
+                    }
+                }
+                return false;
+            }
+            target.setVelocity(new Vector(0, Math.min(0, target.getVelocity().getY()), 0));
+            Location base = target.getLocation();
+            double spin = step * 0.35;
+            for (int k = 0; k < 3; k++) {
+                double a = spin + k * 2 * Math.PI / 3;
+                for (double h = 0.1; h < target.getHeight() + 0.2; h += 0.45) {
+                    world.spawnParticle(Particle.DUST, base.clone().add(Math.cos(a + h) * 0.7, h, Math.sin(a + h) * 0.7),
+                            1, 0, 0, 0, 0, k == 0 ? DAWN_PINK : DAWN);
+                }
+            }
+            return true;
+        });
+    }
+
+    /** Sunshard: a ball of light flies to the target and bursts: damage, Slowness and a Radiant Mark around it. */
+    private void sunshard(Player player, LivingEntity target, Params p) {
+        if (!player.isOnline() || !target.isValid() || target.isDead()) {
+            return;
+        }
+        World world = player.getWorld();
+        double damage = p.d("damage", 4);
+        double radius = p.d("radius", 3);
+        int slow = p.i("slow-ticks", 40);
+        Location from = player.getEyeLocation().subtract(0, 0.3, 0);
+        world.playSound(from, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 0.8f, 1.8f);
+        int flight = 6;
+        repeat(1, flight + 1, step -> {
+            if (!target.isValid() || target.getWorld() != world) {
+                return false;
+            }
+            Location to = target.getLocation().add(0, target.getHeight() / 2, 0);
+            Location at = from.clone().add(to.toVector().subtract(from.toVector()).multiply(step / (double) flight));
+            world.spawnParticle(Particle.DUST, at, 6, 0.12, 0.12, 0.12, 0, DAWN_WHITE);
+            world.spawnParticle(Particle.END_ROD, at, 2, 0.05, 0.05, 0.05, 0.01);
+            if (step == flight) {
+                world.spawnParticle(Particle.END_ROD, at, 30, 0.4, 0.4, 0.4, 0.15);
+                ring(at, radius, 24, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, DAWN));
+                world.playSound(at, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1f, 1.6f);
+                for (LivingEntity near : targets(player, at, radius)) {
+                    hurt(player, near, damage);
+                    near.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, slow, 1));
+                    mark(player, near);
+                }
+            }
+            return true;
+        });
+    }
+
+    /** Prism Snare: a prism of light flies forward, roots and marks the first two enemies it passes through. */
+    private boolean prismSnare(Player player, Params p) {
+        World world = player.getWorld();
+        Location pos = player.getEyeLocation().subtract(0, 0.2, 0);
+        Vector dir = pos.getDirection().normalize();
+        double range = p.d("range", 18);
+        double speed = 1.4;
+        int max = Math.max(1, p.i("targets", 2));
+        double seconds = p.d("root-seconds", 2);
+        double damage = p.d("damage", 4);
+        Set<UUID> hit = new java.util.HashSet<>();
+        world.playSound(pos, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.6f, 0.8f);
+        world.playSound(pos, Sound.ENTITY_EVOKER_CAST_SPELL, 0.8f, 1.6f);
+        int steps = (int) Math.ceil(range / speed);
+        repeat(1, steps, step -> {
+            Location prev = pos.clone();
+            RayTraceResult wall = world.rayTraceBlocks(pos, dir, speed, FluidCollisionMode.NEVER, true);
+            pos.add(dir.clone().multiply(speed));
+            BlockFx.beam(plugin, prev, pos, Material.PINK_STAINED_GLASS.createBlockData(), 0.16f, 4);
+            world.spawnParticle(Particle.END_ROD, pos, 2, 0.08, 0.08, 0.08, 0.01);
+            world.spawnParticle(Particle.DUST, pos, 3, 0.15, 0.15, 0.15, 0, DAWN_PINK);
+            for (LivingEntity target : targets(player, pos, 1.4)) {
+                if (hit.size() < max && hit.add(target.getUniqueId())) {
+                    hurt(player, target, damage);
+                    root(target, seconds);
+                    mark(player, target);
+                    world.playSound(target.getLocation(), Sound.BLOCK_AMETHYST_CLUSTER_BREAK, 1.4f, 1.2f);
+                }
+            }
+            if (wall != null || hit.size() >= max) {
+                world.spawnParticle(Particle.END_ROD, pos, 14, 0.2, 0.2, 0.2, 0.08);
+                return false;
+            }
+            return true;
+        });
+        return true;
+    }
+
+    /** Daybreak Lance: gather the light for a moment, then fire a long beam; marked targets take far more. */
+    private boolean daybreakLance(Player player, Params p) {
+        World world = player.getWorld();
+        int charge = Math.max(1, p.i("charge-ticks", 16));
+        double range = p.d("range", 32);
+        double width = p.d("width", 1.2);
+        double damage = p.d("damage", 10);
+        double markBonus = p.d("marked-multiplier", 1.6);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, charge + 4, 2, false, false, true));
+        world.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.2f, 1.4f);
+        repeat(1, charge + 1, step -> {
+            if (!player.isOnline() || player.isDead() || player.getWorld() != world) {
+                return false;
+            }
+            Location hand = player.getEyeLocation().subtract(0, 0.3, 0).add(player.getEyeLocation().getDirection().multiply(0.8));
+            if (step < charge) {
+                // light gathers into the tip
+                double r = 1.6 * (1 - step / (double) charge) + 0.2;
+                ring(hand, r, 10, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, step % 2 == 0 ? DAWN : DAWN_PINK));
+                if (step % 4 == 0) {
+                    world.playSound(hand, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.8f, 0.8f + step * 0.06f);
+                }
+                return true;
+            }
+            Vector dir = player.getEyeLocation().getDirection().normalize();
+            Location eye = player.getEyeLocation();
+            RayTraceResult wall = world.rayTraceBlocks(eye, dir, range, FluidCollisionMode.NEVER, true);
+            double reach = wall == null ? range : wall.getHitPosition().distance(eye.toVector());
+            Location end = eye.clone().add(dir.clone().multiply(reach));
+            BlockFx.beam(plugin, hand, end, Material.YELLOW_STAINED_GLASS.createBlockData(), 0.7f, 12);
+            BlockFx.beam(plugin, hand, end, Material.WHITE_CONCRETE.createBlockData(), 0.22f, 10);
+            world.playSound(eye, Sound.ENTITY_WARDEN_SONIC_BOOM, 0.6f, 1.8f);
+            world.playSound(eye, Sound.BLOCK_BEACON_ACTIVATE, 1.4f, 1.6f);
+            line(hand, end, 0.6, l -> world.spawnParticle(Particle.END_ROD, l, 1, 0.1, 0.1, 0.1, 0.02));
+            Vector a = eye.toVector();
+            Vector b = end.toVector();
+            Location mid = eye.clone().add(dir.clone().multiply(reach / 2));
+            for (LivingEntity target : targets(player, mid, reach / 2 + width + 1)) {
+                Vector body = target.getLocation().add(0, target.getHeight() / 2, 0).toVector();
+                if (toSegment(body, a, b) > width + target.getWidth() / 2) {
+                    continue;
+                }
+                boolean wasMarked = marked(target);
+                if (wasMarked) {
+                    radiant.remove(target.getUniqueId());
+                    world.spawnParticle(Particle.END_ROD, target.getLocation().add(0, 1, 0), 30, 0.3, 0.6, 0.3, 0.2);
+                    world.playSound(target.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1.2f, 1.4f);
+                }
+                hurt(player, target, damage * (wasMarked ? markBonus : 1));
+                target.setVelocity(target.getVelocity().add(dir.clone().multiply(0.6).setY(0.2)));
+                target.setFireTicks(Math.max(target.getFireTicks(), p.i("fire-ticks", 40)));
+            }
+            return false;
+        });
+        return true;
     }
 
     // ================================================================ helpers

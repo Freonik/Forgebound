@@ -576,7 +576,8 @@ numbers: there can be many of them, and each one is only a short reign.
 | <img src="docs/items/worldsplitter.png" width="40" alt=""> | **Worldsplitter** (axe) | admins only (`/forge legend give <player> weapon:worldsplitter`) | Crushing Weight, *Split the World* (a bigger Upheaval), *Event Horizon* (a bigger Gravity Anchor), Resistance + Strength |
 | <img src="docs/items/bloodfang.png" width="40" alt=""> | **Bloodfang** (sword) | admins only (`/forge legend give <player> weapon:bloodfang`) | lifesteal + Cleave, *Blood Crescent*, *Feeding Frenzy*, Speed II and regeneration at low health |
 | <img src="docs/items/warden_of_the_pit.png" width="40" alt=""> | **Warden of the Pit** (war-maul, 3D model) | The Hunt | *Black Iron Aura* (every 3rd hit: a damaging aura for 4 s), *Iron Will* (damage dealt becomes a shield, max 6 hearts), *Grip of the Deep* (a shadow hand drags everyone in a line to you), *Dominion of Ash* (a sealed 7 s duel ring, the survivor takes the loser's power), Resistance |
-| <img src="docs/items/titans_echo.png" width="40" alt=""> | **Titan's Echo** (greatsword) | The Forge Colossus | a 60 % Echo on every hit, *Titan's Return* (Rewind), *Colossal Resonance*, Resistance |
+| <img src="docs/items/dawnspire.png" width="40" alt=""> | **Dawnspire** (staff of light, 3D model) | The Forge Colossus | *Radiant Mark* (abilities mark enemies, the next hit bursts the mark), *Sunshard* (every 3rd hit: a bursting ball of light), *Prism Snare* (roots and marks the first 2 enemies), *Daybreak Lance* (a charged 32-block beam, marked enemies take 60 % more), Speed |
+| <img src="docs/items/titans_echo.png" width="40" alt=""> | **Titan's Echo** (greatsword) | admins only (`/forge legend give <player> weapon:titans_echo`) | a 60 % Echo on every hit, *Titan's Return* (Rewind), *Colossal Resonance*, Resistance |
 
 Everything is under `big-events:` in the config; the weapons themselves are in `weapons:` with `mythic: true`.
 

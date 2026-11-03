@@ -67,7 +67,7 @@ run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang', 'echo_blade', 'graviton_hammer', 'knightfall',
           'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder', 'valkyries_lance',
           'great_sea_trident', 'silk_needle', 'clawline_pick', 'hex_bow', 'pinning_repeater', 'the_last_act',
-          'stasis_hourglass', 'stitchguard']:
+          'stasis_hourglass', 'stitchguard', 'dawnspire']:
     run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
 for n in ['angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
           'heartsteel_helm', 'heartsteel_greaves', 'heartsteel_treads', 'thorn_crown', 'thorn_greaves', 'thorn_treads',
@@ -130,7 +130,8 @@ wjson(f'{MC}/netherite_sword.json', dispatch([(1001, model("customcraft:item/ech
                                               (1009, model("customcraft:item/silk_needle")),
                                               (1102, model("customcraft:item/bloodfang")),
                                               (1103, model("customcraft:item/titans_echo")),
-                                              (1105, model("customcraft:item/warden_of_the_pit"))], model("minecraft:item/netherite_sword")))
+                                              (1105, model("customcraft:item/warden_of_the_pit")),
+                                              (1106, model("customcraft:item/dawnspire"))], model("minecraft:item/netherite_sword")))
 wjson(f'{MC}/netherite_pickaxe.json', dispatch([(1008, model("customcraft:item/clawline_pick"))], model("minecraft:item/netherite_pickaxe")))
 wjson(f'{MC}/netherite_axe.json', dispatch([(1006, model("customcraft:item/butcher_cleaver")),
                                             (1011, model("customcraft:item/rimebreaker")),

@@ -1219,7 +1219,7 @@ public final class BigEventManager implements Listener {
                     podium.append(i == 0 ? "" : "&7, ").append("&f").append(i + 1).append(". &e").append(name(e.getKey()))
                             .append(" &7(").append(share).append("%)");
                     List<Integer> totems = c.getIntegerList("top-totems");
-                    reward(e.getKey(), i < tokens.size() ? tokens.get(i) : 0, i == 0 ? c.getString("mythic", "titans_echo") : null,
+                    reward(e.getKey(), i < tokens.size() ? tokens.get(i) : 0, i == 0 ? c.getString("mythic", "dawnspire") : null,
                             1, type(), i < totems.size() ? totems.get(i) : 0);
                 } else if (share >= 2) {
                     reward(e.getKey(), c.getInt("player-tokens", 3), null,
