@@ -69,7 +69,7 @@ public final class Updater implements Listener {
         task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::check, 20L * 60, every);
     }
 
-    /** /forge update on|off|now */
+    /** /forge server update on|off|now */
     public void command(org.bukkit.command.CommandSender sender, String what) {
         switch (what) {
             case "on", "off" -> {

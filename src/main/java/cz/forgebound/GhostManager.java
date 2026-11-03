@@ -1382,7 +1382,7 @@ public final class GhostManager implements Listener {
         prey = null;
     }
 
-    /** Admin: /forge ghost [player] */
+    /** Admin: /forge event ghost [player] */
     public boolean forceSpawn(Player victim) {
         return spawn(victim, victim.getName());
     }

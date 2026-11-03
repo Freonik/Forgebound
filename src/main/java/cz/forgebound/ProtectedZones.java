@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Spawn (the Forge Citadel from /forge spawnbuild) and every Ancient Forge can't be griefed for good: blocks can be
+ * Spawn (the Forge Citadel from /forge world spawnbuild) and every Ancient Forge can't be griefed for good: blocks can be
  * mined and blown up, but nothing drops, and after protection.regen-minutes every changed block comes back (placed
  * blocks disappear again). A block only comes back when nobody stands in it, and a block under someone is only
  * taken away when nobody is above it, so the regeneration never suffocates or drops anyone.
@@ -78,7 +78,7 @@ public final class ProtectedZones implements Listener {
         save();
     }
 
-    /** The citadel built by /forge spawnbuild (center = the floor under the admin), or null to forget it. */
+    /** The citadel built by /forge world spawnbuild (center = the floor under the admin), or null to forget it. */
     public void setSpawn(World world, int x, int y, int z) {
         if (world == null) {
             data.set("spawn", null);
@@ -314,7 +314,7 @@ public final class ProtectedZones implements Listener {
         }
     }
 
-    /** How many blocks are waiting to come back (for /forge status). */
+    /** How many blocks are waiting to come back (for /forge legend status). */
     public int pending() {
         return original.size();
     }

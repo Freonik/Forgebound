@@ -130,7 +130,7 @@ public final class LegendManager implements Listener {
     }
 
     /** No copy is valid any more (the legend went back to the forge). */
-    /** Legends someone holds that nobody forged (given with /forge give, e.g. while testing): ref -> holder name. */
+    /** Legends someone holds that nobody forged (given with /forge legend give, e.g. while testing): ref -> holder name. */
     public java.util.Map<String, String> adminGiven() {
         java.util.Map<String, String> map = new java.util.LinkedHashMap<>();
         for (ItemManager.Kind kind : new ItemManager.Kind[] {ItemManager.Kind.WEAPON, ItemManager.Kind.RELIC}) {
@@ -284,7 +284,7 @@ public final class LegendManager implements Listener {
                 sb.append(!online.isEmpty() ? "online" : "seen " + RitualManager.format(Math.max(0, now - seen)) + " ago");
             }
             if (claim == null) {
-                sb.append(", given by an admin");                   // nobody forged it: /forge give
+                sb.append(", given by an admin");                   // nobody forged it: /forge legend give
             }
             held.add(sb.append(')').toString());
         }

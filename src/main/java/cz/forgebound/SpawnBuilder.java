@@ -32,9 +32,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * /forge spawnbuild: builds the Forge Citadel (spawn_build.txt.gz, made by art/spawn_build.py) around the admin:
+ * /forge world spawnbuild: builds the Forge Citadel (spawn_build.txt.gz, made by art/spawn_build.py) around the admin:
  * the floor goes under their feet, the air above the plaza is cleared, the ground under it filled. A few thousand
- * blocks per tick, so the server keeps running. Everything it changed is saved, /forge spawnbuild undo puts it back.
+ * blocks per tick, so the server keeps running. Everything it changed is saved, /forge world spawnbuild undo puts it back.
  */
 public final class SpawnBuilder {
 
@@ -102,7 +102,7 @@ public final class SpawnBuilder {
         return new Plan(blocks, signs);
     }
 
-    /** /forge spawnbuild [confirm|undo|cancel] */
+    /** /forge world spawnbuild [confirm|undo|cancel] */
     public void command(CommandSender sender, String what) {
         switch (what) {
             case "undo" -> undo(sender);
@@ -116,7 +116,7 @@ public final class SpawnBuilder {
                         saveUndo(running);
                         running = null;
                     }
-                    sender.sendMessage(ItemManager.color("&eStopped. &7/forge spawnbuild undo puts back what was already changed."));
+                    sender.sendMessage(ItemManager.color("&eStopped. &7/forge world spawnbuild undo puts back what was already changed."));
                 }
             }
             case "confirm" -> {
@@ -126,7 +126,7 @@ public final class SpawnBuilder {
                 }
                 Long asked = confirm.remove(p.getUniqueId());
                 if (asked == null || System.currentTimeMillis() - asked > 60_000) {
-                    sender.sendMessage(ItemManager.color("&7Run &f/forge spawnbuild &7first."));
+                    sender.sendMessage(ItemManager.color("&7Run &f/forge world spawnbuild &7first."));
                     return;
                 }
                 build(p);
@@ -138,7 +138,7 @@ public final class SpawnBuilder {
                 }
                 if (undoFile.isFile()) {
                     // a second build would overwrite the undo of the first one: the old citadel couldn't be removed any more
-                    p.sendMessage(ItemManager.color("&cThere already is a citadel. &7Remove it first with &f/forge spawnbuild undo&7, "
+                    p.sendMessage(ItemManager.color("&cThere already is a citadel. &7Remove it first with &f/forge world spawnbuild undo&7, "
                             + "then build the new one."));
                     return;
                 }
@@ -147,15 +147,15 @@ public final class SpawnBuilder {
                         + "in the middle, centered on &fyour feet&7 (stand where the season should start)."));
                 p.sendMessage(ItemManager.color("&7Everything within &f" + RADIUS + " &7blocks and &f" + CLEAR_HEIGHT
                         + " &7up is cleared and the ground below is filled. Chests in the area lose their items. "
-                        + "&f/forge spawnbuild undo &7puts the old blocks back."));
-                p.sendMessage(ItemManager.color("&eType &f/forge spawnbuild confirm &ewithin a minute."));
+                        + "&f/forge world spawnbuild undo &7puts the old blocks back."));
+                p.sendMessage(ItemManager.color("&eType &f/forge world spawnbuild confirm &ewithin a minute."));
             }
         }
     }
 
     private void build(Player admin) {
         if (task != null) {
-            admin.sendMessage(ItemManager.color("&7It's already building &8(/forge spawnbuild cancel)"));
+            admin.sendMessage(ItemManager.color("&7It's already building &8(/forge world spawnbuild cancel)"));
             return;
         }
         Plan plan;
@@ -264,7 +264,7 @@ public final class SpawnBuilder {
                 if (p != null) {
                     p.sendMessage(ItemManager.color("&a⚒ The Forge Citadel is done. &7World spawn = the center. "
                             + "Put the Questmaster in the east stall: stand at &f" + (ox + 24) + " " + (oy + 1) + " " + (oz - 10)
-                            + "&7 and run &f/forge npc set&7."));
+                            + "&7 and run &f/forge world npc set&7."));
                 }
                 plugin.getLogger().info("[SpawnBuild] done, " + (undo.size() - 1) + " blocks changed");
             } else if (at[0] % (PER_TICK * 20) < PER_TICK) {
@@ -293,7 +293,7 @@ public final class SpawnBuilder {
 
     private void undo(CommandSender sender) {
         if (task != null) {
-            sender.sendMessage(ItemManager.color("&7Wait until it's done or &f/forge spawnbuild cancel&7."));
+            sender.sendMessage(ItemManager.color("&7Wait until it's done or &f/forge world spawnbuild cancel&7."));
             return;
         }
         if (!undoFile.isFile()) {

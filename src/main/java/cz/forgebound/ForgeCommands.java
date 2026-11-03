@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -62,6 +63,11 @@ final class ForgeCommands {
                     "Your daily and weekly quests (rewards are claimed at the Questmaster)", List.of("quest"));
             commands.register(simple("hud", (s, a) -> plugin.hud().onCommand(s, a)).build(),
                     "Hide or show your sidebar", List.of("sidebar"));
+            commands.register(Commands.literal("help").executes(ctx -> {
+                        CommandHelp.player(ctx.getSource().getSender());
+                        return Command.SINGLE_SUCCESS;
+                    }).build(),
+                    "All the commands of this server, clickable", List.of("pomoc", "commands", "prikazy"));
         });
     }
 
@@ -125,12 +131,76 @@ final class ForgeCommands {
 
     // ================================================================ /forge
 
+    /** Old flat /forge subcommands -> where they live now (they keep working, just hidden from the suggestions). */
+    static final Map<String, String> LEGACY = Map.ofEntries(
+            Map.entry("give", "legend give"), Map.entry("release", "legend release"), Map.entry("finish", "legend finish"),
+            Map.entry("purge", "legend purge"), Map.entry("stars", "legend stars"), Map.entry("status", "legend status"),
+            Map.entry("token", "item token"), Map.entry("seal", "item seal"), Map.entry("tracker", "item tracker"),
+            Map.entry("recon", "item recon"), Map.entry("totem", "item totem"),
+            Map.entry("locate", "world locate"), Map.entry("scorched", "world scorched"), Map.entry("ancient", "world ancient"),
+            Map.entry("spawnbuild", "world spawnbuild"), Map.entry("npc", "world npc"),
+            Map.entry("ghost", "event ghost"), Map.entry("meteor", "event meteor"), Map.entry("warden", "event warden"),
+            Map.entry("bigevent", "event big"),
+            Map.entry("reload", "server reload"), Map.entry("update", "server update"), Map.entry("enchants", "server enchants"));
+
+    private static int ok() {
+        return Command.SINGLE_SUCCESS;
+    }
+
     private LiteralArgumentBuilder<CommandSourceStack> forgeTree() {
-        var root = Commands.literal("forge").executes(ctx -> forge(ctx));
-        for (String plain : List.of("reload", "status", "meteor", "warden", "recon", "seal", "tracker", "totem")) {
-            root.then(Commands.literal(plain).requires(ForgeCommands::admin).executes(ctx -> forge(ctx, plain)));
+        var root = Commands.literal("forge").executes(ctx -> {
+            forge(ctx);
+            if (admin(ctx.getSource())) {
+                CommandHelp.admin(ctx.getSource().getSender(), null);
+            }
+            return ok();
+        });
+        root.then(Commands.literal("help").requires(ForgeCommands::admin)
+                .executes(ctx -> {
+                    CommandHelp.admin(ctx.getSource().getSender(), null);
+                    return ok();
+                })
+                .then(Commands.argument("category", StringArgumentType.word()).suggests(suggest(CommandHelp::adminCategories))
+                        .executes(ctx -> {
+                            CommandHelp.admin(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "category"));
+                            return ok();
+                        })));
+        root.then(legendTree());
+        root.then(itemTree());
+        root.then(worldTree());
+        root.then(eventTree());
+        var season = Commands.literal("season").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "season"));
+        for (String sub : List.of("start", "preview", "cancel")) {
+            season.then(Commands.literal(sub).executes(ctx -> forge(ctx, "season", sub)));
         }
-        root.then(Commands.literal("give").requires(ForgeCommands::admin)
+        root.then(season);
+        root.then(serverTree());
+        // the old flat commands (/forge give, /forge locate...): not suggested any more, but still understood
+        root.then(Commands.argument("old", StringArgumentType.greedyString()).requires(ForgeCommands::admin)
+                .executes(ctx -> {
+                    String line = StringArgumentType.getString(ctx, "old").trim();
+                    String first = line.split(" ", 2)[0].toLowerCase(Locale.ROOT);
+                    String rest = line.length() > first.length() ? line.substring(first.length()) : "";
+                    String now = LEGACY.get(first);
+                    if (now == null) {
+                        ctx.getSource().getSender().sendMessage(ItemManager.color("&cUnknown command. &7/forge help"));
+                    } else {
+                        org.bukkit.Bukkit.dispatchCommand(ctx.getSource().getSender(), "forge " + now + rest);
+                    }
+                    return ok();
+                }));
+        return root;
+    }
+
+    // ---------------------------------------------------------------- /forge legend
+
+    private LiteralArgumentBuilder<CommandSourceStack> legendTree() {
+        var legend = Commands.literal("legend").requires(ForgeCommands::admin).executes(ctx -> {
+            CommandHelp.admin(ctx.getSource().getSender(), "legend");
+            return ok();
+        });
+        legend.then(Commands.literal("status").executes(ctx -> forge(ctx, "status")));
+        legend.then(Commands.literal("give")
                 .then(Commands.argument("player", ArgumentTypes.player())
                         .then(Commands.argument("item", ArgumentTypes.key()).suggests(suggest(() -> plugin.items().refs()))
                                 .executes(ctx -> forge(ctx, "give", onePlayer(ctx, "player").getName(),
@@ -139,122 +209,86 @@ final class ForgeCommands {
                                         .executes(ctx -> forge(ctx, "give", onePlayer(ctx, "player").getName(),
                                                 ref(ctx.getArgument("item", Key.class)),
                                                 String.valueOf(IntegerArgumentType.getInteger(ctx, "amount"))))))));
-        root.then(Commands.literal("purge").requires(ForgeCommands::admin)
-                .then(Commands.argument("name", StringArgumentType.word())
-                        .executes(ctx -> {
-                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), false);
-                            return Command.SINGLE_SUCCESS;
-                        })
-                        .then(Commands.literal("confirm").executes(ctx -> {
-                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), true);
-                            return Command.SINGLE_SUCCESS;
-                        }))));
-        root.then(Commands.literal("release").requires(ForgeCommands::admin)
+        legend.then(Commands.literal("release")
                 .then(Commands.literal("all-admin")
                         .executes(ctx -> {
                             Purge.releaseAdminGiven(plugin, ctx.getSource().getSender(), false);
-                            return Command.SINGLE_SUCCESS;
+                            return ok();
                         })
                         .then(Commands.literal("confirm").executes(ctx -> {
                             Purge.releaseAdminGiven(plugin, ctx.getSource().getSender(), true);
-                            return Command.SINGLE_SUCCESS;
+                            return ok();
+                        })))
+                .then(Commands.argument("legend", ArgumentTypes.key()).suggests(suggest(this::legendIds))
+                        .executes(ctx -> forge(ctx, "release", ref(ctx.getArgument("legend", Key.class))))
+                        .then(Commands.literal("confirm")
+                                .executes(ctx -> forge(ctx, "release", ref(ctx.getArgument("legend", Key.class)), "confirm")))));
+        legend.then(Commands.literal("finish")
+                .then(Commands.argument("legend", ArgumentTypes.key()).suggests(suggest(this::legendIds))
+                        .executes(ctx -> forge(ctx, "finish", ref(ctx.getArgument("legend", Key.class))))));
+        legend.then(Commands.literal("purge")
+                .then(Commands.argument("name", StringArgumentType.word())
+                        .executes(ctx -> {
+                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), false);
+                            return ok();
+                        })
+                        .then(Commands.literal("confirm").executes(ctx -> {
+                            Purge.purge(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "name"), true);
+                            return ok();
                         }))));
-        for (String sub : List.of("release", "finish")) {
-            root.then(Commands.literal(sub).requires(ForgeCommands::admin)
-                    .then(Commands.argument("legend", ArgumentTypes.key()).suggests(suggest(this::legendIds))
-                            .executes(ctx -> forge(ctx, sub, ref(ctx.getArgument("legend", Key.class))))));
-        }
-        root.then(Commands.literal("event").requires(ForgeCommands::admin)
-                .then(Commands.argument("event", StringArgumentType.word()).suggests(suggest(EventManager::names))
-                        .executes(ctx -> forge(ctx, "event", StringArgumentType.getString(ctx, "event")))));
-        var big = Commands.literal("bigevent").requires(ForgeCommands::admin).executes(ctx -> {
-            plugin.bigEvents().list(ctx.getSource().getSender());
-            return Command.SINGLE_SUCCESS;
-        });
-        big.then(Commands.literal("plan")
-                .then(Commands.argument("type", StringArgumentType.word()).suggests(suggest(() -> BigEventManager.TYPES))
-                        .then(Commands.argument("time", StringArgumentType.greedyString())
-                                .executes(ctx -> {
-                                    plugin.bigEvents().plan(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "type"),
-                                            StringArgumentType.getString(ctx, "time"));
-                                    return Command.SINGLE_SUCCESS;
-                                }))));
-        big.then(Commands.literal("start")
-                .then(Commands.argument("type", StringArgumentType.word()).suggests(suggest(() -> BigEventManager.TYPES))
-                        .executes(ctx -> {
-                            plugin.bigEvents().startNow(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "type"));
-                            return Command.SINGLE_SUCCESS;
-                        })));
-        big.then(Commands.literal("cancel")
-                .then(Commands.argument("id", StringArgumentType.word()).suggests(suggest(() -> plugin.bigEvents().ids()))
-                        .executes(ctx -> {
-                            plugin.bigEvents().cancel(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "id"));
-                            return Command.SINGLE_SUCCESS;
-                        })));
-        big.then(Commands.literal("stop").executes(ctx -> {
-            plugin.bigEvents().stop(ctx.getSource().getSender());
-            return Command.SINGLE_SUCCESS;
-        }));
-        big.then(Commands.literal("list").executes(ctx -> {
-            plugin.bigEvents().list(ctx.getSource().getSender());
-            return Command.SINGLE_SUCCESS;
-        }));
-        root.then(big);
-        root.then(Commands.literal("npc").requires(ForgeCommands::admin)
-                .then(Commands.literal("set").executes(ctx -> player(ctx, p -> plugin.quests().setNpc(p))))
-                .then(Commands.literal("remove").executes(ctx -> {
-                    plugin.quests().removeNpc(ctx.getSource().getSender());
-                    return Command.SINGLE_SUCCESS;
-                })));
-        var spawnBuild = Commands.literal("spawnbuild").requires(ForgeCommands::admin).executes(ctx -> {
-            plugin.spawnBuilder().command(ctx.getSource().getSender(), "");
-            return Command.SINGLE_SUCCESS;
-        });
-        for (String sub : List.of("confirm", "undo", "cancel")) {
-            spawnBuild.then(Commands.literal(sub).executes(ctx -> {
-                plugin.spawnBuilder().command(ctx.getSource().getSender(), sub);
-                return Command.SINGLE_SUCCESS;
-            }));
-        }
-        root.then(spawnBuild);
-        var enchants = Commands.literal("enchants").requires(ForgeCommands::admin).executes(ctx -> {
-            plugin.customEnchants().command(ctx.getSource().getSender(), "status");
-            return Command.SINGLE_SUCCESS;
-        });
-        for (String sub : List.of("status", "unlock", "lock", "reset")) {
-            enchants.then(Commands.literal(sub).executes(ctx -> {
-                plugin.customEnchants().command(ctx.getSource().getSender(), sub);
-                return Command.SINGLE_SUCCESS;
-            }));
-        }
-        root.then(enchants);
-        var season = Commands.literal("season").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "season"));
-        for (String sub : List.of("start", "preview", "cancel")) {
-            season.then(Commands.literal(sub).executes(ctx -> forge(ctx, "season", sub)));
-        }
-        root.then(season);
-        root.then(Commands.literal("ghost").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "ghost"))
-                .then(Commands.literal("stop").executes(ctx -> forge(ctx, "ghost", "stop")))
+        legend.then(Commands.literal("stars")
                 .then(Commands.argument("player", ArgumentTypes.player())
-                        .executes(ctx -> forge(ctx, "ghost", onePlayer(ctx, "player").getName()))));
-        root.then(Commands.literal("scorched").requires(ForgeCommands::admin).executes(ctx -> {
-            plugin.scorched().locate(ctx.getSource().getSender());
-            return Command.SINGLE_SUCCESS;
-        }));
-        root.then(Commands.literal("locate").requires(ForgeCommands::admin)
+                        .then(Commands.argument("stars", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(1, 5))
+                                .executes(ctx -> {
+                                    plugin.stars().setCommand(ctx.getSource().getSender(), onePlayer(ctx, "player"),
+                                            com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(ctx, "stars"));
+                                    return ok();
+                                }))));
+        return legend;
+    }
+
+    // ---------------------------------------------------------------- /forge item
+
+    private LiteralArgumentBuilder<CommandSourceStack> itemTree() {
+        var item = Commands.literal("item").requires(ForgeCommands::admin).executes(ctx -> {
+            CommandHelp.admin(ctx.getSource().getSender(), "item");
+            return ok();
+        });
+        item.then(Commands.literal("token").executes(ctx -> forge(ctx, "token"))
+                .then(Commands.argument("amount", IntegerArgumentType.integer(1, 64))
+                        .executes(ctx -> forge(ctx, "token", String.valueOf(IntegerArgumentType.getInteger(ctx, "amount"))))));
+        for (String plain : List.of("seal", "tracker", "recon", "totem")) {
+            item.then(Commands.literal(plain).executes(ctx -> forge(ctx, plain)));
+        }
+        return item;
+    }
+
+    // ---------------------------------------------------------------- /forge world
+
+    private LiteralArgumentBuilder<CommandSourceStack> worldTree() {
+        var world = Commands.literal("world").requires(ForgeCommands::admin).executes(ctx -> {
+            CommandHelp.admin(ctx.getSource().getSender(), "world");
+            return ok();
+        });
+        world.then(Commands.literal("locate")
                 .then(Commands.argument("biome", StringArgumentType.word())
                         .suggests((ctx, b) -> {
                             BiomeLocator.NAMES.forEach(b::suggest);
                             return b.buildFuture();
                         })
                         .executes(ctx -> {
-                            BiomeLocator.locate(plugin, ctx.getSource().getSender(), StringArgumentType.getString(ctx, "biome").toLowerCase(Locale.ROOT));
-                            return Command.SINGLE_SUCCESS;
+                            BiomeLocator.locate(plugin, ctx.getSource().getSender(),
+                                    StringArgumentType.getString(ctx, "biome").toLowerCase(Locale.ROOT));
+                            return ok();
                         })));
-        root.then(Commands.literal("ancient").requires(ForgeCommands::admin)
+        world.then(Commands.literal("scorched").executes(ctx -> {
+            plugin.scorched().locate(ctx.getSource().getSender());
+            return ok();
+        }));
+        world.then(Commands.literal("ancient")
                 .executes(ctx -> {
                     plugin.stars().list(ctx.getSource().getSender());
-                    return Command.SINGLE_SUCCESS;
+                    return ok();
                 })
                 .then(Commands.literal("here").executes(ctx -> player(ctx, p -> plugin.stars().buildHere(p))))
                 .then(Commands.literal("end").executes(ctx -> {
@@ -265,34 +299,113 @@ final class ForgeCommands {
                     } else {
                         plugin.stars().raiseEnd(end, ctx.getSource().getSender());
                     }
-                    return Command.SINGLE_SUCCESS;
+                    return ok();
                 }))
                 .then(Commands.literal("finish").executes(ctx -> {
                     plugin.stars().finishAll(ctx.getSource().getSender());
-                    return Command.SINGLE_SUCCESS;
+                    return ok();
                 }))
                 .then(Commands.literal("cool").executes(ctx -> {
                     plugin.stars().resetCooldowns(ctx.getSource().getSender());
-                    return Command.SINGLE_SUCCESS;
+                    return ok();
                 })));
-        root.then(Commands.literal("stars").requires(ForgeCommands::admin)
+        var spawnBuild = Commands.literal("spawnbuild").executes(ctx -> {
+            plugin.spawnBuilder().command(ctx.getSource().getSender(), "");
+            return ok();
+        });
+        for (String sub : List.of("confirm", "undo", "cancel")) {
+            spawnBuild.then(Commands.literal(sub).executes(ctx -> {
+                plugin.spawnBuilder().command(ctx.getSource().getSender(), sub);
+                return ok();
+            }));
+        }
+        world.then(spawnBuild);
+        world.then(Commands.literal("npc")
+                .then(Commands.literal("set").executes(ctx -> player(ctx, p -> plugin.quests().setNpc(p))))
+                .then(Commands.literal("remove").executes(ctx -> {
+                    plugin.quests().removeNpc(ctx.getSource().getSender());
+                    return ok();
+                })));
+        return world;
+    }
+
+    // ---------------------------------------------------------------- /forge event
+
+    private LiteralArgumentBuilder<CommandSourceStack> eventTree() {
+        var event = Commands.literal("event").requires(ForgeCommands::admin).executes(ctx -> {
+            CommandHelp.admin(ctx.getSource().getSender(), "event");
+            return ok();
+        });
+        event.then(Commands.literal("ghost").executes(ctx -> forge(ctx, "ghost"))
+                .then(Commands.literal("stop").executes(ctx -> forge(ctx, "ghost", "stop")))
                 .then(Commands.argument("player", ArgumentTypes.player())
-                        .then(Commands.argument("stars", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(1, 5))
+                        .executes(ctx -> forge(ctx, "ghost", onePlayer(ctx, "player").getName()))));
+        event.then(Commands.literal("meteor").executes(ctx -> forge(ctx, "meteor")));
+        event.then(Commands.literal("warden").executes(ctx -> forge(ctx, "warden")));
+        var big = Commands.literal("big").executes(ctx -> {
+            plugin.bigEvents().list(ctx.getSource().getSender());
+            return ok();
+        });
+        big.then(Commands.literal("plan")
+                .then(Commands.argument("type", StringArgumentType.word()).suggests(suggest(() -> BigEventManager.TYPES))
+                        .then(Commands.argument("time", StringArgumentType.greedyString())
                                 .executes(ctx -> {
-                                    plugin.stars().setCommand(ctx.getSource().getSender(), onePlayer(ctx, "player"),
-                                            com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(ctx, "stars"));
-                                    return Command.SINGLE_SUCCESS;
+                                    plugin.bigEvents().plan(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "type"),
+                                            StringArgumentType.getString(ctx, "time"));
+                                    return ok();
                                 }))));
-        var update = Commands.literal("update").requires(ForgeCommands::admin)
-                .executes(ctx -> update(ctx, "now"));
+        big.then(Commands.literal("start")
+                .then(Commands.argument("type", StringArgumentType.word()).suggests(suggest(() -> BigEventManager.TYPES))
+                        .executes(ctx -> {
+                            plugin.bigEvents().startNow(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "type"));
+                            return ok();
+                        })));
+        big.then(Commands.literal("cancel")
+                .then(Commands.argument("id", StringArgumentType.word()).suggests(suggest(() -> plugin.bigEvents().ids()))
+                        .executes(ctx -> {
+                            plugin.bigEvents().cancel(ctx.getSource().getSender(), StringArgumentType.getString(ctx, "id"));
+                            return ok();
+                        })));
+        big.then(Commands.literal("stop").executes(ctx -> {
+            plugin.bigEvents().stop(ctx.getSource().getSender());
+            return ok();
+        }));
+        big.then(Commands.literal("list").executes(ctx -> {
+            plugin.bigEvents().list(ctx.getSource().getSender());
+            return ok();
+        }));
+        event.then(big);
+        // small events: blood_moon, rift, legend_hunt, happy_hour... and stop
+        event.then(Commands.argument("event", StringArgumentType.word()).suggests(suggest(EventManager::names))
+                .executes(ctx -> forge(ctx, "event", StringArgumentType.getString(ctx, "event"))));
+        return event;
+    }
+
+    // ---------------------------------------------------------------- /forge server
+
+    private LiteralArgumentBuilder<CommandSourceStack> serverTree() {
+        var server = Commands.literal("server").requires(ForgeCommands::admin).executes(ctx -> {
+            CommandHelp.admin(ctx.getSource().getSender(), "server");
+            return ok();
+        });
+        server.then(Commands.literal("reload").executes(ctx -> forge(ctx, "reload")));
+        var update = Commands.literal("update").executes(ctx -> update(ctx, "now"));
         for (String sub : List.of("on", "off", "now", "restart", "cancel")) {
             update.then(Commands.literal(sub).executes(ctx -> update(ctx, sub)));
         }
-        root.then(update);
-        root.then(Commands.literal("token").requires(ForgeCommands::admin).executes(ctx -> forge(ctx, "token"))
-                .then(Commands.argument("amount", IntegerArgumentType.integer(1, 64))
-                        .executes(ctx -> forge(ctx, "token", String.valueOf(IntegerArgumentType.getInteger(ctx, "amount"))))));
-        return root;
+        server.then(update);
+        var enchants = Commands.literal("enchants").executes(ctx -> {
+            plugin.customEnchants().command(ctx.getSource().getSender(), "status");
+            return ok();
+        });
+        for (String sub : List.of("status", "unlock", "lock", "reset")) {
+            enchants.then(Commands.literal(sub).executes(ctx -> {
+                plugin.customEnchants().command(ctx.getSource().getSender(), sub);
+                return ok();
+            }));
+        }
+        server.then(enchants);
+        return server;
     }
 
     private int update(CommandContext<CommandSourceStack> ctx, String what) {

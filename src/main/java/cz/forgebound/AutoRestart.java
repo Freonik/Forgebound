@@ -138,7 +138,7 @@ public final class AutoRestart {
         });
     }
 
-    /** /forge update restart|cancel */
+    /** /forge server update restart|cancel */
     public void command(CommandSender sender, String what) {
         if (what.equals("cancel")) {
             if (countdown == null) {
@@ -151,7 +151,7 @@ public final class AutoRestart {
             return;
         }
         if (countdown != null || checking) {
-            sender.sendMessage(ItemManager.color("&7A restart is already on its way &8(/forge update cancel)"));
+            sender.sendMessage(ItemManager.color("&7A restart is already on its way &8(/forge server update cancel)"));
             return;
         }
         sender.sendMessage(ItemManager.color("&7Checking all Forgebound plugins for a new version..."));

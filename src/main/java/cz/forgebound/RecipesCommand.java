@@ -12,11 +12,11 @@ import java.util.Map;
 
 /**
  * /forge                               - tells players to use a crafting table (the menu only opens there)
- * /forge reload                        - reloads the config (admin)
- * /forge give <player> <ref> [amount]  - gives a weapon / relic, ignores uniqueness (admin)
- * /forge status                        - which weapons exist / are being forged (admin)
- * /forge release <id>                  - makes a weapon/relic forgeable again, stops its ritual (admin)
- * /forge finish <weapon>               - finishes a running ritual right now (admin)
+ * /forge server reload                        - reloads the config (admin)
+ * /forge legend give <player> <ref> [amount]  - gives a weapon / relic, ignores uniqueness (admin)
+ * /forge legend status                        - which weapons exist / are being forged (admin)
+ * /forge legend release <id>                  - makes a weapon/relic forgeable again, stops its ritual (admin)
+ * /forge legend finish <weapon>               - finishes a running ritual right now (admin)
  */
 public final class RecipesCommand {
 
@@ -135,7 +135,7 @@ public final class RecipesCommand {
                 org.bukkit.entity.Player victim = args.length > 1 ? Bukkit.getPlayerExact(args[1])
                         : sender instanceof org.bukkit.entity.Player p ? p : null;
                 if (victim == null) {
-                    sender.sendMessage(ItemManager.color("&7Usage: &e/forge ghost [player|stop]"));
+                    sender.sendMessage(ItemManager.color("&7Usage: &e/forge event ghost [player|stop]"));
                 } else if (!plugin.ghost().forceSpawn(victim)) {
                     sender.sendMessage(ItemManager.color("&7The Doppelganger is already here."));
                 }

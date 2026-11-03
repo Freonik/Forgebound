@@ -8,7 +8,7 @@ import java.util.SplittableRandom;
 /**
  * Where the Scorched Lands are: smooth 2D noise from the world seed. A spot belongs to the biome when the noise
  * there is above a threshold; the threshold is picked so that about {@code rarity} of the world is scorched.
- * Pure Java (no server), so it can be tested and so /forge scorched can find areas that aren't generated yet.
+ * Pure Java (no server), so it can be tested and so /forge world scorched can find areas that aren't generated yet.
  */
 final class ScorchedNoise {
 

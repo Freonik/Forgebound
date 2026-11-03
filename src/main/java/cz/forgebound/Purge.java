@@ -12,10 +12,10 @@ import java.util.UUID;
 
 /**
  * Admin clean-up after testing:
- * /forge purge <name> [confirm]   - wipes a player's leaderboard data (records, bounty, legend stats) under every UUID
+ * /forge legend purge <name> [confirm]   - wipes a player's leaderboard data (records, bounty, legend stats) under every UUID
  *                                   that name has had (online-mode and offline-mode UUIDs differ)
- * /forge release all-admin [confirm] - releases every legend that was given with /forge give and never forged
- *                                   (their copies crumble, like with /forge release)
+ * /forge legend release all-admin [confirm] - releases every legend that was given with /forge legend give and never forged
+ *                                   (their copies crumble, like with /forge legend release)
  */
 final class Purge {
 
@@ -42,7 +42,7 @@ final class Purge {
             sender.sendMessage(ItemManager.color("&eThis wipes &f" + name + "&e's leaderboard data (records, stars, bounty, legend kills and damage) "
                     + "under these UUIDs:"));
             ids.forEach(u -> sender.sendMessage(ItemManager.color("&7 - &f" + u)));
-            sender.sendMessage(ItemManager.color("&7Items, legends and the team stay. Run &e/forge purge " + name + " confirm"));
+            sender.sendMessage(ItemManager.color("&7Items, legends and the team stay. Run &e/forge legend purge " + name + " confirm"));
             return;
         }
         int records = plugin.top() != null ? plugin.top().purge(ids) : 0;
@@ -66,7 +66,7 @@ final class Purge {
         if (!confirm) {
             sender.sendMessage(ItemManager.color("&eThese " + given.size() + " legends were given by an admin (never forged):"));
             given.forEach((ref, holder) -> sender.sendMessage(ItemManager.color("&7 - &f" + ref + " &8(" + holder + ")")));
-            sender.sendMessage(ItemManager.color("&cTheir copies crumble. &7Run &e/forge release all-admin confirm"));
+            sender.sendMessage(ItemManager.color("&cTheir copies crumble. &7Run &e/forge legend release all-admin confirm"));
             return;
         }
         given.keySet().forEach(ref -> plugin.legends().revoke(ref));

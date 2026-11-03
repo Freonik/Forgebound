@@ -288,10 +288,10 @@ public final class BigEventManager implements Listener {
 
     public void list(CommandSender sender) {
         if (running != null) {
-            sender.sendMessage(ItemManager.color("&dRunning: " + title(running.type()) + " &7- &f/forge bigevent stop &7ends it without prizes"));
+            sender.sendMessage(ItemManager.color("&dRunning: " + title(running.type()) + " &7- &f/forge event big stop &7ends it without prizes"));
         }
         if (planned.isEmpty()) {
-            sender.sendMessage(ItemManager.color("&7No big events planned. &f/forge bigevent plan <border|hunt|boss> <20:00 | 25.10 20:00 | +2h>"));
+            sender.sendMessage(ItemManager.color("&7No big events planned. &f/forge event big plan <border|hunt|boss> <20:00 | 25.10 20:00 | +2h>"));
             return;
         }
         for (Planned p : planned.values()) {

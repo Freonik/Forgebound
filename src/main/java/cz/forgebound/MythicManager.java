@@ -94,7 +94,7 @@ public final class MythicManager implements Listener {
                 continue;
             }
             long at = expiresAt(stack);
-            if (at == 0) {                         // made some other way (e.g. /forge give): the clock starts now
+            if (at == 0) {                         // made some other way (e.g. /forge legend give): the clock starts now
                 contents[i] = create(entry);
                 changed = true;
             } else if (at <= now) {

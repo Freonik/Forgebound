@@ -973,7 +973,7 @@ public final class StarManager implements Listener {
 
     // ================================================================ admin
 
-    /** /forge ancient: the known forges, and the guaranteed ones that haven't generated yet. */
+    /** /forge world ancient: the known forges, and the guaranteed ones that haven't generated yet. */
     public void list(CommandSender sender) {
         drainFound();
         if (plugin.scorched() != null) {
@@ -991,11 +991,11 @@ public final class StarManager implements Listener {
             }
         }
         if (!hasEndForge()) {
-            sender.sendMessage(ItemManager.color("&8- End: &7rises when the dragon dies &8(or &e/forge ancient end&8)"));
+            sender.sendMessage(ItemManager.color("&8- End: &7rises when the dragon dies &8(or &e/forge world ancient end&8)"));
         }
         if (sites.isEmpty()) {
             sender.sendMessage(ItemManager.color("&7No Ancient Forge has generated yet. They appear in NEW chunks (Scorched Lands, Nether). "
-                    + "&e/forge ancient here &7builds one where you stand."));
+                    + "&e/forge world ancient here &7builds one where you stand."));
             return;
         }
         long now = System.currentTimeMillis();
@@ -1012,7 +1012,7 @@ public final class StarManager implements Listener {
         return w == null ? world : w.getKey().asString();
     }
 
-    /** /forge ancient here: builds an Ancient Forge in front of the admin (the anvil 6 blocks ahead). */
+    /** /forge world ancient here: builds an Ancient Forge in front of the admin (the anvil 6 blocks ahead). */
     public void buildHere(Player player) {
         Location at = player.getLocation();
         Site site = build(at.getWorld(), at.getBlockX(), at.getBlockY() - 1, at.getBlockZ());
@@ -1110,7 +1110,7 @@ public final class StarManager implements Listener {
         return w.getHighestBlockYAt(x, z, org.bukkit.HeightMap.MOTION_BLOCKING_NO_LEAVES);
     }
 
-    /** /forge stars <player> <stars>: sets the stars of the weapon in the player's hand. */
+    /** /forge legend stars <player> <stars>: sets the stars of the weapon in the player's hand. */
     public void setCommand(CommandSender sender, Player target, double stars) {
         ItemStack hand = target.getInventory().getItemInMainHand();
         ItemManager.Entry entry = starWeapon(hand);
@@ -1125,7 +1125,7 @@ public final class StarManager implements Listener {
         sender.sendMessage(ItemManager.color("&7" + target.getName() + "'s ").append(ItemManager.nameOf(hand)));
     }
 
-    /** /forge ancient finish: ends every running ascension now. */
+    /** /forge world ancient finish: ends every running ascension now. */
     public void finishAll(CommandSender sender) {
         for (Running r : running.values()) {
             r.endsAt = System.currentTimeMillis();
@@ -1133,7 +1133,7 @@ public final class StarManager implements Listener {
         sender.sendMessage(ItemManager.color("&7" + running.size() + " ascension(s) will finish now."));
     }
 
-    /** /forge ancient cool: resets every forge's cooldown. */
+    /** /forge world ancient cool: resets every forge's cooldown. */
     public void resetCooldowns(CommandSender sender) {
         sites.values().forEach(s -> s.readyAt = 0);
         save();

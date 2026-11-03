@@ -1,6 +1,6 @@
 # ============================================================
 #  Forgebound - configuration
-#  After editing, just run /forge reload (no restart needed).
+#  After editing, just run /forge server reload (no restart needed).
 #
 #  The forge menu opens ONLY from a crafting table:
 #  shift + right-click it with an empty hand.
@@ -186,7 +186,7 @@ messages:
 #  false on a weapon/relic: it disappears from the forge and can't be made
 #                           (copies that already exist keep working)
 #  false on a material:     it stops dropping from mobs, chests and vaults
-#  Missing entries count as true. Apply with /forge reload.
+#  Missing entries count as true. Apply with /forge server reload.
 # ------------------------------------------------------------
 craftable:
   weapons:
@@ -199,7 +199,7 @@ craftable:
     abyssal_maw: true
     clawline_pick: true
     silk_needle: true
-    # not obtainable yet - only /forge give (flip to true to put it in the forge)
+    # not obtainable yet - only /forge legend give (flip to true to put it in the forge)
     knightfall: false
     rimebreaker: true
     pinning_repeater: true
@@ -293,8 +293,8 @@ ritual:
 #  Each weapon and relic can exist only once on the server. Once its ritual
 #  starts, nobody else can make it.
 #  Set "unique: false" on a weapon or relic to exclude it.
-#  Admins: /forge status, /forge release <id>
-#  (/forge give ignores this, it's an admin tool)
+#  Admins: /forge legend status, /forge legend release <id>
+#  (/forge legend give ignores this, it's an admin tool)
 # ------------------------------------------------------------
 unique-weapons:
   enabled: true
@@ -1377,7 +1377,7 @@ top:
 #  "they" join the server: a glitched copy of that player in legendary gear that hunts them.
 #  If it kills them, it takes one of their legends and keeps coming back with it (every
 #  "return-minutes") until somebody kills it. The stolen legends are kept in ghost.yml, never lost.
-#  Admins: /forge ghost [player|stop]
+#  Admins: /forge event ghost [player|stop]
 # ------------------------------------------------------------
 doppelganger:
   enabled: true
@@ -1660,7 +1660,7 @@ dialogs:
   pay-confirm-from: 10
   # /forge season without arguments: theme + start / preview / cancel
   season-panel: true
-  # /forge release asks first (shows who owns the legend)
+  # /forge legend release asks first (shows who owns the legend)
   release-confirm: true
 
 # ------------------------------------------------------------
@@ -1699,7 +1699,7 @@ items:
 #  A rare burnt biome (forgebound:scorched_lands): ash in the air, grey-orange sky, coarse dirt, gravel and
 #  blackstone, trees burnt to stumps. Ruins generate in it: ruined forges, burnt workshops, slag heaps and
 #  watchtowers, with loot chests (and Bounty Tokens / rarely a legendary material) and husk guards.
-#  ONLY NEW CHUNKS: land that's already generated is never changed. /forge scorched = where's the nearest one.
+#  ONLY NEW CHUNKS: land that's already generated is never changed. /forge world scorched = where's the nearest one.
 #  Changes to rarity / zone-size only affect chunks generated afterwards (keep them once the world is played).
 # ------------------------------------------------------------
 # ------------------------------------------------------------
@@ -1856,8 +1856,8 @@ stars:
 #  Use the anvil in the middle holding a legend weapon. The weapon stays in the forge during the ritual
 #  and drops there when it ends - whoever is there can take it. A pillar of soul fire above the forge
 #  shows where it is from far away (smoke while it cools down).
-#  /forge ancient (list, tp) - /forge ancient here (build one) - /forge ancient end (raise the End forge now)
-#  /forge stars <player> <1-5>
+#  /forge world ancient (list, tp) - /forge world ancient here (build one) - /forge world ancient end (raise the End forge now)
+#  /forge legend stars <player> <1-5>
 # ------------------------------------------------------------
 ancient-forge:
   # the most stars each forge can give
@@ -1909,7 +1909,7 @@ auto-update:
   # ONLY turn this on if something starts the server again after it stops: e.g. a daily "start" in your host's
   # planner a few minutes after the restart (set host-start to that time), or a host that restarts it by itself.
   # Otherwise the server would stay off until someone starts it.
-  # /forge update restart = check now and restart (even without a new version), /forge update cancel = stop the countdown
+  # /forge server update restart = check now and restart (even without a new version), /forge server update cancel = stop the countdown
   restart:
     enabled: false
     # when your host's planner starts the server; the restart has to be done before it (else it waits for tomorrow)
@@ -1944,8 +1944,8 @@ teams:
 
 # ------------------------------------------------------------
 #  BIG EVENTS - only started by an admin, planned ahead:
-#    /forge bigevent plan <border|hunt|boss> <20:00 | 25.10 20:00 | +2h>   (the boss rises where you stand)
-#    /forge bigevent start <type>   /forge bigevent list   /forge bigevent cancel <id>   /forge bigevent stop
+#    /forge event big plan <border|hunt|boss> <20:00 | 25.10 20:00 | +2h>   (the boss rises where you stand)
+#    /forge event big start <type>   /forge event big list   /forge event big cancel <id>   /forge event big stop
 #  Everyone is told a day, an hour, 10 minutes and a minute before; the last 10 minutes count down in a bar.
 #  The winner gets a MYTHIC weapon (see the weapons section) that fades after mythic-days.
 #  Prizes for players who are offline when an event ends wait until they join.
@@ -1995,7 +1995,7 @@ big-events:
     mythic: titans_echo
 
 # ------------------------------------------------------------
-#  QUESTS - the Questmaster (an NPC): /forge npc set puts it where you stand, /forge npc remove.
+#  QUESTS - the Questmaster (an NPC): /forge world npc set puts it where you stand, /forge world npc remove.
 #  Every day daily-count quests from "daily", every week (from Monday) weekly-count from "weekly" - the same for
 #  everybody. Progress counts anywhere (/quests shows it), the reward is claimed at the Questmaster.
 #  type: KILL (target: entity types or ANY_MONSTER), KILL_PLAYER (each victim once), MINE (target: blocks or a
@@ -2041,7 +2041,7 @@ quests:
 #  TOTEM OF THE FORGE - a totem of undying that also works from anywhere in the inventory (held in a hand it
 #  works like any totem). Back at full health, a few seconds untouchable, absorption, and a burst of fire that
 #  throws everyone around you back. From big events, weekly quests and the token shop (rotating offer).
-#  Angel's Wings save you first if they're ready. /forge totem gives you one.
+#  Angel's Wings save you first if they're ready. /forge item totem gives you one.
 # ------------------------------------------------------------
 forge-totem:
   enabled: true
@@ -2068,11 +2068,11 @@ forge-totem:
 custom-enchants:
   # off = never, on = always, unlock = they wake up for the whole server (with a ceremony) once players have forged
   # unlock-count legends (admin gifts don't count; a whole armor set counts as one legend).
-  # unlock-count: 0 = use unlock-fraction of all the legends instead. /forge enchants [status|unlock|lock|reset]
+  # unlock-count: 0 = use unlock-fraction of all the legends instead. /forge server enchants [status|unlock|lock|reset]
   mode: unlock
   unlock-count: 5
   unlock-fraction: 0.334
-  # how many times each enchantment can come out of a tome per season (/forge enchants reset = new season)
+  # how many times each enchantment can come out of a tome per season (/forge server enchants reset = new season)
   copies:
     common: 8
     rare: 4
@@ -2114,7 +2114,7 @@ custom-enchants:
 
 # ------------------------------------------------------------
 #  PROTECTION
-#  Spawn (the Forge Citadel from /forge spawnbuild) and every Ancient Forge: blocks can be mined and blown up,
+#  Spawn (the Forge Citadel from /forge world spawnbuild) and every Ancient Forge: blocks can be mined and blown up,
 #  but nothing drops, and after regen-minutes they come back (blocks placed there disappear again).
 #  It never puts a block back inside someone or pulls one away from under someone. Admins in creative build freely.
 # ------------------------------------------------------------
@@ -2184,7 +2184,7 @@ recon:
 #  METEOR
 #  Every few hours a meteor falls somewhere within "radius" blocks of spawn.
 #  Its location is revealed step by step; it carries a Meteor Cache with a legendary
-#  material. Admins: /forge meteor
+#  material. Admins: /forge event meteor
 # ------------------------------------------------------------
 meteor:
   enabled: true
@@ -2205,7 +2205,7 @@ meteor:
 #  FORGE WARDEN
 #  A boss. Sneak + right-click a crafting table holding the summon item.
 #  The top damage dealer gets a Warden's Seal (choose any legendary material).
-#  Admins: /forge warden
+#  Admins: /forge event warden
 # ------------------------------------------------------------
 warden:
   enabled: true

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * /forge locate &lt;biome&gt;: where the nearest of the plugin's own biome pairs is. Vanilla /locate biome can't find
+ * /forge world locate &lt;biome&gt;: where the nearest of the plugin's own biome pairs is. Vanilla /locate biome can't find
  * them - they're painted onto chunks after generation, the world's biome source doesn't know about them.
  * The search works on the noise, so it also finds places nobody has generated yet (only those turn into the biome).
  */

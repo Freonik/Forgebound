@@ -91,17 +91,17 @@
 3. *(Optional, recommended)* Add the resource pack to `server.properties`. The release notes contain the exact two lines
    to copy (link + SHA1), see [Resource pack](#resource-pack). Then set `menu.resource-pack: true` in
    `plugins/Forgebound/config.yml`.
-4. Run `/forge reload` after any config change. No restart needed.
+4. Run `/forge server reload` after any config change. No restart needed.
 
 > **Auto-update:** every hour Forgebound checks GitHub for a newer release, downloads it into `plugins/update/`
 > and tells the admins; the new version starts with the next **restart**. It also puts that release's resource pack
 > link and SHA1 into `server.properties`, so you never have to copy the SHA1 by hand (only if your pack line already
-> points to this repository). Turn it off with **`/forge update off`** (`/forge update now` checks right away).
+> points to this repository). Turn it off with **`/forge server update off`** (`/forge server update now` checks right away).
 >
 > **Nightly restart** (off by default, `auto-update.restart.enabled`)**:** at 4:00 Forgebound, Forgebound Guard and Forgebound Teams check for
 > a new version together. If any of them has one, players get a 10-minute countdown and the server restarts once for
 > all of them (it waits for a running big event). Turn it on only if your host starts the server again after it stops.
-> `/forge update restart` checks and restarts now, `/forge update cancel` stops the countdown.
+> `/forge server update restart` checks and restarts now, `/forge server update cancel` stops the countdown.
 >
 > **Updating by hand:** just replace the jar. New weapons, relics, materials and messages are added to your existing `config.yml`
 > automatically (your own changes stay). Entries you delete on purpose are remembered and not added back.
@@ -418,7 +418,7 @@ Rare **Sealed Tomes** (Common / Rare / Legendary) turn up in structure chests an
 levels are more common). These enchantments exist nowhere else, and only **normal gear** takes them: legendary weapons
 and relics can't, and the weapon ones (Lifesteal, Bleed, Execute, Cripple) only work on mobs and on players who carry
 a legend - they help hunt the legends, never replace them. They stay **locked until players have forged 5 legends** (a whole armor set counts as one) (then a server-wide ceremony wakes them up),
-and each enchantment exists only **2 / 4 / 8 times per season** (Legendary / Rare / Common). `/forge enchants` shows the
+and each enchantment exists only **2 / 4 / 8 times per season** (Legendary / Rare / Common). `/forge server enchants` shows the
 progress and what's left; `unlock`, `lock` and `reset` (new season) are for admins.
 
 | Rarity | Enchantments |
@@ -554,7 +554,7 @@ Every event can be switched off on its own, or all of them with `events.enabled:
 
 ## Big events and mythic weapons
 
-Big events never start on their own: an admin plans them ahead with `/forge bigevent plan`, and the whole server
+Big events never start on their own: an admin plans them ahead with `/forge event big plan`, and the whole server
 is told a day, an hour, 10 minutes and a minute before. The last 10 minutes count down in a bar at the top.
 
 | Event | What happens | Who wins |
@@ -582,7 +582,7 @@ Everything is under `big-events:` in the config; the weapons themselves are in `
 
 ## Quests
 
-The **Questmaster** stands where an admin put him (`/forge npc set`). Every day there are **3 daily quests** and
+The **Questmaster** stands where an admin put him (`/forge world npc set`). Every day there are **3 daily quests** and
 every week **one weekly quest** - the same for everybody: kill monsters, mine ores, chop logs, fish, travel,
 bring him items, kill players. Progress counts anywhere (`/quests` shows it); the reward - Bounty Tokens,
 legendary materials, XP - is claimed at the Questmaster. All three daily quests in one day give a bonus.
@@ -641,11 +641,11 @@ The guards are husks in battered iron armor. The chests have iron, gold, coal, s
 or a smithing template, plus a chance of **Bounty Tokens** and (big chests) a **legendary material**.
 
 > Only **new chunks** become Scorched Lands - land that's already generated is never changed. On an old world they
-> show up out where nobody has been yet; `/forge scorched` tells you where the nearest one is.
+> show up out where nobody has been yet; `/forge world scorched` tells you where the nearest one is.
 
 **Guaranteed areas.** So a server with a world border always has some: from the seed, **2 Scorched Lands areas**
 are placed 500–1700 blocks from 0,0. There is exactly **one Ancient Forge per dimension**: in the middle of one of
-those areas, and one in the Nether within 220 blocks (inside a Nether border of 1/8). `/forge ancient` shows where
+those areas, and one in the Nether within 220 blocks (inside a Nether border of 1/8). `/forge world ancient` shows where
 they will be, even before anyone went there. Change it in `scorched-lands.guaranteed` and `ancient-forge`
 (random extra forges are off by default).
 
@@ -792,32 +792,32 @@ It takes over the settings from Forgebound 2.5 automatically.
 | `/quests` | everyone | your daily and weekly quests (rewards are claimed at the Questmaster) |
 | `/shop` | everyone | the token shop (alias `/store`) |
 | `/pay [<player> <amount>]` | everyone | send Bounty Tokens to another player (without arguments: a window to pick the player and the amount) |
-| `/forge status` | `forgebound.admin` | which weapons and relics exist or are being forged (with real names) |
-| `/forge give <player> <weapon:id\|relic:id\|material:id> [amount]` | `forgebound.admin` | give an item (ignores uniqueness) |
-| `/forge release <id>` | `forgebound.admin` | make a weapon or relic forgeable again (stops its ritual); asks for confirmation first |
-| `/forge finish <id>` | `forgebound.admin` | finish a running ritual right now |
-| `/forge reload` | `forgebound.admin` | reload `config.yml` |
-| `/forge meteor` | `forgebound.admin` | drop a meteor now |
+| `/forge legend status` | `forgebound.admin` | which weapons and relics exist or are being forged (with real names) |
+| `/forge legend give <player> <weapon:id\|relic:id\|material:id> [amount]` | `forgebound.admin` | give an item (ignores uniqueness) |
+| `/forge legend release <id>` | `forgebound.admin` | make a weapon or relic forgeable again (stops its ritual); asks for confirmation first |
+| `/forge legend finish <id>` | `forgebound.admin` | finish a running ritual right now |
+| `/forge server reload` | `forgebound.admin` | reload `config.yml` |
+| `/forge event meteor` | `forgebound.admin` | drop a meteor now |
 | `/forge event <blood_moon\|rift\|legend_hunt\|happy_hour\|forge_market\|golden_shipment\|stop>` | `forgebound.admin` | start an event now (or stop them all) |
-| `/forge bigevent plan <border\|hunt\|boss> <time>` | `forgebound.admin` | plan a big event: `20:00`, `25.10 20:00` or `+2h` (the boss rises where you stand) |
-| `/forge bigevent [list\|start <type>\|cancel <id>\|stop]` | `forgebound.admin` | list the planned events, start one now, cancel one, end the running one without prizes |
-| `/forge npc <set\|remove>` | `forgebound.admin` | put the Questmaster where you stand, or take him away |
-| `/forge spawnbuild [confirm\|undo\|cancel]` | `forgebound.admin` | build the Forge Citadel (a ~70×70 spawn plaza for the season ceremony) centered on you; `undo` puts the old blocks back. The citadel and every Ancient Forge are protected (`protection` in the config): mined or blown-up blocks drop nothing and grow back after 25 min, never inside or under a player |
+| `/forge event big plan <border\|hunt\|boss> <time>` | `forgebound.admin` | plan a big event: `20:00`, `25.10 20:00` or `+2h` (the boss rises where you stand) |
+| `/forge event big [list\|start <type>\|cancel <id>\|stop]` | `forgebound.admin` | list the planned events, start one now, cancel one, end the running one without prizes |
+| `/forge world npc <set\|remove>` | `forgebound.admin` | put the Questmaster where you stand, or take him away |
+| `/forge world spawnbuild [confirm\|undo\|cancel]` | `forgebound.admin` | build the Forge Citadel (a ~70×70 spawn plaza for the season ceremony) centered on you; `undo` puts the old blocks back. The citadel and every Ancient Forge are protected (`protection` in the config): mined or blown-up blocks drop nothing and grow back after 25 min, never inside or under a player |
 | `/forge season <start\|preview\|cancel>` | `forgebound.admin` | season start ceremony (countdown, "Welcome to ... SMP", a beam into the sky, everyone scattered into the world); `preview` skips the teleport; without an argument it opens a panel with the theme and the buttons |
-| `/forge update [on\|off\|now]` | `forgebound.admin` | auto-update on/off, or check for a new version now |
-| `/forge scorched` | `forgebound.admin` | where the nearest Scorched Lands are (click to teleport) |
-| `/forge ancient [here\|end\|finish\|cool]` | `forgebound.admin` | list the Ancient Forges (click to teleport), build one where you stand, raise the End forge now, finish running rituals, reset cooldowns |
-| `/forge stars <player> <1-5>` | `forgebound.admin` | set the stars of the weapon in a player's hand (half steps like 3.5 work) |
-| `/forge recon` | `forgebound.admin` | give yourself a Recon Spyglass |
-| `/forge warden` | `forgebound.admin` | wake the Forge Warden where you stand |
-| `/forge token\|seal\|tracker [amount]` | `forgebound.admin` | give yourself Bounty Tokens, a Warden's Seal or a Legend Tracker |
-| `/forge totem` | `forgebound.admin` | give yourself a Totem of the Forge |
+| `/forge server update [on\|off\|now]` | `forgebound.admin` | auto-update on/off, or check for a new version now |
+| `/forge world scorched` | `forgebound.admin` | where the nearest Scorched Lands are (click to teleport) |
+| `/forge world ancient [here\|end\|finish\|cool]` | `forgebound.admin` | list the Ancient Forges (click to teleport), build one where you stand, raise the End forge now, finish running rituals, reset cooldowns |
+| `/forge legend stars <player> <1-5>` | `forgebound.admin` | set the stars of the weapon in a player's hand (half steps like 3.5 work) |
+| `/forge item recon` | `forgebound.admin` | give yourself a Recon Spyglass |
+| `/forge event warden` | `forgebound.admin` | wake the Forge Warden where you stand |
+| `/forge item token\|seal\|tracker [amount]` | `forgebound.admin` | give yourself Bounty Tokens, a Warden's Seal or a Legend Tracker |
+| `/forge item totem` | `forgebound.admin` | give yourself a Totem of the Forge |
 | | `forgebound.nocooldown` | abilities and relics without cooldowns (for testing) |
 
 Aliases: `/recipes`, `/recepty`.
 
 All commands suggest their arguments while you type (players, items, legends, events, leaderboard categories).
-Bigger purchases in `/shop`, `/pay` of 10+ tokens and `/forge release` open a confirmation window; the `dialogs`
+Bigger purchases in `/shop`, `/pay` of 10+ tokens and `/forge legend release` open a confirmation window; the `dialogs`
 section of the config sets the limits or turns the windows off.
 
 ---
@@ -893,7 +893,7 @@ The pack's source is in [`resourcepack/`](resourcepack). GitHub Actions zips it 
    ```
    This link never changes, it always points to the newest release. Only update the SHA1 when the pack itself changed (the release notes always show the current one).
    Optionally add `require-resource-pack=true`.
-2. Set `menu.resource-pack: true` in the plugin config and run `/forge reload`.
+2. Set `menu.resource-pack: true` in the plugin config and run `/forge server reload`.
 
 **Local testing:** drop the zip into `.minecraft/resourcepacks`, enable it in the game, and set `menu.resource-pack: true`.
 

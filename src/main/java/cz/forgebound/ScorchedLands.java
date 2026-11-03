@@ -757,7 +757,7 @@ public final class ScorchedLands implements Listener {
         }
     }
 
-    // ================================================================ /forge scorched
+    // ================================================================ /forge world scorched
 
     /** Tells an admin where the nearest Scorched Lands are (also in chunks nobody has generated yet). */
     public void locate(CommandSender sender) {

@@ -343,7 +343,7 @@ public final class CustomEnchants implements Listener {
         return pool;
     }
 
-    /** /forge enchants [status|unlock|lock|reset] */
+    /** /forge server enchants [status|unlock|lock|reset] */
     public void command(org.bukkit.command.CommandSender sender, String what) {
         switch (what) {
             case "unlock" -> {

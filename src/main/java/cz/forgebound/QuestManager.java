@@ -59,7 +59,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * The Questmaster: an NPC (placed with /forge npc set) with daily and weekly quests - the same for everyone,
+ * The Questmaster: an NPC (placed with /forge world npc set) with daily and weekly quests - the same for everyone,
  * picked from the pools in the config. Progress counts anywhere, the reward is claimed at the NPC.
  */
 public final class QuestManager implements Listener {
@@ -704,7 +704,7 @@ public final class QuestManager implements Listener {
         }
     }
 
-    /** For /forge status and the codex: how many players finished something today. */
+    /** For /forge legend status and the codex: how many players finished something today. */
     public int finishedToday() {
         Set<String> who = new HashSet<>();
         ConfigurationSection players = data.getConfigurationSection("players");
