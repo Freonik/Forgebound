@@ -399,6 +399,28 @@ class Model:
             out[left] = {"rotation": [r[0], -r[1], -r[2]], "translation": t, "scale": [s] * 3}
         return out
 
+    def dots(self, a, b, tex, size=0.16, step=0.32, glow=0):
+        """A thin line (bowstring, thread) between two points, made of small cubes."""
+        n = max(1, int(math.dist(a, b) / step))
+        for k in range(n + 1):
+            p = [a[i] + (b[i] - a[i]) * k / n for i in range(3)]
+            self.box((p[0] - size, p[1] - size, p[2] - size), (p[0] + size, p[1] + size, p[2] + size), tex, glow=glow)
+
+    def sprite_display(self, hands, theta, gui_tilt=(15, -20)):
+        """For models built upright that stand in for a vanilla diagonal sprite: the vanilla hand transforms with
+        an extra turn of `theta` degrees about z (left hand mirrored), menus/frame/ground fitted automatically."""
+        d = {}
+        for k, v in hands.items():
+            r = list(v['rotation'])
+            r[2] = round(r[2] + (theta if 'right' in k else -theta), 2)
+            d[k] = {"rotation": r, "translation": list(v['translation']), "scale": list(v['scale'])}
+        d['gui'] = self._fit((gui_tilt[0], gui_tilt[1], theta), 0.95)
+        d['fixed'] = self._fit((0, 180, theta), 0.9)
+        g = self._fit((0, 0, theta), 0.55)
+        g['translation'][1] = round(g['translation'][1] + 2.5, 2)
+        d['ground'] = g
+        return d
+
     def display(self, grip_y, tp_scale, fp_scale, gui_rot=(20, -35, -42)):
         d = {}
         for ctx, s in (('thirdperson', tp_scale), ('firstperson', fp_scale)):
@@ -453,6 +475,7 @@ class Model:
         """Another model drawn from this model's atlas (e.g. the axe with its head thrown away)."""
         v = Model(name, self.frames, self.frametime)
         v.tex = self.tex
+        v.R = getattr(self, 'R', None)
         v.regions = self.regions
         v.painters = self.painters
         return v

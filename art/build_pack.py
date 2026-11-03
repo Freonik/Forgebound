@@ -66,10 +66,8 @@ run('menu.py', f'{CC}/textures/font')
 run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang', 'echo_blade', 'graviton_hammer', 'knightfall',
           'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder', 'valkyries_lance',
-          'great_sea_trident', 'silk_needle', 'clawline_pick']:
+          'great_sea_trident', 'silk_needle', 'clawline_pick', 'hex_bow', 'pinning_repeater', 'the_last_act']:
     run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
-for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
-    wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
 for n in ['stasis_hourglass', 'angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
           'heartsteel_helm', 'heartsteel_greaves', 'heartsteel_treads', 'thorn_crown', 'thorn_greaves', 'thorn_treads',
           'hide_cowl', 'hide_mantle', 'hide_stompers', 'seraph_mantle', 'seraph_greaves']:
@@ -155,7 +153,7 @@ wjson(f'{MC}/mace.json', dispatch([(1010, model("customcraft:item/knightfall"))]
 # Pinning Repeater: same states as the vanilla crossbow. Vanilla crossbow textures point to the top-left
 # (stock in the bottom-right corner) and the crossbow model's hand rotation expects that, so ours are mirrored.
 from PIL import Image as _XImg
-CROSSBOWS = ['pinning_repeater', 'the_last_act']
+CROSSBOWS = []          # both crossbows are 3D models now (w3d_*.py), nothing to mirror or write here
 STATES = ['', '_pulling_0', '_pulling_1', '_pulling_2', '_arrow', '_firework']
 for _n in [b + st for b in CROSSBOWS for st in STATES]:
     _f = f'{CC}/textures/item/{_n}.png'
