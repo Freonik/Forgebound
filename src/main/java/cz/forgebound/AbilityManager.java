@@ -1972,14 +1972,16 @@ public final class AbilityManager implements Listener {
         long start = System.currentTimeMillis();
         world.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 1f, 0.7f);
         noFall.put(player.getUniqueId(), start + 4000);
+        Object chain = new Object();
         repeat(1, 40, step -> {
             if (!player.isOnline() || player.isDead() || player.getWorld() != world) {
+                ChainVisual.remove(chain);
                 return false;
             }
             Location hand = player.getLocation().add(0, 1.2, 0);
             if (step < 2) {
                 Location tip = hand.clone().add(hook.toVector().subtract(hand.toVector()).multiply((step + 1) / 2.0));
-                line(hand, tip, 0.3, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, CHAIN_DUST));
+                ChainVisual.draw(plugin, chain, hand, tip);
                 return true;
             }
             if (step == 2) {
@@ -1992,9 +1994,10 @@ public final class AbilityManager implements Listener {
                     player.setVelocity(pull);
                 }
             }
-            line(hand, hook, 0.35, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, CHAIN_DUST));
+            ChainVisual.draw(plugin, chain, hand, hook);
             // reaching the end of the chain in time: leap
             if (player.getLocation().distanceSquared(hook) < 6.5) {
+                ChainVisual.remove(chain);
                 if (System.currentTimeMillis() - start <= window) {
                     Vector v = player.getVelocity();
                     player.setVelocity(new Vector(v.getX() * 0.6, leap, v.getZ() * 0.6));
@@ -2323,16 +2326,17 @@ public final class AbilityManager implements Listener {
         if (target instanceof Player victim) {
             victim.sendActionBar(plugin.raw("ability-pinned", "&7You've been &fpinned&7!"));
         }
+        Object chain = "pin:" + target.getUniqueId();
         repeat(2, (int) Math.ceil(seconds * 10) + 1, step -> {
             Long end = pinned.get(target.getUniqueId());
             if (end == null || end < System.currentTimeMillis() || !target.isValid() || target.isDead()) {
                 unpin(target);
+                ChainVisual.remove(chain);
                 return false;
             }
             target.setVelocity(new Vector(0, Math.min(0, target.getVelocity().getY()), 0));
             if (anchor.getWorld() == target.getWorld()) {
-                line(anchor, target.getLocation().add(0, target.getHeight() / 2, 0), 0.4,
-                        l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, CHAIN_DUST));
+                ChainVisual.draw(plugin, chain, anchor, target.getLocation().add(0, target.getHeight() / 2, 0));
             }
             return true;
         });
