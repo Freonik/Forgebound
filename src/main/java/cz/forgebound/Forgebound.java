@@ -266,6 +266,7 @@ public final class Forgebound extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         ChainVisual.clear();
+        BlockFx.clear();
         if (updater != null) {
             updater.stop();
         }

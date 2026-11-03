@@ -100,6 +100,7 @@ public final class AbilityManager implements Listener {
     private static final Particle.DustOptions TONGUE_TIP = new Particle.DustOptions(Color.fromRGB(255, 150, 178), 2.0f);
     private static final Particle.DustOptions ABYSS_DUST = new Particle.DustOptions(Color.fromRGB(40, 210, 190), 1.0f);
     private static final Particle.DustOptions SILK_DUST = new Particle.DustOptions(Color.fromRGB(245, 240, 230), 0.8f);
+    private static final org.bukkit.block.data.BlockData SILK_BLOCK = Material.WHITE_WOOL.createBlockData();
     private static final Particle.DustOptions NEEDLE_RED = new Particle.DustOptions(Color.fromRGB(200, 30, 40), 0.9f);
     private static final Particle.DustOptions SOUL_WHITE = new Particle.DustOptions(Color.fromRGB(230, 236, 255), 1.2f);
     private static final Particle.DustOptions KNIGHT_GOLD = new Particle.DustOptions(Color.fromRGB(255, 200, 70), 1.2f);
@@ -756,6 +757,15 @@ public final class AbilityManager implements Listener {
         for (LivingEntity target : victims) {
             target.setVelocity(new Vector(0, 0.55, 0));
             target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, lift, 2, false, true, true));
+            // chunks of the ground tear out and fly up with them
+            org.bukkit.block.data.BlockData under = target.getLocation().getBlock().getRelative(0, -1, 0).getBlockData();
+            if (!under.getMaterial().isAir() && under.getMaterial().isSolid()) {
+                ThreadLocalRandom rnd = ThreadLocalRandom.current();
+                for (int k = 0; k < 4; k++) {
+                    BlockFx.debris(plugin, target.getLocation().add(rnd.nextDouble(-0.6, 0.6), 0.2, rnd.nextDouble(-0.6, 0.6)), under,
+                            new Vector(rnd.nextDouble(-0.08, 0.08), rnd.nextDouble(0.45, 0.7), rnd.nextDouble(-0.08, 0.08)), 30);
+                }
+            }
         }
         repeat(2, lift / 2, step -> {
             for (LivingEntity target : victims) {
@@ -1182,7 +1192,7 @@ public final class AbilityManager implements Listener {
                     : world.rayTrace(tip, dir, seg, FluidCollisionMode.NEVER, true, 0.5, e -> valid(player, e));
             if (hit != null && hit.getHitEntity() instanceof LivingEntity target) {
                 Location grab = hit.getHitPosition().toLocation(world);
-                tongue(mouth, grab);
+                tongue(player, mouth, grab);
                 hurt(player, target, damage);
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, slowTicks, slowLevel));
                 addTaste(target, tp.i("tongue-stacks", 1), Math.max(1, tp.i("max", 3)), tp.d("duration", 6));
@@ -1204,7 +1214,7 @@ public final class AbilityManager implements Listener {
             }
             if ((hit != null && hit.getHitBlock() != null) || reach[0] + seg >= range) {
                 Location end = hit != null ? hit.getHitPosition().toLocation(world) : tip.clone().add(dir.clone().multiply(seg));
-                tongue(mouth, end);
+                tongue(player, mouth, end);
                 if (hit != null) {
                     world.playSound(end, Sound.BLOCK_SLIME_BLOCK_HIT, 1f, 0.8f);
                 }
@@ -1212,7 +1222,7 @@ public final class AbilityManager implements Listener {
                 return false;
             }
             reach[0] += seg;
-            tongue(mouth, mouth.clone().add(dir.clone().multiply(reach[0])));
+            tongue(player, mouth, mouth.clone().add(dir.clone().multiply(reach[0])));
             return true;
         });
         return true;
@@ -1222,9 +1232,12 @@ public final class AbilityManager implements Listener {
         return player.getEyeLocation().subtract(0, 0.3, 0).add(player.getEyeLocation().getDirection().multiply(0.3));
     }
 
-    private void tongue(Location from, Location to) {
+    private static final org.bukkit.block.data.BlockData TONGUE_BLOCK = Material.PINK_TERRACOTTA.createBlockData();
+
+    /** The tongue: a real fleshy rope from the mouth (redrawn every tick while it's out). */
+    private void tongue(Player player, Location from, Location to) {
         World world = from.getWorld();
-        line(from, to, 0.22, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, TONGUE_DUST));
+        BlockFx.rope(plugin, "tongue:" + player.getUniqueId(), from, to, TONGUE_BLOCK, 0.16f);
         world.spawnParticle(Particle.DUST, to, 3, 0.06, 0.06, 0.06, 0, TONGUE_TIP);
     }
 
@@ -1239,7 +1252,7 @@ public final class AbilityManager implements Listener {
                 return false;
             }
             double t = 1 - (step + 1) / 4.0;
-            tongue(mouth, mouth.clone().add(end.toVector().subtract(mouth.toVector()).multiply(t)));
+            tongue(player, mouth, mouth.clone().add(end.toVector().subtract(mouth.toVector()).multiply(t)));
             return true;
         });
     }
@@ -1552,6 +1565,7 @@ public final class AbilityManager implements Listener {
     private void grapple(Player player, Location point, LivingEntity target, double power, double stopShort) {
         World world = player.getWorld();
         int flyTicks = 2;
+        Object thread = new Object();
         repeat(1, flyTicks + 8, step -> {
             if (!player.isOnline() || player.isDead() || player.getWorld() != world) {
                 return false;
@@ -1561,7 +1575,7 @@ public final class AbilityManager implements Listener {
             Location hand = player.getLocation().add(0, 1.2, 0);
             if (step < flyTicks) {
                 Location tip = hand.clone().add(to.toVector().subtract(hand.toVector()).multiply((step + 1.0) / flyTicks));
-                line(hand, tip, 0.3, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, SILK_DUST));
+                BlockFx.rope(plugin, thread, hand, tip, SILK_BLOCK, 0.05f);
                 return true;
             }
             if (step == flyTicks) {
@@ -1576,7 +1590,7 @@ public final class AbilityManager implements Listener {
                 }
                 noFall.put(player.getUniqueId(), System.currentTimeMillis() + 3000);
             }
-            line(hand, to, 0.35, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, SILK_DUST));
+            BlockFx.rope(plugin, thread, hand, to, SILK_BLOCK, 0.05f);
             return player.getLocation().distanceSquared(to) > 2.5;
         });
     }
@@ -2287,6 +2301,21 @@ public final class AbilityManager implements Listener {
             if (step % 3 == 0) {
                 world.playSound(center, Sound.BLOCK_POWDER_SNOW_BREAK, 1f, 0.8f);
             }
+            // ice spikes break out of the ground along the wave
+            ThreadLocalRandom rnd = ThreadLocalRandom.current();
+            for (int k = 0; k < 2 + (int) width; k++) {
+                Location at = center.clone().add(side.clone().multiply(rnd.nextDouble(-width, width)));
+                Block ground = at.getBlock();
+                for (int down = 0; down < 3 && !ground.getRelative(0, -1, 0).getType().isSolid(); down++) {
+                    ground = ground.getRelative(0, -1, 0);
+                }
+                if (!ground.getRelative(0, -1, 0).getType().isSolid()) {
+                    continue;
+                }
+                Material ice = rnd.nextInt(3) == 0 ? Material.BLUE_ICE : rnd.nextBoolean() ? Material.PACKED_ICE : Material.ICE;
+                BlockFx.spike(plugin, ground.getLocation().add(0.5, 0, 0.5), ice.createBlockData(),
+                        (float) rnd.nextDouble(0.25, 0.45), (float) rnd.nextDouble(0.6, 1.6), 28);
+            }
             for (LivingEntity target : targets(player, center, width + 0.8)) {
                 if (hitOnce.add(target.getUniqueId())) {
                     hurt(player, target, damage);
@@ -2405,7 +2434,8 @@ public final class AbilityManager implements Listener {
         double range = p.d("range", 45);
         RayTraceResult ray = world.rayTrace(eye, dir, range, FluidCollisionMode.NEVER, true, 0.6, e -> valid(player, e));
         Location end = ray != null ? ray.getHitPosition().toLocation(world) : eye.clone().add(dir.clone().multiply(range));
-        line(eye.clone().add(dir.clone().multiply(0.8)), end, 0.5, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, ACT_GOLD));
+        line(eye.clone().add(dir.clone().multiply(0.8)), end, 1.5, l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, ACT_GOLD));
+        BlockFx.beam(plugin, eye.clone().add(dir.clone().multiply(0.8)).subtract(0, 0.25, 0), end, Material.GOLD_BLOCK.createBlockData(), 0.09f, 6);
         world.playSound(eye, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.2f, 1.4f);
         world.playSound(eye, Sound.BLOCK_NOTE_BLOCK_CHIME, 1f, 1.6f);
         if (ray != null && ray.getHitEntity() instanceof LivingEntity target) {
