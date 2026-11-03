@@ -62,12 +62,11 @@ run('gui.py', f'{CC}/textures/item/gui')
 run('menu.py', f'{CC}/textures/font')
 
 # ---- models
-for n in ['clawline_pick', 'silk_needle']:
-    wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": f"customcraft:item/{n}"}})
 # 3D weapons: real block-element models, each with its own animated atlas
 run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang', 'echo_blade', 'graviton_hammer', 'knightfall',
-          'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder']:
+          'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder', 'valkyries_lance',
+          'great_sea_trident', 'silk_needle', 'clawline_pick']:
     run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
 for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
@@ -188,7 +187,12 @@ wjson(f'{MC}/crossbow.json', dispatch([(1012, crossbow_states('customcraft:item/
                                        (1016, crossbow_states('customcraft:item/the_last_act'))],
                                       json.load(open('/home/claude/ref/vanilla/i_crossbow.json'))['model']))
 # Valkyrie's Lance + Trident: flat icon in menus / on the ground, a long held model like the vanilla spear in hand
-def long_weapon(name):
+def long_weapon(name, flat=True):
+    """Inventory / frame model + the in-hand spear model. flat=False: the 3D script already wrote both models."""
+    if not flat:
+        return {"type": "minecraft:select", "property": "minecraft:display_context",
+                "cases": [{"when": ["gui", "ground", "fixed", "on_shelf"], "model": model(f"customcraft:item/{name}")}],
+                "fallback": model(f"customcraft:item/{name}_in_hand")}
     wjson(f'{CC}/models/item/{name}.json', {"parent": "minecraft:item/generated", "textures": {"layer0": f"customcraft:item/{name}"}})
     wjson(f'{CC}/models/item/{name}_in_hand.json', {"parent": "minecraft:item/spear_in_hand",
                                                     "textures": {"layer0": f"customcraft:item/{name}_in_hand"}})
@@ -196,10 +200,10 @@ def long_weapon(name):
             "cases": [{"when": ["gui", "ground", "fixed", "on_shelf"], "model": model(f"customcraft:item/{name}")}],
             "fallback": model(f"customcraft:item/{name}_in_hand")}
 spear_vanilla = json.load(open('/home/claude/ref/vanilla/i_netherite_spear.json'))
-spear_def = dispatch([(1013, long_weapon('valkyries_lance'))], spear_vanilla['model'])
+spear_def = dispatch([(1013, long_weapon('valkyries_lance', flat=False))], spear_vanilla['model'])
 spear_def['swap_animation_scale'] = spear_vanilla.get('swap_animation_scale', 1.0)
 wjson(f'{MC}/netherite_spear.json', spear_def)
-wjson(f'{MC}/trident.json', dispatch([(1015, long_weapon('great_sea_trident'))],
+wjson(f'{MC}/trident.json', dispatch([(1015, long_weapon('great_sea_trident', flat=False))],
                                      json.load(open('/home/claude/ref/vanilla/i_trident.json'))['model']))
 wjson(f'{MC}/diamond_axe.json', dispatch([(1002, model("customcraft:item/graviton_hammer"))], model("minecraft:item/diamond_axe")))
 wjson(f'{MC}/netherite_hoe.json', dispatch([(1004, model("customcraft:item/soulbinder"))], model("minecraft:item/netherite_hoe")))

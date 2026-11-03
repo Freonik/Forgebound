@@ -373,6 +373,32 @@ class Model:
         cx, cy = (lo[0] + hi[0]) / 2 * s, (lo[1] + hi[1]) / 2 * s
         return {"rotation": list(rot), "translation": [round(-cx * 16, 2), round(-cy * 16, 2), 0], "scale": [round(s, 3)] * 3}
 
+    def spear_display(self, grip_y, tp_scale, fp_scale):
+        """Hand transforms matching the vanilla spear (spear_in_hand: a 32 px diagonal sprite, tip top-left):
+        same grip point and pointing direction, our model uniformly scaled."""
+        vanilla = {
+            'firstperson_righthand': ([-20, 90, -35], [3.13, 2.0, 0.13], [1.36, 1.36, 0.68], fp_scale),
+            'thirdperson_righthand': ([5, 270, -40], [0, 2, 2], [1.7, 1.7, 0.85], tp_scale),
+        }
+        tip, butt = (1.0, 15.5), (15.75, 0.25)               # sprite ends in model units
+        dx, dy = tip[0] - butt[0], tip[1] - butt[1]
+        ln = math.hypot(dx, dy)
+        d = (dx / ln, dy / ln)
+        q = (butt[0] + 0.25 * dx, butt[1] + 0.25 * dy)       # the hand holds a quarter of the way up
+        theta = math.degrees(math.atan2(-d[0], d[1]))
+        out = {}
+        for ctx, (rot, tr, sc, s) in vanilla.items():
+            Rv = _mm(_mm(_R('x', rot[0]), _R('y', -rot[1])), _R('z', rot[2]))
+            grip = [tr[i] / 16 + v for i, v in enumerate(_mv(Rv, [sc[0] * (q[0] / 16 - 0.5), sc[1] * (q[1] / 16 - 0.5), 0]))]
+            axis = _mv(Rv, [d[0], d[1], 0])
+            off = s * (grip_y / 16 - 0.5)
+            t = [round((grip[i] - off * axis[i]) * 16, 2) for i in range(3)]
+            r = [rot[0], rot[1], round(rot[2] + theta, 2)]
+            out[ctx] = {"rotation": r, "translation": t, "scale": [s] * 3}
+            left = ctx.replace('right', 'left')
+            out[left] = {"rotation": [r[0], -r[1], -r[2]], "translation": t, "scale": [s] * 3}
+        return out
+
     def display(self, grip_y, tp_scale, fp_scale, gui_rot=(20, -35, -42)):
         d = {}
         for ctx, s in (('thirdperson', tp_scale), ('firstperson', fp_scale)):
