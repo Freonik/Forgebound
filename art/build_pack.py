@@ -62,13 +62,12 @@ run('gui.py', f'{CC}/textures/item/gui')
 run('menu.py', f'{CC}/textures/font')
 
 # ---- models
-for n in ['soulbinder', 'abyssal_maw', 'clawline_pick', 'silk_needle',
-          'rimebreaker', 'rimebreaker_thrown']:
+for n in ['clawline_pick', 'silk_needle']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": f"customcraft:item/{n}"}})
 # 3D weapons: real block-element models, each with its own animated atlas
 run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang', 'echo_blade', 'graviton_hammer', 'knightfall',
-          'butcher_cleaver']:
+          'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder']:
     run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
 for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
@@ -76,7 +75,6 @@ for n in ['stasis_hourglass', 'angels_wings', 'thorn_plate', 'heartsteel_core', 
           'heartsteel_helm', 'heartsteel_greaves', 'heartsteel_treads', 'thorn_crown', 'thorn_greaves', 'thorn_treads',
           'hide_cowl', 'hide_mantle', 'hide_stompers', 'seraph_mantle', 'seraph_greaves']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/generated", "textures": {"layer0": f"customcraft:item/{n}"}})
-wjson(f'{CC}/models/item/hydra_edge.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": "customcraft:item/hydra_edge"}})
 for n in ['angels_wings']:
     wjson(f'{CC}/equipment/{n}.json', {"layers": {"humanoid": [{"texture": f"customcraft:{n}"}]}})
 # set armor: helmet / chestplate / boots use the humanoid layer, leggings their own layer

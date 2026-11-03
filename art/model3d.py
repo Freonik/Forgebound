@@ -389,12 +389,14 @@ class Model:
         d['head'] = {"rotation": [0, 0, 0], "translation": [0, 10, 0], "scale": [0.6, 0.6, 0.6]}
         return d
 
-    def write(self, tex_dir, model_dir, grip_y, tp_scale=0.6, fp_scale=0.45, gui_rot=(20, -35, -42)):
+    def check(self):
         for e in self.elements:                     # Minecraft refuses models outside -16..32 or odd angles
             for v in e["from"] + e["to"]:
                 assert -16 <= v <= 32, (self.name, e)
             if "rotation" in e:
                 assert e["rotation"]["angle"] in (-45, -22.5, 0, 22.5, 45), (self.name, e)
+
+    def write_texture(self, tex_dir):
         sheet = Image.new('RGBA', (N, N * self.frames))
         for f in range(self.frames):
             im = Image.new('RGBA', (N, N), (0, 0, 0, 0))
@@ -405,9 +407,26 @@ class Model:
         sheet.save(f'{tex_dir}/{self.name}.png')
         with open(f'{tex_dir}/{self.name}.png.mcmeta', 'w') as fh:
             json.dump({"animation": {"frametime": self.frametime, "interpolate": True}}, fh)
+
+    def write_model(self, model_dir, grip_y, tp_scale=0.6, fp_scale=0.45, gui_rot=(20, -35, -42), display=None):
+        self.check()
         model = {"credit": "Forgebound", "texture_size": [N, N],
                  "textures": {"t": self.tex, "particle": self.tex}, "elements": self.elements,
-                 "display": self.display(grip_y, tp_scale, fp_scale, gui_rot)}
+                 "display": display or self.display(grip_y, tp_scale, fp_scale, gui_rot)}
         with open(f'{model_dir}/{self.name}.json', 'w') as fh:
             json.dump(model, fh, indent=1)
+        return model["display"]
+
+    def write(self, tex_dir, model_dir, grip_y, tp_scale=0.6, fp_scale=0.45, gui_rot=(20, -35, -42)):
+        self.check()
+        self.write_texture(tex_dir)
+        self.write_model(model_dir, grip_y, tp_scale, fp_scale, gui_rot)
         return len(self.elements)
+
+    def variant(self, name):
+        """Another model drawn from this model's atlas (e.g. the axe with its head thrown away)."""
+        v = Model(name, self.frames, self.frametime)
+        v.tex = self.tex
+        v.regions = self.regions
+        v.painters = self.painters
+        return v
