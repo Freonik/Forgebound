@@ -91,10 +91,19 @@ def nice(enum):
 USED = set()
 
 
+def is_3d(name):
+    """3D items: their texture is an atlas, the icon is the rendered docs/items/<name>.png instead."""
+    model = os.path.join(TEX, '..', '..', 'models', 'item', name + '.json')
+    try:
+        return 'elements' in json.load(open(model))
+    except (OSError, ValueError):
+        return False
+
+
 def sprite(name, size=64, cls=''):
     """An item icon; animated strips play as CSS sprite animations."""
     path = os.path.join(TEX, name + '.png')
-    if not os.path.exists(path) or name in DOCS_ICON:
+    if not os.path.exists(path) or name in DOCS_ICON or is_3d(name):
         path = os.path.join(ROOT, 'docs/items', name + '.png')
         if not os.path.exists(path):
             return ''
