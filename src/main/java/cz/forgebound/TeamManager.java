@@ -66,6 +66,28 @@ public final class TeamManager {
         return false;
     }
 
+    /** Forgebound Teams: did these two teams just end an alliance? Then a kill between them pays no bounty. */
+    public boolean noBounty(Player killer, Player victim) {
+        if (!enabled() || killer == null || victim == null) {
+            return false;
+        }
+        for (org.bukkit.plugin.RegisteredServiceProvider<java.util.function.BiFunction> reg
+                : Bukkit.getServicesManager().getRegistrations(java.util.function.BiFunction.class)) {
+            if (reg.getPlugin().getName().equals("ForgeboundTeams") && reg.getPlugin().isEnabled()) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    java.util.function.BiFunction<Player, Player, Boolean> f = reg.getProvider();
+                    if (Boolean.TRUE.equals(f.apply(killer, victim))) {
+                        return true;
+                    }
+                } catch (RuntimeException ignored) {
+                    // a different BiFunction - not ours
+                }
+            }
+        }
+        return false;
+    }
+
     /** The placeholder's value for this player, or null if they have no team. */
     private String teamOf(Player p, String placeholder) {
         long now = System.currentTimeMillis();

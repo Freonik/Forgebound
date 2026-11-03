@@ -205,6 +205,9 @@ public final class BountyManager implements Listener {
                 && !plugin.getConfig().getBoolean("teams.bounty-on-teammates", false)) {
             return;                                              // no bounty farming inside a team
         }
+        if (plugin.teams() != null && plugin.teams().noBounty(killer, victim)) {
+            return;                                              // their alliance just ended: no breaking it to cash in
+        }
         int bounty = bountyOf(victim.getUniqueId());
         if (bounty <= 0) {
             return;
