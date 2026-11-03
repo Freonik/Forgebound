@@ -320,6 +320,24 @@ class Model:
     def rot(axis, angle, origin):
         return {"angle": angle, "axis": axis, "origin": [round(v, 3) for v in origin]}
 
+    def ball(self, c, r, tex, glow=0):
+        """A rough sphere: a cube plus copies turned 45 degrees about each axis."""
+        x, y, z = c
+        k = r * 0.82
+        self.box((x - k, y - k, z - k), (x + k, y + k, z + k), tex, glow=glow)
+        for ax in ('x', 'y', 'z'):
+            self.box((x - k * 0.98, y - k * 0.98, z - k * 0.98), (x + k * 0.98, y + k * 0.98, z + k * 0.98), tex,
+                     rot=self.rot(ax, 45, c), glow=glow)
+
+    def ring(self, c, r, t, tex, glow=0, axis='y', angle=0):
+        """A square ring of four bars around the y axis (a halo), optionally turned."""
+        x, y, z = c
+        rot = self.rot(axis, angle, c) if angle else None
+        self.box((x - r, y - t / 2, z - r), (x + r, y + t / 2, z - r + t), tex, rot=rot, glow=glow)
+        self.box((x - r, y - t / 2, z + r - t), (x + r, y + t / 2, z + r), tex, rot=rot, glow=glow)
+        self.box((x - r, y - t / 2, z - r + t), (x - r + t, y + t / 2, z + r - t), tex, rot=rot, glow=glow)
+        self.box((x + r - t, y - t / 2, z - r + t), (x + r, y + t / 2, z + r - t), tex, rot=rot, glow=glow)
+
     def plane(self, fr, to, tex, angle=45, glow=15, origin=None):
         """A pair of crossed translucent planes (flames, glows) standing on the y axis."""
         cx = (fr[0] + to[0]) / 2
