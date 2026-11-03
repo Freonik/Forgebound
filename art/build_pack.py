@@ -66,9 +66,10 @@ run('menu.py', f'{CC}/textures/font')
 run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang', 'echo_blade', 'graviton_hammer', 'knightfall',
           'butcher_cleaver', 'rimebreaker', 'hydra_edge', 'abyssal_maw', 'soulbinder', 'valkyries_lance',
-          'great_sea_trident', 'silk_needle', 'clawline_pick', 'hex_bow', 'pinning_repeater', 'the_last_act']:
+          'great_sea_trident', 'silk_needle', 'clawline_pick', 'hex_bow', 'pinning_repeater', 'the_last_act',
+          'stasis_hourglass', 'stitchguard']:
     run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
-for n in ['stasis_hourglass', 'angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
+for n in ['angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
           'heartsteel_helm', 'heartsteel_greaves', 'heartsteel_treads', 'thorn_crown', 'thorn_greaves', 'thorn_treads',
           'hide_cowl', 'hide_mantle', 'hide_stompers', 'seraph_mantle', 'seraph_greaves']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/generated", "textures": {"layer0": f"customcraft:item/{n}"}})
@@ -90,8 +91,7 @@ def shield_model(vanilla_model):
                 {"from": [-1, -3, -5], "to": [1, 3, 1],
                  "faces": {k: {"uv": [8, 0, 9, 3], "texture": "#s"} for k in ["north", "south", "east", "west", "up", "down"]}}],
             "display": display}
-wjson(f'{CC}/models/item/stitchguard.json', shield_model('m_shield.json'))
-wjson(f'{CC}/models/item/stitchguard_blocking.json', shield_model('m_shield_blocking.json'))
+# (Stitchguard and the Stasis Hourglass are 3D models now: w3d_stitchguard.py / w3d_stasis_hourglass.py)
 # names of Forgebound's enchantments (the server sends English fallbacks, the pack adds translations)
 LANG = {
     'en_us': {"enchantment.forgebound.forge_touch": "Forge Touch", "enchantment.forgebound.bounty_hunter": "Bounty Hunter", "enchantment.forgebound.lifesteal": "Lifesteal", "enchantment.forgebound.bleed": "Bleed", "enchantment.forgebound.execute": "Execute", "enchantment.forgebound.cripple": "Cripple", "enchantment.forgebound.wisdom": "Wisdom", "enchantment.forgebound.overload": "Overload", "enchantment.forgebound.dodge": "Dodge", "enchantment.forgebound.implants": "Implants", "enchantment.forgebound.springs": "Springs", "enchantment.forgebound.warding": "Warding", "enchantment.forgebound.grounded": "Grounded", "enchantment.forgebound.cleanse": "Cleanse", "enchantment.forgebound.telepathy": "Telepathy", "enchantment.forgebound.vein_miner": "Vein Miner"},
