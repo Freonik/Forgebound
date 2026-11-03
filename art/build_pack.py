@@ -50,7 +50,6 @@ run('arsenal.py', f'{CC}/textures/item')
 # The Last Act (rifle on the crossbow) + Gilded Mask Shard
 run('lastact.py', f'{CC}/textures/item')
 # mythic event weapons: Worldsplitter, Bloodfang, Titan's Echo
-run('mythics.py', f'{CC}/textures/item')
 # Totem of the Forge
 run('forge_totem.py', f'{CC}/textures/item')
 # Scorched Lands animal variants (charred pig, ashen cow, cinder chicken, cinder wolf)
@@ -64,10 +63,12 @@ run('menu.py', f'{CC}/textures/font')
 
 # ---- models
 for n in ['echo_blade', 'graviton_hammer', 'soulbinder', 'butcher_cleaver', 'abyssal_maw', 'clawline_pick', 'silk_needle',
-          'knightfall', 'rimebreaker', 'rimebreaker_thrown', 'worldsplitter', 'bloodfang', 'titans_echo', 'chainbreaker']:
+          'knightfall', 'rimebreaker', 'rimebreaker_thrown']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": f"customcraft:item/{n}"}})
-# Warden of the Pit: a real 3D model with its own atlas
+# 3D weapons: real block-element models, each with its own animated atlas
 run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
+for w in ['chainbreaker', 'titans_echo', 'worldsplitter', 'bloodfang']:
+    run(f'w3d_{w}.py', f'{CC}/textures/item', f'{CC}/models/item')
 for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
 for n in ['stasis_hourglass', 'angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
