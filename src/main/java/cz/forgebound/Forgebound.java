@@ -670,6 +670,15 @@ public final class Forgebound extends JavaPlugin implements Listener {
             }
             seenChanged |= seen.add(chainMark);
         }
+        // 2.39.0: the Hunt gives the Warden of the Pit instead of the Bloodfang (old copies keep working)
+        String wardenMark = "changed:big-events.hunt.mythic=warden_of_the_pit";
+        if (!seen.contains(wardenMark)) {
+            if ("bloodfang".equals(getConfig().getString("big-events.hunt.mythic"))) {
+                getConfig().set("big-events.hunt.mythic", "warden_of_the_pit");
+                added.add("big-events.hunt.mythic (bloodfang -> warden_of_the_pit)");
+            }
+            seenChanged |= seen.add(wardenMark);
+        }
         if (!added.isEmpty()) {
             saveConfig();
             getLogger().info("Added new default config entries: " + String.join(", ", added));

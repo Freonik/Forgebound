@@ -182,8 +182,20 @@ public final class AbilityManager implements Listener {
     private final Map<UUID, Stolen> stolen = new HashMap<>();
     /** victim -> its ultimate, held by a thief (can't be used until the thief uses it or it runs out) */
     private final Map<UUID, Stolen> sealed = new HashMap<>();
+    /** Warden of the Pit: hits counted toward the Black Iron Aura */
+    private final Map<UUID, Integer> auraHits = new HashMap<>();
+    /** player -> burning Black Iron Aura */
+    private final Map<UUID, Aura> auras = new HashMap<>();
+    /** player -> Iron Will shield */
+    private final Map<UUID, Shield> shields = new HashMap<>();
+    /** Dominion of Ash: participant -> the other one */
+    private final Map<UUID, UUID> realms = new HashMap<>();
     private RelicManager relics;
     private int ticks;
+
+    private record Aura(long until, double damage, double radius) { }
+
+    private record Shield(double amount, long fades) { }
 
     private record Stolen(UUID thief, UUID victim, String weaponRef, String activeKey, String name, long until) { }
 
@@ -342,6 +354,16 @@ public final class AbilityManager implements Listener {
                 }
             }
             bloodrush.values().removeIf(t -> t < now);
+            shields.values().removeIf(sh -> sh.fades() < now);
+            for (Iterator<Map.Entry<UUID, Aura>> it = auras.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<UUID, Aura> e = it.next();
+                Player owner = Bukkit.getPlayer(e.getKey());
+                if (e.getValue().until() < now || owner == null || owner.isDead()) {
+                    it.remove();
+                    continue;
+                }
+                pulseAura(owner, e.getValue());
+            }
             for (Iterator<Map.Entry<UUID, Stolen>> it = stolen.entrySet().iterator(); it.hasNext(); ) {
                 Stolen st = it.next().getValue();
                 Player thief = Bukkit.getPlayer(st.thief());
@@ -415,6 +437,26 @@ public final class AbilityManager implements Listener {
                 bar.append("  &8┃  ");
             }
             bar.append("&6⚔ ").append(killsOf(player.getInventory().getItemInMainHand()));
+        }
+        if (weapon.abilities.onHit(HitType.IRON_AURA) != null) {
+            if (!bar.isEmpty()) {
+                bar.append("  &8┃  ");
+            }
+            Aura aura = auras.get(player.getUniqueId());
+            if (aura != null) {
+                bar.append("&2☗ &a").append(seconds(aura.until() - now)).append("s");
+            } else {
+                int every = Math.max(1, weapon.abilities.onHit(HitType.IRON_AURA).params().i("every", 3));
+                int n = Math.min(every, auraHits.getOrDefault(player.getUniqueId(), 0));
+                bar.append("&2☗ &a").append("●".repeat(n)).append("&8").append("○".repeat(every - n));
+            }
+        }
+        Shield shield = shields.get(player.getUniqueId());
+        if (shield != null && shield.fades() > now) {
+            if (!bar.isEmpty()) {
+                bar.append("  &8┃  ");
+            }
+            bar.append("&7⛨ &f").append(String.format(Locale.ROOT, "%.1f", shield.amount() / 2)).append("❤");
         }
         OnHit soul = weapon.abilities.onHit(HitType.SOUL);
         if (soul != null) {
@@ -628,6 +670,8 @@ public final class AbilityManager implements Listener {
             case FINALE -> finale(player, weapon, p);
             case REGICIDE -> regicide(player, p);
             case USURP -> usurp(player, p);
+            case GRIP -> grip(player, p);
+            case DOMINION -> dominion(player, p);
         };
     }
 
@@ -3147,6 +3191,31 @@ public final class AbilityManager implements Listener {
                 world.playSound(at, Sound.BLOCK_CHAIN_BREAK, 1.4f, 0.6f);
                 world.playSound(at, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1f, 0.7f);
             }
+            case IRON_AURA -> {
+                int every = Math.max(1, p.i("every", 3));
+                int count = auraHits.merge(attacker.getUniqueId(), 1, Integer::sum);
+                if (count >= every) {
+                    auraHits.remove(attacker.getUniqueId());
+                    boolean fresh = !auras.containsKey(attacker.getUniqueId());
+                    auras.put(attacker.getUniqueId(), new Aura(System.currentTimeMillis() + (long) (p.d("seconds", 4) * 1000),
+                            p.d("damage", 1.5), p.d("radius", 3.5)));
+                    if (fresh) {
+                        world.playSound(attacker.getLocation(), Sound.ENTITY_WITHER_SHOOT, 0.7f, 0.5f);
+                        world.playSound(attacker.getLocation(), Sound.BLOCK_SOUL_SAND_BREAK, 1.4f, 0.6f);
+                    }
+                }
+            }
+            case IRON_WILL -> {
+                double gain = event.getFinalDamage() * p.d("percent", 30) / 100.0;
+                if (gain > 0) {
+                    Shield old = shields.get(attacker.getUniqueId());
+                    double have = old == null || old.fades() < System.currentTimeMillis() ? 0 : old.amount();
+                    double amount = Math.min(p.d("max", 12), have + gain);
+                    shields.put(attacker.getUniqueId(), new Shield(amount,
+                            System.currentTimeMillis() + (long) (p.d("fade-seconds", 6) * 1000)));
+                    world.spawnParticle(Particle.DUST, attacker.getLocation().add(0, 1, 0), 5, 0.3, 0.4, 0.3, 0, IRON_GREY);
+                }
+            }
             case LASHING_CHAIN -> {
                 long now = System.currentTimeMillis();
                 if (lashReady.getOrDefault(attacker.getUniqueId(), 0L) > now) {
@@ -3506,6 +3575,230 @@ public final class AbilityManager implements Listener {
             player.sendActionBar(plugin.raw("ability-usurp-cast", "&5⛓ &d{ability}&5 unleashed!",
                     "ability", ItemManager.color(ult.name())));
         }
+    }
+
+    // ================================================================ WARDEN OF THE PIT (mythic)
+
+    private static final Particle.DustOptions SOUL_GREEN = new Particle.DustOptions(Color.fromRGB(80, 220, 140), 1.2f);
+    private static final Particle.DustOptions ASH_GREY = new Particle.DustOptions(Color.fromRGB(70, 70, 74), 1.6f);
+    private static final Particle.DustOptions IRON_GREY = new Particle.DustOptions(Color.fromRGB(150, 150, 160), 1.0f);
+    private static final org.bukkit.block.data.BlockData PIT_STONE = Material.BLACKSTONE.createBlockData();
+
+    /** Black Iron Aura: one pulse (every half second) - hurts everyone close to you. */
+    private void pulseAura(Player owner, Aura aura) {
+        World world = owner.getWorld();
+        Location at = owner.getLocation();
+        for (LivingEntity target : targets(owner, at, aura.radius())) {
+            hurt(owner, target, aura.damage());
+            world.spawnParticle(Particle.DUST, target.getLocation().add(0, 1, 0), 4, 0.25, 0.4, 0.25, 0, SOUL_GREEN);
+        }
+        double spin = (ticks % 40) * 0.3;
+        for (int k = 0; k < 18; k++) {
+            double a = spin + 2 * Math.PI * k / 18;
+            Location l = at.clone().add(Math.cos(a) * aura.radius(), 0.2 + (k % 3) * 0.35, Math.sin(a) * aura.radius());
+            world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, k % 2 == 0 ? ASH_GREY : SOUL_GREEN);
+        }
+        world.spawnParticle(Particle.LARGE_SMOKE, at.clone().add(0, 0.3, 0), 4, aura.radius() / 2, 0.1, aura.radius() / 2, 0.01);
+    }
+
+    /** Iron Will: the shield soaks up damage before your health does. */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onShielded(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player) || UNLINKABLE_CAUSES.contains(event.getCause().name())) {
+            return;
+        }
+        Shield shield = shields.get(player.getUniqueId());
+        if (shield == null) {
+            return;
+        }
+        if (shield.fades() < System.currentTimeMillis()) {
+            shields.remove(player.getUniqueId());
+            return;
+        }
+        double full = event.getFinalDamage();
+        if (full <= 0) {
+            return;
+        }
+        double take = Math.min(shield.amount(), full);
+        if (shield.amount() - take <= 0.01) {
+            shields.remove(player.getUniqueId());
+        } else {
+            shields.put(player.getUniqueId(), new Shield(shield.amount() - take, shield.fades()));
+        }
+        event.setDamage(event.getDamage() * (full - take) / full);
+        player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation().add(0, 1, 0), 10, 0.3, 0.4, 0.3, 0, PIT_STONE);
+        player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, 0.6f, 0.6f);
+    }
+
+    /** Distance from a point to the segment a-b. */
+    private static double toSegment(Vector point, Vector a, Vector b) {
+        Vector ab = b.clone().subtract(a);
+        double len2 = ab.lengthSquared();
+        double t = len2 < 1.0E-6 ? 0 : Math.max(0, Math.min(1, point.clone().subtract(a).dot(ab) / len2));
+        return point.distance(a.clone().add(ab.multiply(t)));
+    }
+
+    /** Grip of the Deep: a shadow hand shoots out, grabs everyone along its line and drags them to you. */
+    private boolean grip(Player player, Params p) {
+        World world = player.getWorld();
+        Location eye = player.getEyeLocation();
+        Vector dir = eye.getDirection().normalize();
+        double range = p.d("range", 12);
+        RayTraceResult wall = world.rayTraceBlocks(eye, dir, range, FluidCollisionMode.NEVER, true);
+        double reach = wall == null ? range : Math.max(1, wall.getHitPosition().distance(eye.toVector()));
+        double width = p.d("width", 1.6);
+        double damage = p.d("damage", 5);
+        double pullPower = p.d("pull", 1.0);
+        int slow = p.i("slow-ticks", 40);
+        int out = 5;
+        Object hand = new Object();
+        List<LivingEntity> grabbed = new ArrayList<>();
+        world.playSound(eye, Sound.ENTITY_WARDEN_ATTACK_IMPACT, 1f, 0.6f);
+        world.playSound(eye, Sound.BLOCK_SCULK_SHRIEKER_SHRIEK, 0.5f, 1.4f);
+        repeat(1, out * 2 + 1, step -> {
+            if (!player.isOnline() || player.isDead() || player.getWorld() != world) {
+                BlockFx.remove(hand);
+                return false;
+            }
+            Location from = player.getEyeLocation().add(0, -0.45, 0);
+            double t = step <= out ? step / (double) out : (2.0 * out - step) / out;
+            Location tip = from.clone().add(dir.clone().multiply(Math.max(0.4, reach * t)));
+            BlockFx.rope(plugin, hand, from, tip, PIT_STONE, 0.3f);
+            world.spawnParticle(Particle.SQUID_INK, tip, 4, 0.25, 0.25, 0.25, 0.01);
+            world.spawnParticle(Particle.DUST, tip, 4, 0.3, 0.3, 0.3, 0, SOUL_GREEN);
+            if (step == out) {
+                // the hand closes: everyone along the line is caught
+                Vector a = eye.toVector();
+                Vector b = a.clone().add(dir.clone().multiply(reach));
+                Location mid = eye.clone().add(dir.clone().multiply(reach / 2));
+                for (LivingEntity target : targets(player, mid, reach / 2 + width + 1)) {
+                    Vector body = target.getLocation().add(0, target.getHeight() / 2, 0).toVector();
+                    if (toSegment(body, a, b) <= width + target.getWidth() / 2) {
+                        grabbed.add(target);
+                        hurt(player, target, damage);
+                        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, slow, 1));
+                        world.spawnParticle(Particle.BLOCK, body.toLocation(world), 18, 0.3, 0.4, 0.3, 0, PIT_STONE);
+                    }
+                }
+                world.playSound(tip, grabbed.isEmpty() ? Sound.BLOCK_SCULK_BREAK : Sound.ENTITY_WARDEN_HEARTBEAT, 1.4f, 0.7f);
+            }
+            if (step == out + 1) {
+                for (LivingEntity target : grabbed) {
+                    if (!target.isValid() || target.isDead()) {
+                        continue;
+                    }
+                    Vector v = player.getLocation().toVector().subtract(target.getLocation().toVector()).setY(0);
+                    double distance = v.length();
+                    if (distance > 2.0) {
+                        v.normalize().multiply(Math.min(2.4, (0.35 + distance * 0.12) * pullPower));
+                        target.setVelocity(v.setY(0.3));
+                    }
+                }
+            }
+            if (step == out * 2) {
+                BlockFx.remove(hand);
+            }
+            return true;
+        });
+        return true;
+    }
+
+    /** Dominion of Ash: drag one enemy into a sealed ring for a duel; whoever survives takes the loser's power. */
+    private boolean dominion(Player player, Params p) {
+        LivingEntity target = lookTarget(player, p.d("range", 10));
+        if (target == null) {
+            fail(player, "ability-dominion-miss", "&cLook at an enemy to drag into your realm.");
+            return false;
+        }
+        if (realms.containsKey(player.getUniqueId()) || realms.containsKey(target.getUniqueId())) {
+            fail(player, "ability-dominion-busy", "&cThat fight is already sealed in a realm.");
+            return false;
+        }
+        World world = player.getWorld();
+        double radius = p.d("radius", 6);
+        int steps = Math.max(1, p.i("duration", 7) * 10);
+        Location center = player.getLocation().add(target.getLocation()).multiply(0.5);
+        center.setY(Math.min(player.getLocation().getY(), target.getLocation().getY()));
+        realms.put(player.getUniqueId(), target.getUniqueId());
+        realms.put(target.getUniqueId(), player.getUniqueId());
+        target.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 50, 0, false, false, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 30, 0, false, false, true));
+        for (int k = 0; k < 10; k++) {
+            double a = 2 * Math.PI * k / 10;
+            Location base = center.clone().add(Math.cos(a) * radius, -0.3, Math.sin(a) * radius);
+            BlockFx.spike(plugin, base, PIT_STONE, 0.55f, 2.6f, steps * 2);
+        }
+        world.playSound(center, Sound.ENTITY_WITHER_SPAWN, 0.6f, 0.5f);
+        world.playSound(center, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1.5f, 0.5f);
+        if (target instanceof Player victim) {
+            victim.sendMessage(plugin.raw("ability-dominion-victim", "&8☗ &c{player} &7dragged you into the &8Dominion of Ash&7. Only one walks out.",
+                    "player", player.getName()));
+        }
+        repeat(2, steps, step -> {
+            boolean casterOut = !player.isOnline() || player.isDead() || player.getWorld() != world;
+            boolean targetOut = !target.isValid() || target.isDead() || target.getWorld() != world;
+            if (casterOut || targetOut || step >= steps - 1) {
+                realms.remove(player.getUniqueId(), target.getUniqueId());
+                realms.remove(target.getUniqueId(), player.getUniqueId());
+                world.playSound(center, Sound.BLOCK_BEACON_DEACTIVATE, 1.4f, 0.5f);
+                if (target.isDead() && player.isOnline() && !player.isDead()) {
+                    dominionWin(player, p);
+                } else if (player.isDead() && target instanceof Player other && other.isOnline() && !other.isDead()) {
+                    dominionWin(other, p);
+                }
+                return false;
+            }
+            ring(center.clone().add(0, 0.2 + (step % 3) * 0.6, 0), radius, 36,
+                    l -> world.spawnParticle(Particle.DUST, l, 1, 0, 0, 0, 0, ASH_GREY));
+            if (step % 2 == 0) {
+                world.spawnParticle(Particle.WHITE_ASH, center.clone().add(0, 1.5, 0), 25, radius / 2, 1.2, radius / 2, 0);
+            }
+            // the two inside can't leave
+            for (LivingEntity inside : new LivingEntity[]{player, target}) {
+                Vector off = inside.getLocation().toVector().subtract(center.toVector()).setY(0);
+                double d = off.length();
+                if (d > radius + 2.5 && d > 0.01) {
+                    Location back = center.clone().add(off.normalize().multiply(radius - 1.2));
+                    back.setY(inside.getLocation().getY());
+                    back.setYaw(inside.getLocation().getYaw());
+                    back.setPitch(inside.getLocation().getPitch());
+                    inside.teleport(back);
+                } else if (d > radius - 0.6 && d > 0.01) {
+                    inside.setVelocity(off.normalize().multiply(-0.6).setY(0.15));
+                    world.spawnParticle(Particle.DUST, inside.getLocation().add(0, 1, 0), 6, 0.2, 0.5, 0.2, 0, SOUL_GREEN);
+                }
+            }
+            // and nobody else gets in
+            for (Entity other : world.getNearbyEntities(center, radius + 1, radius, radius + 1)) {
+                if (!(other instanceof LivingEntity living) || other instanceof ArmorStand || other.equals(player)
+                        || other.equals(target) || (other instanceof Player pl && pl.getGameMode() == GameMode.SPECTATOR)) {
+                    continue;
+                }
+                Vector off = living.getLocation().toVector().subtract(center.toVector()).setY(0);
+                if (off.length() <= radius + 0.5) {
+                    if (off.lengthSquared() < 0.01) {
+                        off = new Vector(1, 0, 0);
+                    }
+                    living.setVelocity(off.normalize().multiply(0.8).setY(0.25));
+                }
+            }
+            return true;
+        });
+        return true;
+    }
+
+    private void dominionWin(Player winner, Params p) {
+        int ticks = p.i("reward-seconds", 20) * 20;
+        winner.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, ticks, Math.max(0, p.i("strength-level", 1) - 1)));
+        winner.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, ticks, Math.max(0, p.i("resistance-level", 1) - 1)));
+        double add = heal(winner, p.d("heal", 6));
+        if (add > 0) {
+            winner.setHealth(Math.min(maxHealth(winner), winner.getHealth() + add));
+        }
+        winner.getWorld().spawnParticle(Particle.SOUL, winner.getLocation().add(0, 1, 0), 30, 0.4, 0.7, 0.4, 0.05);
+        winner.getWorld().playSound(winner.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 1f, 0.6f);
+        winner.sendMessage(plugin.raw("ability-dominion-won", "&8☗ &7You walked out of the Dominion: &cthe loser's power is yours &8({time}s)",
+                "time", String.valueOf(ticks / 20)));
     }
 
     // ================================================================ helpers

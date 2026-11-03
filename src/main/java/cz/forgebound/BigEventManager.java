@@ -911,7 +911,7 @@ public final class BigEventManager implements Listener {
                 podium.append(i == 0 ? "" : "&7, ").append("&f").append(i + 1).append(". &e").append(name(e.getKey()))
                         .append(" &7(").append(e.getValue()).append(")");
                 List<Integer> totems = cfg("hunt").getIntegerList("top-totems");
-                reward(e.getKey(), i < tokens.size() ? tokens.get(i) : 0, i == 0 ? cfg("hunt").getString("mythic", "bloodfang") : null,
+                reward(e.getKey(), i < tokens.size() ? tokens.get(i) : 0, i == 0 ? cfg("hunt").getString("mythic", "warden_of_the_pit") : null,
                         i == 0 ? 1 : 0, type(), i < totems.size() ? totems.get(i) : 0);
             }
             Bukkit.broadcast(plugin.msg("hunt-won", "&6⚔ The Hunt is over! {podium}", "podium", ItemManager.color(podium.toString())));

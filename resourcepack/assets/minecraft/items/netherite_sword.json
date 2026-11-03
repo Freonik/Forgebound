@@ -37,6 +37,13 @@
           "type": "minecraft:model",
           "model": "customcraft:item/titans_echo"
         }
+      },
+      {
+        "threshold": 1105,
+        "model": {
+          "type": "minecraft:model",
+          "model": "customcraft:item/warden_of_the_pit"
+        }
       }
     ],
     "fallback": {

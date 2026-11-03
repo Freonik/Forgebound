@@ -66,6 +66,8 @@ run('menu.py', f'{CC}/textures/font')
 for n in ['echo_blade', 'graviton_hammer', 'soulbinder', 'butcher_cleaver', 'abyssal_maw', 'clawline_pick', 'silk_needle',
           'knightfall', 'rimebreaker', 'rimebreaker_thrown', 'worldsplitter', 'bloodfang', 'titans_echo', 'chainbreaker']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/handheld", "textures": {"layer0": f"customcraft:item/{n}"}})
+# Warden of the Pit: a real 3D model with its own atlas
+run('warden3d.py', f'{CC}/textures/item', f'{CC}/models/item')
 for n in ['hex_bow', 'hex_bow_pulling_0', 'hex_bow_pulling_1', 'hex_bow_pulling_2']:
     wjson(f'{CC}/models/item/{n}.json', {"parent": "minecraft:item/bow", "textures": {"layer0": f"customcraft:item/{n}"}})
 for n in ['stasis_hourglass', 'angels_wings', 'thorn_plate', 'heartsteel_core', 'thick_hide', 'soul_vessel_mask',
@@ -130,7 +132,8 @@ wjson(f'{MC}/netherite_sword.json', dispatch([(1001, model("customcraft:item/ech
                                               (1007, model("customcraft:item/abyssal_maw")),
                                               (1009, model("customcraft:item/silk_needle")),
                                               (1102, model("customcraft:item/bloodfang")),
-                                              (1103, model("customcraft:item/titans_echo"))], model("minecraft:item/netherite_sword")))
+                                              (1103, model("customcraft:item/titans_echo")),
+                                              (1105, model("customcraft:item/warden_of_the_pit"))], model("minecraft:item/netherite_sword")))
 wjson(f'{MC}/netherite_pickaxe.json', dispatch([(1008, model("customcraft:item/clawline_pick"))], model("minecraft:item/netherite_pickaxe")))
 wjson(f'{MC}/netherite_axe.json', dispatch([(1006, model("customcraft:item/butcher_cleaver")),
                                             (1011, model("customcraft:item/rimebreaker")),

@@ -170,6 +170,10 @@ messages:
   ability-usurp-back: "&a⛓ &d{ability} &ais yours again."
   ability-usurp-faded: "&8⛓ &7The usurped &d{ability} &7slipped away."
   ability-usurped: "&5⛓ &d{ability} &7was usurped by &c{thief}&7! &8({time}s)"
+  ability-dominion-miss: "&cLook at an enemy to drag into your realm."
+  ability-dominion-busy: "&cThat fight is already sealed in a realm."
+  ability-dominion-victim: "&8☗ &c{player} &7dragged you into the &8Dominion of Ash&7. Only one walks out."
+  ability-dominion-won: "&8☗ &7You walked out of the Dominion: &cthe loser's power is yours &8({time}s)"
   ability-no-target: "&cNo target in range."
   ability-rewind-none: "&cNo echo to return to yet."
   ability-rewind-blocked: "&cYour past position is blocked."
@@ -1181,6 +1185,63 @@ weapons:
           pull: 0.6
           slow-level: 3
 
+  warden_of_the_pit:
+    mythic: true
+    material: NETHERITE_SWORD
+    name: "&2&k|&r &a&lWarden of the Pit &2&k|"
+    lore:
+      - "&7The last hunter fell. Something older picked up the mace."
+    custom-model-data: 1105
+    unbreakable: true
+    attack-damage: 13
+    attack-speed: 1.0
+    enchants:
+      sharpness: 6
+    abilities:
+      passive:
+        effects: { resistance: 0 }
+        description: "Resistance I"
+      on-hit:
+        - type: IRON_AURA
+          chance: 100
+          every: 3
+          seconds: 4
+          damage: 1.5
+          radius: 3.5
+          description: ["Black Iron Aura: every 3rd hit ignites an", "aura for 4s - 1.5 damage every half second", "to every enemy within 3.5 blocks."]
+        - type: IRON_WILL
+          chance: 100
+          percent: 30
+          max: 12
+          fade-seconds: 6
+          description: ["Iron Will: 30% of the damage you deal", "becomes a shield (max 6 hearts) that soaks", "up damage; it fades 6s after your last hit."]
+      active:
+        grip:
+          type: GRIP
+          name: "&2&lGrip of the Deep"
+          trigger: SWAP
+          cooldown: 16
+          description: ["A shadow hand shoots forward (12 blocks)", "and drags everyone along its line to you:", "5 damage and Slowness II."]
+          range: 12
+          width: 1.6
+          damage: 5
+          pull: 1.0
+          slow-ticks: 40
+        dominion:
+          type: DOMINION
+          name: "&8&lDominion of Ash"
+          trigger: SHIFT_SWAP
+          cooldown: 100
+          description: ["Drag the enemy you look at (10 blocks)", "into a sealed ring for 7s - nobody leaves,", "nobody gets in. Whoever survives takes the", "loser's power: Strength I, Resistance I", "and 3 hearts healed for 20s."]
+          range: 10
+          radius: 6
+          duration: 7
+          reward-seconds: 20
+          strength-level: 1
+          resistance-level: 1
+          heal: 6
+
+  # no longer an event reward - only given by an admin: /forge legend give <player> weapon:bloodfang
   bloodfang:
     mythic: true
     material: NETHERITE_SWORD
@@ -2040,7 +2101,7 @@ big-events:
     top-tokens: [10, 6, 4]
     top-totems: [1, 0, 0]
     player-tokens: 1
-    mythic: bloodfang
+    mythic: warden_of_the_pit
   boss:
     name: "&4&lThe Forge Colossus"
     health: 800
