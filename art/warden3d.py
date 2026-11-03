@@ -332,6 +332,10 @@ if __name__ == '__main__':
         if "rotation" in e:
             assert e["rotation"]["angle"] in (-45, -22.5, 0, 22.5, 45), e
     tex_dir, model_dir = sys.argv[1], sys.argv[2]
+    import model3d
+    turner = model3d.Model('warden_of_the_pit')
+    turner.elements = elements
+    turner.turn_around()                    # edge/beak facing away from the player, like vanilla blades
     sheet = Image.new('RGBA', (N, N * FRAMES))
     for i in range(FRAMES):
         sheet.paste(paint(i), (0, i * N))

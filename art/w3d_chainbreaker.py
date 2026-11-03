@@ -97,7 +97,6 @@ m.box((C - 0.35, HY1 + 0.3, C - 0.35), (C + 0.35, HY1 + 1.4, C + 0.35), 'edge', 
 for x, yy, z, s in [(C + 13.2, MY + 4.2, C + 1.4, 0.45), (C + 14.4, MY - 1.0, C - 1.6, 0.35), (C + 12.0, MY - 5.6, C + 1.8, 0.4),
                     (C + 10.6, HY1 + 0.8, C - 1.2, 0.3), (C + 15.0, MY + 1.6, C + 0.6, 0.3)]:
     m.box((x - s, yy - s, z - s), (x + s, yy + s, z + s), 'ember', rot=R('z', 45, (x, yy, z)), glow=15)
-m.plane((C + 12.6, MY - 3.5, 0), (C + 17.0, MY + 3.5, 0), 'flame', origin=(C + 14.8, MY - 3.5, C))
 
 if __name__ == '__main__':
     print(m.write(sys.argv[1], sys.argv[2], grip_y=0.0, tp_scale=0.62, fp_scale=0.46), 'elements')

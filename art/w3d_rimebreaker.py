@@ -74,6 +74,8 @@ t.box((C - 0.55, 18.8, C - 0.55), (C + 0.55, 20.2, C + 0.55), 'rune', rot=R('y',
 
 if __name__ == '__main__':
     m.write_texture(sys.argv[1])
+    m.turn_around()
+    t.turn_around()
     d = m.write_model(sys.argv[2], grip_y=0.0, tp_scale=0.62, fp_scale=0.46)
     t.write_model(sys.argv[2], 0, display=d)      # held exactly like the full axe
     print(len(m.elements), 'elements')

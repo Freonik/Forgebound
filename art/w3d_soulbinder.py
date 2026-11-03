@@ -16,6 +16,7 @@ m.region('silver', (12, 4, 16, 8), sheen(STEEL, 0.4, 0.95))
 m.region('flame', (0, 8, 8, 16), flame(SOULC))
 m.region('dark', (8, 8, 12, 12), plate(SHADE, 0.4, rivets=False))
 R = m.rot
+m.turn = False      # built with the blade on -x already, like the vanilla hoe
 
 # long haft, silver bands, a soul gem at the bottom
 m.box((C - 0.75, -9.0, C - 0.75), (C + 0.75, 26.0, C + 0.75), 'haft')

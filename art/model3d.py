@@ -456,6 +456,27 @@ class Model:
         with open(f'{tex_dir}/{self.name}.png.mcmeta', 'w') as fh:
             json.dump({"animation": {"frametime": self.frametime, "interpolate": True}}, fh)
 
+    def turn_around(self):
+        """Turns the whole model 180 degrees about its own (y) axis. The weapons are built with their edge on +x,
+        but a vanilla blade's edge faces the other way in the hand, so the melee models are turned before writing."""
+        swap = {'north': 'south', 'south': 'north', 'east': 'west', 'west': 'east', 'up': 'up', 'down': 'down'}
+        for e in self.elements:
+            fr, to = e['from'], e['to']
+            e['from'] = [round(16 - to[0], 3), fr[1], round(16 - to[2], 3)]
+            e['to'] = [round(16 - fr[0], 3), to[1], round(16 - fr[2], 3)]
+            if 'rotation' in e:
+                r = e['rotation']
+                o = r['origin']
+                r['origin'] = [round(16 - o[0], 3), o[1], round(16 - o[2], 3)]
+                if r['axis'] in ('x', 'z'):
+                    r['angle'] = -r['angle'] if r['angle'] else 0
+            faces = {}
+            for name, face in e['faces'].items():
+                if name in ('up', 'down'):
+                    face = dict(face, rotation=(face.get('rotation', 0) + 180) % 360)
+                faces[swap[name]] = face
+            e['faces'] = faces
+
     def write_model(self, model_dir, grip_y, tp_scale=0.6, fp_scale=0.45, gui_rot=(20, -35, -42), display=None):
         self.check()
         model = {"credit": "Forgebound", "texture_size": [N, N],
@@ -467,6 +488,8 @@ class Model:
 
     def write(self, tex_dir, model_dir, grip_y, tp_scale=0.6, fp_scale=0.45, gui_rot=(20, -35, -42)):
         self.check()
+        if getattr(self, 'turn', True):
+            self.turn_around()
         self.write_texture(tex_dir)
         self.write_model(model_dir, grip_y, tp_scale, fp_scale, gui_rot)
         return len(self.elements)
