@@ -178,6 +178,9 @@ public final class GhostManager implements Listener {
             @Override
             public void run() {
                 t++;
+                if (body != null && !body.isValid()) {
+                    respawnLost();               // the body was lost (died to lava/void, its chunk unloaded...)
+                }
                 if (active()) {
                     safeTick();
                 } else if (t % 1200 == 0) {
@@ -297,6 +300,44 @@ public final class GhostManager implements Listener {
         return at.clone().add(at.getDirection().multiply(-6).setY(0));
     }
 
+    /** true while a lost body is being put back (no join message, no log line) */
+    private boolean respawning;
+
+    /**
+     * The body vanished without the hunt ending: put it back next to its prey with the same health, time and loot,
+     * or end the visit properly if the prey is gone. (Before, a lost body made it "join" again every minute.)
+     */
+    private void respawnLost() {
+        Player victim = target == null ? null : Bukkit.getPlayer(target);
+        String name = copyName;
+        double keepHp = hp;
+        double keepAbsorb = absorb;
+        long keepEnds = endsAt;
+        int keepRockets = rockets;
+        int keepApples = apples;
+        int keepHeals = healsUsed;
+        java.util.Map<UUID, Double> keepDamage = new java.util.HashMap<>(damage);
+        leave(false);
+        if (victim == null || !survival(victim) || name == null || System.currentTimeMillis() >= keepEnds) {
+            resetTop();
+            plugin.getLogger().info("Doppelganger of " + name + " lost its body and left");
+            return;
+        }
+        respawning = true;
+        try {
+            spawn(victim, name);
+        } finally {
+            respawning = false;
+        }
+        hp = keepHp;
+        absorb = keepAbsorb;
+        endsAt = keepEnds;
+        rockets = keepRockets;
+        apples = keepApples;
+        healsUsed = keepHeals;
+        damage.putAll(keepDamage);
+    }
+
     /** Admin / scheduler: the Doppelganger joins and hunts "victim". */
     public boolean spawn(Player victim, String copyOf) {
         if (active() || victim == null) {
@@ -349,12 +390,16 @@ public final class GhostManager implements Listener {
         });
         bar = BossBar.bossBar(glitched.color(NamedTextColor.WHITE), 1f, BossBar.Color.WHITE, BossBar.Overlay.NOTCHED_20);
         // a perfectly normal join message
-        Bukkit.broadcast(Component.translatable("multiplayer.player.joined", NamedTextColor.YELLOW, glitched));
+        if (!respawning) {
+            Bukkit.broadcast(Component.translatable("multiplayer.player.joined", NamedTextColor.YELLOW, glitched));
+        }
         glitchFx(at);
         if (!stolen.isEmpty()) {
             chat("i still have your " + plain(stolen.get(0)) + ", " + copyOf);
         }
-        plugin.getLogger().info("Doppelganger of " + copyOf + " is hunting " + victim.getName());
+        if (!respawning) {
+            plugin.getLogger().info("Doppelganger of " + copyOf + " is hunting " + victim.getName());
+        }
         return true;
     }
 
