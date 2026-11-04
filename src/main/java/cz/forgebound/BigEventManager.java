@@ -774,7 +774,21 @@ public final class BigEventManager implements Listener {
             data.set("backup.border.damage", b.getDamageAmount());
             data.set("backup.border.buffer", b.getDamageBuffer());
             plugin.saveYaml(data, file);
-            double start = Math.min(b.getSize(), c.getDouble("start-size", 2000));
+            // the border must start around everyone: nobody may begin outside it (that killed everyone at once)
+            double far = 0;
+            for (UUID id : alive) {
+                Player p = Bukkit.getPlayer(id);
+                if (p != null) {
+                    Location l = p.getLocation();
+                    far = Math.max(far, Math.max(Math.abs(l.getX() - cx), Math.abs(l.getZ() - cz)));
+                }
+            }
+            double need = 2 * (far + Math.max(16, c.getDouble("start-margin", 64)));
+            double start = Math.min(b.getMaxSize(), Math.max(Math.min(b.getSize(), c.getDouble("start-size", 2000)), need));
+            if (start > c.getDouble("start-size", 2000)) {
+                plugin.getLogger().info("[BigEvent] border starts at " + (int) start + " (the farthest player is "
+                        + (int) far + " blocks from the center)");
+            }
             b.setCenter(cx, cz);
             b.setSize(start);
             b.setDamageAmount(c.getDouble("damage-per-block", 1.0));
@@ -845,8 +859,13 @@ public final class BigEventManager implements Listener {
                 return;
             }
             ConfigurationSection c = cfg("border");
-            UUID winner = alive.stream().max(Comparator.comparingInt(id -> kills.getOrDefault(id, 0))).orElse(lastDead);
+            // nobody alive: the last one to fall wins - but not when everyone fell in the first minute (something went wrong)
+            boolean early = System.currentTimeMillis() - started < 60_000L;
+            UUID winner = alive.stream().max(Comparator.comparingInt(id -> kills.getOrDefault(id, 0)))
+                    .orElse(early ? null : lastDead);
             if (winner == null) {
+                Bukkit.broadcast(plugin.msg("border-void", "&c☠ The Closing World ended without a winner."));
+                plugin.getLogger().info("[BigEvent] border ended without a winner (" + everyone.size() + " players)");
                 return;
             }
             Bukkit.broadcast(plugin.msg("border-won", "&c☠ The Closing World is over! &e{player} &7is the last one standing.",

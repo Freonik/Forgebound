@@ -2150,6 +2150,8 @@ big-events:
     center: [0, 0]
     start-size: 2000
     final-size: 100
+    # the border never starts smaller than needed to hold every player (+ this many blocks)
+    start-margin: 64
     shrink-minutes: 25
     final-minutes: 5
     damage-per-block: 1.0
