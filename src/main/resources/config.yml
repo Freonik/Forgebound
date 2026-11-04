@@ -175,6 +175,7 @@ messages:
   ability-dominion-victim: "&8☗ &c{player} &7dragged you into the &8Dominion of Ash&7. Only one walks out."
   ability-dominion-won: "&8☗ &7You walked out of the Dominion: &cthe loser's power is yours &8({time}s)"
   ability-prism-rooted: "&eYou're caught in a &fprism&e!"
+  big-event-keep-gear: "&7Big event: you keep your &fgear&7, everything else dropped."
   ability-no-target: "&cNo target in range."
   ability-rewind-none: "&cNo echo to return to yet."
   ability-rewind-blocked: "&cYour past position is blocked."
@@ -2142,6 +2143,9 @@ big-events:
   # while a big event runs, teams and alliances are corrupted: teammates and allies can hurt and kill each other
   # (Forgebound Teams turns its friendly-fire protection off; their kills count for the event)
   corrupt-teams: true
+  # dying during a big event: keep everything with durability (weapons, tools, armor...) and Forgebound's legends,
+  # relics and mythic weapons; food, apples, blocks, cobwebs, pearls, potions, xp bottles and the rest drop
+  keep-gear: true
   border:
     center: [0, 0]
     start-size: 2000

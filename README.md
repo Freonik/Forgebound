@@ -565,6 +565,8 @@ is told a day, an hour, 10 minutes and a minute before. The last 10 minutes coun
 
 While a big event runs, **the teams are corrupted**: teammates and allies can hurt and kill each other, every player
 for themselves (Forgebound Teams turns its protection off until the event ends).
+Dying during a big event you **keep your gear** (everything with durability, legends, relics, mythic weapons);
+food, golden apples, blocks, cobwebs, pearls, potions, arrows and experience bottles drop (`big-events.keep-gear`).
 
 The winner gets a **mythic weapon**, everyone who took part gets Bounty Tokens (the top three of the Hunt and the
 Colossus more, plus legendary materials). Prizes for players who are offline wait until they join.

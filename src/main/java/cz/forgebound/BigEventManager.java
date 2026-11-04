@@ -582,6 +582,62 @@ public final class BigEventManager implements Listener {
         }
     }
 
+    /**
+     * Keep gear: during a big event a dead player keeps everything with durability (weapons, tools, armor, shield,
+     * elytra...) and Forgebound's legends, relics and mythic weapons; food, golden apples, blocks, cobwebs, pearls,
+     * potions, arrows, experience bottles and the rest drop as usual. Runs after Forgebound's other death handlers.
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDeathKeepGear(PlayerDeathEvent event) {
+        if (running == null || event.getKeepInventory() || !plugin.getConfig().getBoolean("big-events.keep-gear", true)) {
+            return;
+        }
+        Player player = event.getEntity();
+        org.bukkit.inventory.PlayerInventory inv = player.getInventory();
+        java.util.List<ItemStack> drops = new java.util.ArrayList<>(event.getDrops());
+        java.util.List<ItemStack> out = new java.util.ArrayList<>();
+        ItemStack[] contents = inv.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack stack = contents[i];
+            if (stack == null || stack.getType().isAir()) {
+                continue;
+            }
+            // whatever came from the inventory is taken off the drop list; what is left there are extras (tokens...)
+            for (java.util.Iterator<ItemStack> it = drops.iterator(); it.hasNext(); ) {
+                ItemStack d = it.next();
+                if (d.isSimilar(stack) && d.getAmount() == stack.getAmount()) {
+                    it.remove();
+                    break;
+                }
+            }
+            if (stack.containsEnchantment(org.bukkit.enchantments.Enchantment.VANISHING_CURSE)) {
+                contents[i] = null;                              // vanishes, like in vanilla
+            } else if (!gear(stack)) {
+                out.add(stack);
+                contents[i] = null;
+            }
+        }
+        inv.setContents(contents);
+        out.addAll(drops);
+        event.setKeepInventory(true);
+        event.setKeepLevel(false);
+        event.getDrops().clear();
+        Location at = player.getLocation();
+        for (ItemStack stack : out) {
+            at.getWorld().dropItemNaturally(at, stack);
+        }
+        player.sendMessage(plugin.msg("big-event-keep-gear", "&7Big event: you keep your &fgear&7, everything else dropped."));
+    }
+
+    /** Gear kept on death during a big event. */
+    private boolean gear(ItemStack stack) {
+        ItemManager.Entry custom = plugin.items().customOf(stack);
+        if (custom != null) {
+            return custom.kind != ItemManager.Kind.MATERIAL;
+        }
+        return stack.getType().getMaxDurability() > 0;
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(PlayerDeathEvent event) {
         if (running != null) {

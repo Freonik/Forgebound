@@ -251,13 +251,13 @@ T = {
             '<ul><li><b>☠ The Closing World</b> – border se stahuje k jednomu místu. Smrt, odpojení nebo odchod ze světa = konec. Vyhrává poslední, kdo zůstane.</li>'
             '<li><b>⚔ The Hunt</b> – všichni jsou vidět na locator baru. Vyhrává nejvíc zabitých hráčů.</li>'
             '<li><b>☠ The Forge Colossus</b> – obří boss: dupe, hází ohnivé koule, přitahuje a volá kostlivce. Ublížit mu můžou jen hráči. Vyhrává nejvíc poškození.</li></ul>'
-            '<p><b>Během velkého eventu se týmy rozpadnou:</b> spoluhráči i spojenci se můžou navzájem zranit a zabít – každý sám za sebe. Po eventu je všechno zase jako dřív.</p>'
+            '<p><b>Během velkého eventu se týmy rozpadnou:</b> spoluhráči i spojenci se můžou navzájem zranit a zabít – každý sám za sebe. Po eventu je všechno zase jako dřív. Kdo na eventu umře, <b>nechá si výbavu</b> (zbraně, nástroje, brnění, legendy) – jídlo, jablka, bloky, pavučiny, perly, lektvary a exp bottly vypadnou.</p>'
             '<p>Vítěz dostane <a href="#mythic">mytickou zbraň</a> na {days} dní, ostatní tokeny, materiály a <a href="quests.html#totem">Totem of the Forge</a>.</p>',
             '<p>Big events are planned ahead by an admin – the server announces them a day, an hour, 10 minutes and a minute before, and the last 10 minutes count down.</p>'
             '<ul><li><b>☠ The Closing World</b> – the border closes in on one spot. Dying, logging out or leaving the world puts you out. The last one standing wins.</li>'
             '<li><b>⚔ The Hunt</b> – everyone shows on the locator bar. The most player kills wins.</li>'
             '<li><b>☠ The Forge Colossus</b> – a giant boss: it slams, throws fire, drags people in and calls skeletons. Only players can hurt it. The most damage wins.</li></ul>'
-            '<p><b>During a big event the teams are corrupted:</b> teammates and allies can hurt and kill each other – every player for themselves. Everything is back to normal afterwards.</p>'
+            '<p><b>During a big event the teams are corrupted:</b> teammates and allies can hurt and kill each other – every player for themselves. Everything is back to normal afterwards. Dying during an event, you <b>keep your gear</b> (weapons, tools, armor, legends) – food, apples, blocks, cobwebs, pearls, potions and experience bottles drop.</p>'
             '<p>The winner gets a <a href="#mythic">mythic weapon</a> for {days} days; everyone else tokens, materials and a <a href="quests.html#totem">Totem of the Forge</a>.</p>'),
     'mythic-title': ('✦ Mytické zbraně', '✦ Mythic weapons'),
     'mythic': ('Mnohem silnější než legendy – ale po {days} dnech <b>vyprchají</b>, ať jsou kdekoli. Nemají hvězdy, nedají se ukovat a může jich být víc.',
