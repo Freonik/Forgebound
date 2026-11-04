@@ -32,8 +32,8 @@ public final class TeamManager {
 
     /** Are these two different players teammates? */
     public boolean allies(Player a, Player b) {
-        if (!enabled() || a == null || b == null || a.equals(b)) {
-            return false;
+        if (!enabled() || a == null || b == null || a.equals(b) || plugin.teamsCorrupted()) {
+            return false;                                        // corrupted teams: nobody is anybody's ally
         }
         // Forgebound Teams (or another team plugin) tells who is on the same side - teammates and allies
         for (org.bukkit.plugin.RegisteredServiceProvider<java.util.function.BiPredicate> reg

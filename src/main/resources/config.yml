@@ -2139,6 +2139,9 @@ big-events:
   announce-minutes: [1440, 60, 10, 1]
   min-players: 2
   mythic-days: 7
+  # while a big event runs, teams and alliances are corrupted: teammates and allies can hurt and kill each other
+  # (Forgebound Teams turns its friendly-fire protection off; their kills count for the event)
+  corrupt-teams: true
   border:
     center: [0, 0]
     start-size: 2000

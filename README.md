@@ -563,6 +563,9 @@ is told a day, an hour, 10 minutes and a minute before. The last 10 minutes coun
 | ⚔ **The Hunt** | for 30 minutes everyone shows on the locator bar | the most player kills |
 | ☠ **The Forge Colossus** | a giant world boss rises: it slams, throws fire, drags in whoever keeps their distance and calls skeletons. Only players can hurt it | the most damage |
 
+While a big event runs, **the teams are corrupted**: teammates and allies can hurt and kill each other, every player
+for themselves (Forgebound Teams turns its protection off until the event ends).
+
 The winner gets a **mythic weapon**, everyone who took part gets Bounty Tokens (the top three of the Hunt and the
 Colossus more, plus legendary materials). Prizes for players who are offline wait until they join.
 

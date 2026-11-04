@@ -162,6 +162,10 @@ public final class Forgebound extends JavaPlugin implements Listener {
         getServer().getServicesManager().register(java.util.function.IntFunction.class, tokens, this,
                 org.bukkit.plugin.ServicePriority.Normal);
         bounty.start();
+        // ... and this: while a big event runs, the teams are "corrupted" (teammates and allies can kill each other)
+        java.util.function.BooleanSupplier corrupt = this::teamsCorrupted;
+        getServer().getServicesManager().register(java.util.function.BooleanSupplier.class, corrupt, this,
+                org.bukkit.plugin.ServicePriority.Normal);
         shop = new ShopManager(this);
         getServer().getPluginManager().registerEvents(shop, this);
         warden = new WardenManager(this);
@@ -371,6 +375,11 @@ public final class Forgebound extends JavaPlugin implements Listener {
 
     public PvpManager pvp() {
         return pvp;
+    }
+
+    /** During a big event (if big-events.corrupt-teams) teams and alliances don't protect anyone. */
+    public boolean teamsCorrupted() {
+        return bigEvents != null && bigEvents.busy() && getConfig().getBoolean("big-events.corrupt-teams", true);
     }
 
     public MythicManager mythics() {
